@@ -1,0 +1,10 @@
+name: 'Theme region test'
+type: module
+description: 'Provides hook implementations for testing regions.'
+package: Testing
+# version: VERSION
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511904

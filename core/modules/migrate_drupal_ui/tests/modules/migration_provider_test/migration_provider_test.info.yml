@@ -1,0 +1,10 @@
+name: 'Migration provider missing'
+type: module
+description: 'Add a migration missing a source and destination migration provider and a source plugin missing a migration provider.'
+package: Testing
+# version: VERSION
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511904

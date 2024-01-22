@@ -1,0 +1,10 @@
+name: 'Lazy route provider install test'
+description: 'Helps test a bug triggered by the url_generator maintaining a stale route provider.'
+type: module
+package: Testing
+# version: VERSION
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511904

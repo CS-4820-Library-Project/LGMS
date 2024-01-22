@@ -1,0 +1,12 @@
+name: 'Filter test module'
+type: module
+description: 'Tests filter hooks and functions.'
+package: Testing
+# version: VERSION
+dependencies:
+  - drupal:filter
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511905

@@ -1,0 +1,11 @@
+name: 'Help Page Test'
+type: module
+description: 'Module to test the help page.'
+package: Testing
+# version: VERSION
+hidden: true
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511905

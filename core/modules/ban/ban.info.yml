@@ -1,0 +1,11 @@
+name: Ban
+type: module
+description: 'Allows banning visits from specific IP addresses.'
+package: Core
+# version: VERSION
+configure: ban.admin_page
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511905
