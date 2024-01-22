@@ -12,7 +12,7 @@ class FirstController extends ControllerBase {
 
 		return [
 			'#type' => 'markup',
-			'#markup' => t('Hello LGMS Module. This is a First test of installation.'),
+			'#markup' => t('Hello LGMS Module. This is a Git test.'),
 		];
 	}
 }
