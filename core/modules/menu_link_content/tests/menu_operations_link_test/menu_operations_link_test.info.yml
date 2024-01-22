@@ -1,0 +1,12 @@
+name: 'Menu Operations Link Test'
+type: module
+hidden: true
+description: "Provides testing hooks to alter menu link content entity's operations links."
+dependencies:
+  - drupal:menu_link_content
+  - drupal:menu_ui
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511904

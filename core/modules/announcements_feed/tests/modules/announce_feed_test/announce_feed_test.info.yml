@@ -1,0 +1,9 @@
+name: 'Announce feed test'
+type: module
+description: 'Support module for announce feed testing.'
+package: Testing
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511905

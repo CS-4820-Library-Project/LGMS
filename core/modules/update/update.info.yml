@@ -1,0 +1,11 @@
+name: 'Update Manager'
+type: module
+description: 'Checks for updates and allows users to manage them through a user interface.'
+# version: VERSION
+package: Core
+configure: update.settings
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511904

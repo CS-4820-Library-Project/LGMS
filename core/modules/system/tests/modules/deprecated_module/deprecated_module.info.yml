@@ -1,0 +1,12 @@
+name: Deprecated module
+type: module
+description: 'Deprecated module'
+package: Testing
+# version: VERSION
+lifecycle: deprecated
+lifecycle_link: 'http://example.com/deprecated'
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511904

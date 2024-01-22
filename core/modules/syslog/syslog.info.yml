@@ -1,0 +1,11 @@
+name: Syslog
+type: module
+description: "Logs events to the web server's system log."
+package: Core
+# version: VERSION
+configure: system.logging_settings
+
+# Information added by Drupal.org packaging script on 2024-01-17
+version: '10.2.2'
+project: 'drupal'
+datestamp: 1705511904
