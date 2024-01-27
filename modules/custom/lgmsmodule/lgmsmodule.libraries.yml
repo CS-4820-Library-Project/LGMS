@@ -2,9 +2,6 @@ lgmsmodule:
   version: VERSION
   js:
     js/lgmsmodule.js: {}
-  css:
-    theme:
-      css/lgmsmodule.css: {}
   dependencies:
     - core/jquery
     - core/drupal
