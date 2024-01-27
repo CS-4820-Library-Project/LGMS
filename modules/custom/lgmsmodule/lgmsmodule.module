@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Contains lgmsmodule.module.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function lgmsmodule_help($route_name, \Drupal\Core\Routing\RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.lgmsmodule':
+      return '<p>' . \Drupal\Component\Utility\Html::escape('Help documentation for LGMS Module.') . '</p>';
+  }
+}

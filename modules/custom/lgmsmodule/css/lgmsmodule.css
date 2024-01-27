@@ -1,0 +1,18 @@
+/* lgmsmodule.css */
+
+/* Add your custom styles here */
+.lgms-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.lgms-table th, .lgms-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.lgms-table th {
+  background-color: #f2f2f2;
+}
