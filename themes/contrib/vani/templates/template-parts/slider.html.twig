@@ -1,0 +1,34 @@
+<section class="slider">
+  <div class="container slider-container">
+    <div class="slider-text">
+      <ul class="js-rotating">
+        {% if slider_code != '' %}
+          {{ slider_code | striptags('<ol>,<ul>,<li>,<p>,<a>,<img>,<video>,<h1>,<h2>,<h3>,<h4>,<h5>,<h6>,<em>,<strong>,<br>,<i>,<button>,<mark>,<hr>') | raw }}
+        {% else %}
+        <li>
+  				<h1>Vani is <em>Multipurpose</em> Drupal theme</h1>
+  				<p>Vani Theme is packed full of all the amazing features and options for you to create</p>
+  				<a class="button-link" href="#">Get Started</a>
+  			</li>
+  			<li>
+  				<h1>Welcome To <em>Drupar</em> Design Studio</h1>
+  				<p>We present you material design. We put our hearts and soul into making every project.</p>
+  				<a class="button-link" href="#">Get Started</a>
+  			</li>
+  			<li>
+  				<h1>We Create <em>Awesome</em> Drupal Themes!</h1>
+  				<p>Our themes are of high quality, flexible and beautifully crafted that stand out of crowd.</p>
+  				<a class="button-link" href="#">Get Started</a>
+  			</li>
+        {% endif %}
+      </ul> <!--/.home-slider -->
+    </div><!-- /slider-text -->
+    <div class="slider-image">
+      {% if slider_image_path != '' %}
+        <img src="{{ slider_image_path }}" alt="slider image" />
+      {% else %}
+        <img src="{{ directory }}/images/slider.svg" alt="slider image" />
+      {% endif %}
+    </div><!-- /slider-image -->
+  </div> <!--/.container -->
+</section>

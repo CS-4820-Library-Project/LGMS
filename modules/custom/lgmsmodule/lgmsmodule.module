@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function lgmsmodule_theme($existing, $type, $theme, $path) {
+  return [
+    'lgmsmodule_content' => [
+      'variables' => ['table' => NULL],
+      'template' => 'lgmsmodule-content',
+    ],
+  ];
+}

@@ -1,0 +1,15 @@
++===============================+
+Version 10.0.0
+28 Aug, 2022
++===============================+
+# Initial version of 10.x.x series
+# The 10.x.x series is Drupal 10 compatible.
+# The 10.x.x uses stable9 as the base theme instead of stable as used in 8.x.x and 9.x.x series.
+
+
++===============================+
+Version 10.0.1
+xx Sep, 2023
++===============================+
+# The 10.x.x series works on Drupal 9.x.x and 10.x.x
+

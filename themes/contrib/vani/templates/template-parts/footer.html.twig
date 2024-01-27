@@ -1,0 +1,80 @@
+<!-- Start: Footer -->
+{% if page.footer_top %}
+  <section id="footer-top">
+    <div class="footer-top footer-block-region container">
+      {{ page.footer_top }}
+    </div>
+  </section>
+{% endif %}<!-- /footer-top -->
+<footer class="footer">
+  {% if page.footer_first or page.footer_second or page.footer_third or page.footer_fourth %}
+    <section id="footer-blocks">
+      <div class="container footer-container">
+        <div class="footer-block footer-block-region block-section">
+          {% if page.footer_first %}
+            {{ page.footer_first }}
+          {% endif %}
+        </div> <!--/footer-first -->
+
+        <div class="footer-block footer-block-region block-section">
+          {% if page.footer_second %}
+            {{ page.footer_second }}
+          {% endif %}
+        </div> <!--/footer-second -->
+
+        <div class="footer-block footer-block-region block-section">
+          {% if page.footer_third %}
+            {{ page.footer_third }}
+          {% endif %}
+        </div> <!--/footer-three -->
+
+        <div class="footer-block footer-block-region block-section">
+          {% if page.footer_fourth %}
+            {{ page.footer_fourth }}
+          {% endif %}
+        </div> <!--/footer-fourth -->
+      </div> <!--/container -->
+    </section> <!--/footer-blocks -->
+  {% endif %} {# end if for footer one, two, three, four blocks #}
+
+  {% if page.footer_bottom %}
+    <section id="footer-bottom">
+      <div class="footer-bottom container block-section">
+        {{ page.footer_bottom }}
+      </div> <!-- /.container -->
+    </section>
+  {% endif %}<!-- /footer-bottom -->
+
+ {% if copyright_text or all_icons_show %}
+  <section id="footer-bottom-last">
+    <div class="container">
+    <div class="footer-bottom-last">
+      {% if copyright_text %}
+          <div class="copyright">
+            &copy; {{ "now"|date("Y") }} {{ site_name }}, All rights reserved.
+          </div>
+      {% endif %}
+      {% if all_icons_show %}
+        <div class="footer-social-icons">
+          {% include '@vani/template-parts/social-icons.html.twig' %}
+        </div>
+      {% endif %}
+      </div> <!--/.social icons -->
+    </div> <!-- /.container -->
+    </div> <!-- /.container -->
+  </section> <!-- /footer-bottom-last -->
+  {% endif %} <!-- end condition if copyright or social icons -->
+</footer>
+{% if scrolltotop_on %}
+<div class="scrolltop"><div class="scrolltop-icon">&#x2191;</div></div>
+{% endif %}
+<!-- End: Footer -->
+{% if font_icon_fontawesome %}
+{{ attach_library('vani/fontawesome') }}
+{% endif %}
+{% if font_icon_material %}
+{{ attach_library('vani/material') }}
+{% endif %}
+{% if bootstrapicons %}
+  {{ attach_library('vani/bootstrap-icons') }}
+{% endif %}

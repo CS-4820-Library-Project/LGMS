@@ -1,0 +1,23 @@
+/* Sidebar
+--------------------------------*/
+.sidebar .block {
+  padding: 1rem;
+  background: var(--content-bg);
+  margin-bottom: 2rem;
+  border-radius: 6px;
+}
+.sidebar .block-title {
+  background: url(../images/circle.svg) no-repeat top right;
+  background-size: contain;
+  line-height: 1;
+  padding-bottom: 0.3rem;
+}
+.sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sidebar li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--content-border-color);
+}

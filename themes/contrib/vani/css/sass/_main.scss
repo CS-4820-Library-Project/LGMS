@@ -1,0 +1,185 @@
+/* Main -> Node */
+.node,
+.node-promoted,
+.node-sticky,
+.node-view-mode-full,
+.node-unpublished {
+  position: relative;
+}
+
+/* Main -> node -> teaser view */
+.node-view-mode-teaser {
+  position: relative;
+  background: var(--content-bg);
+  padding: 1rem 1rem 4rem 1rem;
+  margin-bottom: 4rem;
+  border-radius: 8px;
+}
+.node-view-mode-teaser.node-sticky {
+  border: 2px solid var(--border-color);
+}
+
+/* Main -> node -> Title */
+.node-title a {
+  position: relative;
+  transition: color 0.4s;
+}
+.node-title a::after {
+  position: absolute;
+  content: '';
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--theme-color);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s;
+}
+.node-title a:hover::after {
+  transform: scaleX(1);
+}
+
+/* Main -> node -> submitted details */
+.node-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--content-bg);
+  border: 1px solid var(--content-border-color);
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  width: 100%;
+  margin: 0 0 1rem 0;
+  padding: 10px 1rem;
+}
+.author-picture img {
+  width: auto;
+  max-height: 25px;
+  margin: 0;
+}
+.node-submitted-details {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.node-submitted-details i {
+  color: var(--theme-color);
+}
+
+/* Main -> node -> taxonomy and links */
+.node-taxonomy-container,
+.node-links-container {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-color);
+}
+.term-title {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.taxonomy-terms {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0 0.2rem 0;
+  padding: 0;
+}
+.taxonomy-term a {
+  padding: 6px 14px;
+  border: 2px solid var(--border-color);
+  border-radius: 2rem;
+  -webkit-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+.taxonomy-term a:hover {
+  background: var(--theme-color);
+  color: #ffffff;
+}
+.taxonomy-term a::before {
+  content: '#';
+  margin-right: 5px;
+}
+.node-links-container .links,
+.node-links-container .inline {
+  list-style: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+}
+.inline li {
+  padding: 0;
+}
+/* read more link */
+.node-readmore a {
+  position: relative;
+  border: 2px solid var(--theme-color);
+  border-radius: 2rem;
+  padding: 0.4rem 0.8rem;
+  -webkit-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+.node-readmore a:hover {
+  color: var(--theme-color);
+  padding: 0.4rem 3rem 0.4rem 0.8rem;
+}
+.node-readmore a::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  height: 2px;
+  width: 0;
+  background: var(--theme-color);
+  -webkit-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+.node-readmore a:hover::after {
+  width: 2rem;
+}
+.comment-comments a::before,
+.comment-add a::before {
+  font-family: 'vani';
+  color: var(--theme-color-two);
+  padding-right: 6px;
+}
+.comment-comments a::before{
+  content: "\e911";
+}
+.comment-add a::before {
+  content: "\e910";
+}
+/* Main -> node -> pager */
+.pager__items {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 1rem 0;
+}
+.pager__item {
+  display: grid;
+  place-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.pager__item a {
+  padding: 10px 14px;
+  background: var(--content-bg);
+  border-radius: 4px;
+}
+.pager__item a:hover,
+.pager__item.is-active a {
+  background: var(--theme-color);
+  color: #ffffff;
+}

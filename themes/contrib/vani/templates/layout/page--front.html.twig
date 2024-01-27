@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ *Theme implementation to display front page.
+ *
+ * The doctype, html, head and body tags are not in this template. Instead they
+ * can be found in the html.html.twig template.
+ *
+ */
+#}
+{% include '@vani/template-parts/header.html.twig' %}
+<div id="main-wrapper" class="main-wrapper">
+  {% include '@vani/template-parts/content_home.html.twig' %}
+  <div class="container">
+    {% if front_sidebar %}
+      <div class="main-container">
+    {% endif %}
+    <main id="main" class="page-content home-content">
+      <a id="main-content" tabindex="-1"></a>{# link is in html.html.twig #}
+      {% include '@vani/template-parts/content_top.html.twig' %}
+      {{ page.content }}
+      {% include '@vani/template-parts/content_bottom.html.twig' %}
+    </main>
+    {% if front_sidebar %}
+      {% include '@vani/template-parts/sidebar_left.html.twig' %}
+      {% include '@vani/template-parts/sidebar_right.html.twig' %}
+      </div> {# /.main-container #}
+    {% endif %}
+  </div> {# /.container #}
+</div>{# /main-wrapper #}
+{% include '@vani/template-parts/footer.html.twig' %}
+{% if slider_show %}
+  {{ attach_library('vani/slider') }}
+{% endif %}

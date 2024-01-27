@@ -1,13 +1,13 @@
 <?php return array(
     'root' => array(
         'name' => 'drupal/legacy-project',
-        'pretty_version' => '10.2.2',
-        'version' => '10.2.2.0',
-        'reference' => '12fdd4776494136d144d41b1c614ba8a970e738c',
+        'pretty_version' => 'dev-design/Landingpage',
+        'version' => 'dev-design/Landingpage',
+        'reference' => '5361492e70a0c443d1797a6f598d0311f79f9d14',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'dev' => false,
+        'dev' => true,
     ),
     'versions' => array(
         'asm89/stack-cors' => array(
@@ -61,6 +61,15 @@
             'reference' => '39ab8fcf5a51ce4b85ca97c7a7d033eb12831124',
             'type' => 'library',
             'install_path' => __DIR__ . '/../doctrine/lexer',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'drupal/bootstrap_barrio' => array(
+            'pretty_version' => '5.5.16',
+            'version' => '5.5.16.0',
+            'reference' => '5.5.16',
+            'type' => 'drupal-theme',
+            'install_path' => __DIR__ . '/../../themes/contrib/bootstrap_barrio',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -254,11 +263,20 @@
             ),
         ),
         'drupal/legacy-project' => array(
-            'pretty_version' => '10.2.2',
-            'version' => '10.2.2.0',
-            'reference' => '12fdd4776494136d144d41b1c614ba8a970e738c',
+            'pretty_version' => 'dev-design/Landingpage',
+            'version' => 'dev-design/Landingpage',
+            'reference' => '5361492e70a0c443d1797a6f598d0311f79f9d14',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'drupal/vani' => array(
+            'pretty_version' => '10.0.1',
+            'version' => '10.0.1.0',
+            'reference' => '10.0.1',
+            'type' => 'drupal-theme',
+            'install_path' => __DIR__ . '/../../themes/contrib/vani',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -775,6 +793,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'twbs/bootstrap' => array(
+            'pretty_version' => 'v5.3.2',
+            'version' => '5.3.2.0',
+            'reference' => '344e912d04b5b6a04482113eff20ab416ff01048',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../twbs/bootstrap',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'twig/twig' => array(
             'pretty_version' => 'v3.8.0',
             'version' => '3.8.0.0',
@@ -783,6 +810,12 @@
             'install_path' => __DIR__ . '/../twig/twig',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'twitter/bootstrap' => array(
+            'dev_requirement' => false,
+            'replaced' => array(
+                0 => 'v5.3.2',
+            ),
         ),
     ),
 );

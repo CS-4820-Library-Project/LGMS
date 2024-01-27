@@ -1,0 +1,77 @@
+.block,
+.block-title,
+.block-content {
+  position: relative;
+}
+.block-section .block-title {
+  margin-bottom: 0.7rem;
+}
+.block-section .block-title::before,
+.block-section .block-title::after {
+  position: absolute;
+  content: '';
+  left: 0;
+  height: 1px;
+  background: var(--theme-color);
+}
+.block-section .block-title::before {
+  bottom: 0;
+  width: 30px;
+}
+.block-section .block-title::after {
+  bottom: -6px;
+  width: 45px;
+}
+
+/* Highlighted Block Region */
+.highlighted {
+  position: relative;
+  background: var(--content-bg);
+  width: 100%;
+  margin: 2rem 0 1rem 0;
+  padding: 0;
+}
+.region-highlighted {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.highlighted .block {
+  position: relative;
+  margin: 0;
+  padding: 1rem 0;
+}
+.highlighted p:last-child {
+  margin: 0;
+}
+
+/*Content top and contet bottom Block Region */
+.content-top,
+.content-bottom {
+  width: 100%;
+}
+.region-content-top,
+.region-content-bottom {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.content-top .block,
+.content-bottom .block {
+  position: relative;
+  margin: 0;
+}
+.content-top .block {
+  padding-bottom: 2rem;
+}
+.content-bottom .block {
+  padding-top: 2rem;
+}

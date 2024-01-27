@@ -1,0 +1,37 @@
+Google material font icons
++------------------------------+
+https://material.io/tools/icons
+
+
+FontAwesome
++------------------------------+
+https://fontawesome.com/
+
+
+Google web font
++------------------------------+
+https://fonts.google.com/
+
+
+Open Sans Font by: Steve Matteson
+https://twitter.com/@SteveMatteson1
+https://fonts.google.com/specimen/Open+Sans
+
+
+Roboto Font by: Christian Robertson
+https://fonts.google.com/specimen/Roboto
+
+
+Demo images:
++------------------------------+
+https://undraw.co/illustrations
+
+
+Icons made using Figma
++------------------------------+
+https://www.figma.com/
+
+
+Morphist Slider
++------------------------------+
+https://morphist.fyianlai.com/

@@ -1,9 +1,8 @@
-lgmsmodule.simplecontent:
- path: '/mylgmspath'
- defaults:
-   _controller: 'Drupal\lgmsmodule\Controller\FirstController::simpleContent'
-   _title: 'LGMS Page'
- requirements:
-   _permission: 'access content'
-
+lgmsmodule.content:
+  path: '/lgmsmodule'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::content'
+    _title: 'LGMS Module Landing Page'
+  requirements:
+    _permission: 'access content'
 

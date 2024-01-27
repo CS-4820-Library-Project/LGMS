@@ -1,0 +1,36 @@
+#maintenance-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--body-bg);
+  color: var(--text-color);
+}
+.maintenance-header {
+  position: relative;
+  width: 100%;
+  padding: 1em 0;
+}
+.site-name h4 {
+  color: var(--theme-color);
+  line-height: 1;
+  font-weight: 700;
+}
+#maintenance {
+  position: relative;
+  margin: auto;
+  padding: 1em 0;
+}
+.maintenance {
+  text-align: center;
+}
+.maintenance-title {
+  color: var(--bold-color);
+}
+.maintenance-icon {
+  padding: 2em 0;
+}
+.maintenance-icon img {
+  max-height: 50vh;
+}

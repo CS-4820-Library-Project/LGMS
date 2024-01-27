@@ -1,0 +1,52 @@
+/* Drupal Core
+----------------------------------- */
+/* Drupal core Field */
+[dir] .field:not(:last-child){
+  margin-bottom:36px;
+}
+
+.field__label{
+  font-weight:bold;
+}
+
+[dir=ltr] .field--label-inline .field__label, [dir=ltr] .field--label-inline .field__items{
+  float:left;
+}
+
+[dir=rtl] .field--label-inline .field__label, [dir=rtl] .field--label-inline .field__items{
+  float:right;
+}
+
+[dir=ltr] .field--label-inline .field__label, [dir=ltr] .field--label-inline > .field__item, [dir=ltr] .field--label-inline .field__items{
+  padding-right:0.5em;
+}
+
+[dir=rtl] .field--label-inline .field__label, [dir=rtl] .field--label-inline > .field__item, [dir=rtl] .field--label-inline .field__items{
+  padding-left:0.5em;
+}
+
+.field--label-inline .field__label::after{
+  content:":";
+}
+/* Calendar module
+-------------------------------------- */
+.calendar-calendar .full {
+  display: table;
+}
+.calendar-calendar .empty {
+  display: table-cell;
+}
+/* Admin Toolbar */
+button.toolbar-item,
+button.toolbar-icon {
+  background: none;
+}
+
+/* Filter Module */
+.filter-wrapper {
+  border: 1px solid var(--border-color);
+}
+/* Feed icon */
+.feed-icon {
+  display: block;
+}

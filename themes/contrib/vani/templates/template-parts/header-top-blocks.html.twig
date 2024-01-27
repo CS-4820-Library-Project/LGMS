@@ -1,0 +1,19 @@
+{% if page.header_left or page.header_right %}
+<div class="header-top-blocks">
+  <div class="container">
+    <div class="header-block-container">
+      {% if page.header_left %}
+        <div class="header-block header-block-left">
+          {{ page.header_left }}
+        </div> <!--/.Header Left -->
+      {% endif %}
+
+      {% if page.header_right %}
+        <div class="header-block header-block-right">
+          {{ page.header_right }}
+        </div> <!--/.Header right -->
+      {% endif %}
+    </div><!--/.header-block-container -->
+  </div><!--/.container -->
+</div><!--/.header-top-blocks -->
+{% endif %}

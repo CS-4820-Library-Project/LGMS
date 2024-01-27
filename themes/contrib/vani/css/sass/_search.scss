@@ -1,0 +1,27 @@
+/* Search result page
+--------------------------------------*/
+.page-content input[type="search"] {
+  width: 80%;
+}
+ol.search-results {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+}
+.search-results li {
+  margin: 0 0 1rem 0;
+  padding: 1rem;
+  background: var(--content-bg);
+}
+.search-advanced summary {
+  margin: 10px 0;
+  cursor: pointer;
+}
+.search-advanced .form-details-wrapper {
+  padding: 0.5rem 1.4rem;
+  border: 1px solid var(--border-color);
+}
+.search-advanced .form-wrapper {
+  padding: 0.5rem 1.4rem;
+  border: 1px solid var(--border-color);
+}

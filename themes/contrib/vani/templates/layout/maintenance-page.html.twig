@@ -1,0 +1,44 @@
+{#
+/**
+ * @file
+ * Theme implementation to display a single Drupal page while offline.
+ *
+ * All available variables are mirrored in page.html.twig.
+ *
+ * @see template_preprocess_maintenance_page()
+ */
+ #}
+ <div id="maintenance-page">
+<header class="maintenance-header" role="banner">
+ <div class="container">
+    <div class="site-branding">
+       {% if site_name or site_slogan %}
+          <div class="site-name-slogan">
+             {% if site_name %}
+                <div class="site-name">
+                   <a href="{{ front_page }}" title="{{ 'Home'|t }}" rel="home"><h4>{{ site_name }}</h4></a>
+                </div>
+             {% endif %}
+             {% if site_slogan %}
+                <div class="site-slogan">{{ site_slogan }}</div>
+             {% endif %}
+          </div> <!--/.site-name-slogan -->
+       {% endif %}
+    </div> <!-- /.site-branding -->
+ </div> <!--/.container -->
+</header>
+<main id="maintenance">
+  <div class="container maintenance">
+    <a id="main-content"></a>
+    {% if title %}
+    <h1 class="maintenance-title">{{ title }}</h1>
+    {% endif %}
+    <div class="maintenance-icon"><img src="{{ base_path ~ directory }}/images/maintenance.svg" alt="maintenance image" /></div>
+    <div class="maintenance-message">
+      {{ page.content }}
+    </div>
+</div> <!-- /.container -->
+</main> <!-- /#maintenance -->
+</div><!-- /#maintenance-page -->
+<!-- Custom styling for the maintenance page. -->
+{{ attach_library('vani/maintenance') }}

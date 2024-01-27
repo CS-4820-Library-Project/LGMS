@@ -1,0 +1,46 @@
+{% include '@vani/template-parts/header-top-blocks.html.twig' %}
+<header class="header">
+  <div class="header-cicle header-cicle1"></div>
+  <div class="header-cicle header-cicle3"></div>
+  <div class="header-cicle header-cicle4"></div>
+  <div class="header-cicle header-cicle6"></div>
+  <div class="header-cicle header-cicle7"></div>
+  <div class="header-cicle header-cicle8"></div>
+  <div class="header-cicle header-cicle10"></div>
+  {% if is_front and slider_show %}
+  <div class="header-cicle header-cicle2"></div>
+  <div class="header-cicle header-cicle5"></div>
+  <div class="header-cicle header-cicle9"></div>
+  {% endif %}
+  <div class="container">
+  <div class="header-main">
+    {% if page.site_branding %}
+      <div class="site-brand">
+        {{ page.site_branding }}
+      </div> <!--/.site-branding -->
+    {% endif %}
+    {% if page.primary_menu or page.search_box %}
+      <div class="header-main-right">
+        {% if page.primary_menu %}
+          <div class="mobile-menu"><i class="icon-menu"></i></div> {# mobile-menu #}
+          <div class="primary-menu-wrapper">
+            <div class="menu-wrap">
+              <div class="close-mobile-menu">x</div>
+              {{ page.primary_menu }}
+            </div> <!-- /.menu-wrap -->
+          </div> <!-- /.primary-menu-wrapper -->
+        {% endif %}
+        {% if page.search_box %}
+          {% include '@vani/template-parts/search.html.twig' %}
+        {% endif %}
+      </div> <!-- /.header-right -->
+    {% endif %}
+  </div><!-- /header-main -->
+  </div><!-- /container -->
+  {% if is_front and slider_show %}
+    {% include '@vani/template-parts/slider.html.twig' %}
+  {% elseif not is_front %}
+    {% include '@vani/template-parts/page_header.html.twig' %}
+  {% endif %}
+</header>
+{% include '@vani/template-parts/highlighted.html.twig' %}
