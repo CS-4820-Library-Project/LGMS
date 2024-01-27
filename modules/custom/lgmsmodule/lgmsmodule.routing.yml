@@ -1,5 +1,5 @@
 lgmsmodule.content:
-  path: '/lgmsmodule'
+  path: '/mylgmspath'
   defaults:
     _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::content'
     _title: 'LGMS Module Landing Page'

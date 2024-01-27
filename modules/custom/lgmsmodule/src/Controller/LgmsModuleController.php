@@ -106,14 +106,6 @@ class LgmsModuleController extends ControllerBase
       $rows[] = $data; // Simply pass each sub-array of mock data as a row
     }
 
-    $build['table'] = [
-      '#type' => 'table',
-      '#header' => $header,
-      '#rows' => $rows,
-      '#empty' => $this->t('No entries available.'),
-      '#prefix' => '<div id="table-wrapper">',
-      '#suffix' => '</div>',
-    ];
 
     return $build;
   }
