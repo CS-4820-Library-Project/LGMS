@@ -12,6 +12,14 @@ class SortingForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
+
+    $form['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+
+    $form['search'] = [
+      '#type' => 'search',
+      '#attributes' => ['class' => ['lgms-search'], 'placeholder' => $this->t('Search by guide name...'),],
+    ];
+
     $form['sort_by'] = [
       '#type' => 'select',
       '#title' => $this->t('Sort by'),
@@ -83,6 +91,7 @@ class SortingForm extends FormBase {
       '#header' => $header,
       '#rows' => $rows,
       '#empty' => $this->t('No entries available.'),
+      '#attributes' => ['class' => ['lgms-table']],
     ];
   }
 
