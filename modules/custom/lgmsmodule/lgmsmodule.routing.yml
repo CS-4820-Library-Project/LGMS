@@ -6,3 +6,26 @@ lgmsmodule.content:
   requirements:
     _permission: 'access content'
 
+lgmsmodule.by_subject:
+  path: '/mylgmspath/subject'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::bySubject'
+    _title: 'Guides by Subject'
+  requirements:
+    _permission: 'access content'
+
+lgmsmodule.by_type:
+  path: '/mylgmspath/type'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::byType'
+    _title: 'Guides by Type'
+  requirements:
+    _permission: 'access content'
+
+lgmsmodule.by_owner:
+  path: '/mylgmspath/owner'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::byOwner'
+    _title: 'Guides by Owner'
+  requirements:
+    _permission: 'access content'

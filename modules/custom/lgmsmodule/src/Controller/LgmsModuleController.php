@@ -10,41 +10,112 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class LgmsModuleController extends ControllerBase
 {
-  /**
-   * Returns the page content.
-   */
-  public function content($sort_by = NULL)
+
+
+  public function byOwner()
   {
-
-    // SQL
-
-//    // Fetch titles of all "Article" nodes from the database.
-//    $query = $this->database->select('node_field_data', 'n')
-//      ->condition('n.type', 'article')
-//      ->fields('n', ['title', 'uid', 'nid', 'changed']);
-//    $result = $query->execute()->fetchAllAssoc('nid');
-//    $current_url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];      // Build table rows.
-//    $rows = [];
-//    foreach ($result as $nid => $record) {
-//      $NameQuery = $this->database->select('users_field_data', 'u')
-//        ->fields('u', ['name'])
-//        ->condition('u.uid', $record->uid);
-//      $NameQueryResult = $NameQuery->execute()->fetchField();
-//      $rows[] = [$record->title, $NameQueryResult, date('Y-m-d', $record->changed)];
-//    }
-//    // Build the table.
-//    $build['table'] = [
-//      '#theme' => 'table',
-//      '#header' => ['Title', 'owner', 'last modified'],
-//      '#rows' => $rows,
-//      ];
-
     $build = [];
+
+    // Your existing breadcrumb and setup code here
+    $build['breadcrumb'] = [
+      '#markup' => $this->generateBreadcrumbs(),
+    ];
+
+    $mock_data = $this->getMockData(); // This method should return your mock data array
+
+    // Extract unique owners
+    $owners = array_unique(array_column($mock_data, 0)); // Assuming the 1st element is the owner
+
+    // Sort owners alphabetically
+    sort($owners);
+
+    // Build a renderable list of owners
+    $build['owners'] = [
+      '#theme' => 'item_list',
+      '#items' => $owners,
+      '#title' => $this->t('Owners'),
+    ];
+
+    return $build;
+  }
+
+  public function byType()
+  {
+    $build = [];
+
+    $build['breadcrumb'] = [
+      '#markup' => $this->generateBreadcrumbs(),
+    ];
+
+    $mock_data = $this->getMockData();
+
+    // Process data to get unique types
+    $types = array_unique(array_column($mock_data, 4));
+
+    // Build a table for types
+    $build['types'] = [
+      '#type' => 'table',
+      '#header' => [$this->t('Type')],
+      '#rows' => array_map(function ($type) {
+        return [$type];
+      }, $types),
+      '#empty' => $this->t('No types available.'),
+    ];
+
+    return $build;
+  }
+
+  public function bySubject()
+  {
+    $build = [];
+
+    // Your existing breadcrumb and setup code here
+    $build['breadcrumb'] = [
+      '#markup' => $this->generateBreadcrumbs(),
+    ];
+
+    $mock_data = $this->getMockData(); // This method should return your mock data array
+
+    // Extract unique subjects
+    $subjects = array_unique(array_column($mock_data, 3)); // Assuming the 4th element is the subject
+
+    // Sort subjects alphabetically
+    sort($subjects);
+
+    // Build a renderable list of subjects
+    $build['subjects'] = [
+      '#theme' => 'item_list',
+      '#items' => $subjects,
+      '#title' => $this->t('Subjects'),
+    ];
+
+    return $build;
+  }
+
+  private function getMockData()
+  {
+    return [
+      // ... Your mock data array ...
+      ['Jayvion Simon', 'Getting Started narrowing a big core topic down', '2023-07-21', 'subject A', 'type A'],
+      ['Deja Brady', 'Nikolaus - Leuschke', '2023-04-26', 'subject b', 'type b'],
+      ['Harrison Stein', 'Gleichner, Mueller and Tromp', '2023-09-28', 'subject c', 'type c'],
+      ['Lucian Obrien', 'Hegmann, Kreiger and Bayer', '2023-04-10', 'subject d', 'type d'],
+      ['Reece Chung', 'Lueilwitz and Sons', '2023-05-12', 'subject e', 'type e'],
+      ['Jayvion Simon', 'Getting Started narrowing a big core topic down', '2023-07-21', 'subject f', 'type f'],
+      ['Deja Brady', 'Nikolaus - Leuschke', '2023-04-26', 'subject g', 'type g'],
+      ['Harrison Stein', 'Gleichner, Mueller and Tromp', '2023-09-28', 'subject h', 'type h'],
+      ['Lucian Obrien', 'Hegmann, Kreiger and Bayer', '2023-04-10', 'subject i', 'type i'],
+      ['Reece Chung', 'Lueilwitz and Sons', '2023-05-12', 'subject j', 'type j'],
+    ];
+  }
+
+  private function generateBreadcrumbs()
+  {
+    $breadcrumb = [];
 
     // Parse the current URL
     $current_path = parse_url('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $paths = explode('/', $current_path);
-    $breadcrumb = [];
 
     // Generate breadcrumb links
     $current_url = 'http://' . $_SERVER['HTTP_HOST'];
@@ -55,9 +126,19 @@ class LgmsModuleController extends ControllerBase
       }
     }
 
-    //breadCrumbs
+    return implode(' / ', $breadcrumb);
+  }
+
+  /**
+   * Returns the page content.
+   */
+  public function content($sort_by = NULL)
+  {
+
+    $build = [];
+
     $build['breadcrumb'] = [
-      '#markup' => implode(' / ', $breadcrumb),
+      '#markup' => $this->generateBreadcrumbs(),
     ];
 
     // Get the sorting parameter from the URL if it's not provided as a parameter.
@@ -76,21 +157,10 @@ class LgmsModuleController extends ControllerBase
 
     $base_avatar_path = 'public://avatar/';
 
-    $mock_data = [
-      ['Jayvion Simon', 'Getting Started narrowing a big core topic down', '2023-07-21'],
-      ['Deja Brady', 'Nikolaus - Leuschke', '2023-04-26'],
-      ['Harrison Stein', 'Gleichner, Mueller and Tromp', '2023-09-28'],
-      ['Lucian Obrien', 'Hegmann, Kreiger and Bayer', '2023-04-10'],
-      ['Reece Chung', 'Lueilwitz and Sons', '2023-05-12'],
-      ['Jayvion Simon', 'Getting Started narrowing a big core topic down', '2023-07-21'],
-      ['Deja Brady', 'Nikolaus - Leuschke', '2023-04-26'],
-      ['Harrison Stein', 'Gleichner, Mueller and Tromp', '2023-09-28'],
-      ['Lucian Obrien', 'Hegmann, Kreiger and Bayer', '2023-04-10'],
-      ['Reece Chung', 'Lueilwitz and Sons', '2023-05-12'],
-    ];
+    $mock_data = $this->getMockData();
 
     // Sort the data based on the selected sorting option.
-    usort($mock_data, function($a, $b) use ($sort_by) {
+    usort($mock_data, function ($a, $b) use ($sort_by) {
       switch ($sort_by) {
         case 'owner':
           return strcmp($a[0], $b[0]);
@@ -109,5 +179,4 @@ class LgmsModuleController extends ControllerBase
 
     return $build;
   }
-
 }

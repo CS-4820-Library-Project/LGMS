@@ -1,0 +1,25 @@
+
+    // SQL
+
+    //    // Fetch titles of all "Article" nodes from the database.
+    //    $query = $this->database->select('node_field_data', 'n')
+    //      ->condition('n.type', 'article')
+    //      ->fields('n', ['title', 'uid', 'nid', 'changed']);
+    //    $result = $query->execute()->fetchAllAssoc('nid');
+    //    $current_url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];      // Build table rows.
+    //    $rows = [];
+    //    foreach ($result as $nid => $record) {
+    //      $NameQuery = $this->database->select('users_field_data', 'u')
+    //        ->fields('u', ['name'])
+    //        ->condition('u.uid', $record->uid);
+    //      $NameQueryResult = $NameQuery->execute()->fetchField();
+    //      $rows[] = [$record->title, $NameQueryResult, date('Y-m-d', $record->changed)];
+    //    }
+    //    // Build the table.
+    //    $build['table'] = [
+    //      '#theme' => 'table',
+    //      '#header' => ['Title', 'owner', 'last modified'],
+    //      '#rows' => $rows,
+    //      ];
+
+

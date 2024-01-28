@@ -1,0 +1,19 @@
+lgmsmodule.all_guides:
+  title: 'All Guides'
+  route_name: lgmsmodule.content
+  base_route: lgmsmodule.content
+
+lgmsmodule.by_subject:
+  title: 'By Subject'
+  route_name: lgmsmodule.by_subject
+  base_route: lgmsmodule.content
+
+lgmsmodule.by_type:
+  title: 'By Type'
+  route_name: lgmsmodule.by_type
+  base_route: lgmsmodule.content
+
+lgmsmodule.by_owner:
+  title: 'By Owner'
+  route_name: lgmsmodule.by_owner
+  base_route: lgmsmodule.content
