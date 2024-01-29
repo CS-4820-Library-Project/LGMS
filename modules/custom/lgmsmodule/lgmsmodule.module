@@ -1,5 +1,8 @@
 <?php
 
+use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\taxonomy\Entity\Term;
+
 /**
  * Implements hook_theme().
  */
@@ -10,4 +13,86 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
       'template' => 'lgmsmodule-content',
     ],
   ];
+}
+
+
+/**
+ * @param String $vid the id of the vocab
+ * @param String $name the name of the vocab
+ * @return void
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ * creates a taxonomy
+ */
+function create_vocab(String $vid, String $name): void
+{
+  $vocabulary = Vocabulary::create([
+    'vid' => $vid,
+    'name' => $name,
+  ]);
+  $vocabulary->save();
+}
+
+/**
+ * @param array $terms the terms to add
+ * @param String $vid the id of the vocab
+ * @return void
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ * Adds terms to the taxonomy
+ */
+function add_terms(array $terms, String $vid): void
+{
+  foreach ($terms as $term_name) {
+    $new_term = Term::create([
+      'vid' => $vid,
+      'name' => $term_name,
+    ]);
+
+    $new_term->enforceIsNew();
+    $new_term->save();
+  }
+}
+
+/**
+ * Implements hook_install().
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function lgmsModule_install() {
+  // Create a new Guide Type taxonomy.
+  create_vocab('LGMS Guide Type', 'Guide Type');
+
+  // Add terms to the Guide Type taxonomy
+  $terms = array(
+    'General purpose Guide',
+    'Subject Guide',
+    'Topic Guide',
+    'Course Guide',
+  );
+  add_terms($terms, 'LGMS Guide Type');
+
+
+  // Create a new Guide Subject taxonomy.
+  create_vocab('LGMS Guide Subject', 'Guide Subject');
+
+  // Add terms to the Guide Subject taxonomy
+  $terms = array(
+    'Biology',
+    'Psychology ',
+    'Music',
+    'Modern Languages',
+  );
+  add_terms($terms, 'LGMS Guide Subject');
+
+
+  // Create a new Guide Group taxonomy.
+  create_vocab('LGMS Guide Group', 'Guide Group');
+
+  // Add terms to the Guide Group taxonomy
+  $terms = array(
+    'Group 1',
+    'Group 2',
+    'Group 3',
+    'Group 4',
+  );
+  add_terms($terms, 'LGMS Guide Group');
+
 }
