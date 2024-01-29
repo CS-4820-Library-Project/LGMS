@@ -15,10 +15,6 @@ class LgmsModuleController extends ControllerBase
   public function byOwner()
   {
     $build = [];
-    // Your existing breadcrumb and setup code here
-    $build['breadcrumb'] = [
-      '#markup' => $this->generateBreadcrumbs(),
-    ];
 
     $mock_data = $this->getMockData();
 
@@ -53,11 +49,6 @@ class LgmsModuleController extends ControllerBase
   {
     $build = [];
 
-    // Your existing breadcrumb and setup code here
-    $build['breadcrumb'] = [
-      '#markup' => $this->generateBreadcrumbs(),
-    ];
-
     $mock_data = $this->getMockData();
 
     // Group data by types
@@ -90,11 +81,6 @@ class LgmsModuleController extends ControllerBase
   public function bySubject()
   {
     $build = [];
-
-    // Your existing breadcrumb and setup code here
-    $build['breadcrumb'] = [
-      '#markup' => $this->generateBreadcrumbs(),
-    ];
 
     $mock_data = $this->getMockSubjectGuideData(); // This method should return your mock data array
 
@@ -247,25 +233,6 @@ class LgmsModuleController extends ControllerBase
   }
 
 
-  private function generateBreadcrumbs()
-  {
-    $breadcrumb = [];
-
-    // Parse the current URL
-    $current_path = parse_url('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $paths = explode('/', $current_path);
-
-    // Generate breadcrumb links
-    $current_url = 'http://' . $_SERVER['HTTP_HOST'];
-    foreach ($paths as $path) {
-      if (!empty($path)) {
-        $current_url .= '/' . $path;
-        $breadcrumb[] = '<a href="' . $current_url . '">' . ucfirst($path) . '</a>';
-      }
-    }
-
-    return implode(' / ', $breadcrumb);
-  }
 
   /**
    * Returns the page content.
@@ -274,10 +241,6 @@ class LgmsModuleController extends ControllerBase
   {
 
     $build = [];
-
-    $build['breadcrumb'] = [
-      '#markup' => $this->generateBreadcrumbs(),
-    ];
 
     // Get the sorting parameter from the URL if it's not provided as a parameter.
     if ($sort_by === NULL) {
