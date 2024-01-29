@@ -1,5 +1,5 @@
 lgmsmodule.content:
-  path: '/mylgmspath'
+  path: '/lgms'
   defaults:
     _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::content'
     _title: 'LGMS Module Landing Page'
@@ -7,7 +7,7 @@ lgmsmodule.content:
     _permission: 'access content'
 
 lgmsmodule.by_subject:
-  path: '/mylgmspath/subject'
+  path: '/lgms/subject'
   defaults:
     _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::bySubject'
     _title: 'Guides by Subject'
@@ -15,7 +15,7 @@ lgmsmodule.by_subject:
     _permission: 'access content'
 
 lgmsmodule.by_type:
-  path: '/mylgmspath/type'
+  path: '/lgms/type'
   defaults:
     _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::byType'
     _title: 'Guides by Type'
@@ -23,7 +23,7 @@ lgmsmodule.by_type:
     _permission: 'access content'
 
 lgmsmodule.by_owner:
-  path: '/mylgmspath/owner'
+  path: '/lgms/owner'
   defaults:
     _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::byOwner'
     _title: 'Guides by Owner'
