@@ -18,14 +18,24 @@ class SortingForm extends FormBase
 
     $form['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
 
-    $form['search'] = [
-      '#type' => 'search',
-      '#attributes' => ['class' => ['lgms-search'], 'placeholder' => $this->t('Search by guide name...'),],
+    // Wrap the search and sort elements in a flex container.
+    $form['search_sort_container'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['search-sort-container']],
     ];
 
-    $form['sort_by'] = [
+    // Add the search input inside the container.
+    $form['search_sort_container']['search'] = [
+      '#type' => 'search',
+      '#attributes' => [
+        'class' => ['lgms-search'],
+        'placeholder' => $this->t('Search by guide name...'),
+      ],
+    ];
+
+    // Add the sorting select inside the container.
+    $form['search_sort_container']['sort_by'] = [
       '#type' => 'select',
-      '#title' => $this->t('Sort by'),
       '#options' => [
         'owner' => $this->t('Owner'),
         'guide_name' => $this->t('Guide Name'),
@@ -39,11 +49,14 @@ class SortingForm extends FormBase
       ],
     ];
 
+    // Table container that will be updated via AJAX.
     $form['table'] = [
       '#type' => 'container',
       '#attributes' => ['id' => 'lgms-table-wrapper'],
     ];
 
+    // The buildTable method is used to generate the table.
+    // Pass the 'sort_by' value from the form state; if it doesn't exist, default to 'owner'.
     $form['table']['content'] = $this->buildTable($form_state->getValue('sort_by') ?: 'owner');
 
     return $form;
@@ -51,6 +64,7 @@ class SortingForm extends FormBase
 
   protected function buildTable($sort_by = 'owner')
   {
+    // Your existing buildTable method code
     $header = [
       ['data' => $this->t('Owner')],
       ['data' => $this->t('Guide Name')],
@@ -103,6 +117,7 @@ class SortingForm extends FormBase
 
   public function updateTableCallback(array &$form, FormStateInterface $form_state)
   {
+    // Your existing updateTableCallback method code
     // Refresh the table part of the form with sorted data.
     $form['table']['content'] = $this->buildTable($form_state->getValue('sort_by'));
     return $form['table'];
@@ -110,6 +125,6 @@ class SortingForm extends FormBase
 
   public function submitForm(array &$form, FormStateInterface $form_state)
   {
-    // No submission logic needed for the AJAX-driven form.
+    // Your existing submitForm method code
   }
 }
