@@ -23,3 +23,26 @@
     //      ];
 
 
+  private function generateBreadcrumbs()
+  {
+    $breadcrumb = [];
+
+    // Parse the current URL
+    $current_path = parse_url('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $paths = explode('/', $current_path);
+
+    // Generate breadcrumb links
+    $current_url = 'http://' . $_SERVER['HTTP_HOST'];
+    foreach ($paths as $path) {
+      if (!empty($path)) {
+        $current_url .= '/' . $path;
+        $breadcrumb[] = '<a href="' . $current_url . '">' . ucfirst($path) . '</a>';
+      }
+    }
+
+    return implode(' / ', $breadcrumb);
+  }
+
+    $build['breadcrumb'] = [
+      '#markup' => $this->generateBreadcrumbs(),
+    ];
