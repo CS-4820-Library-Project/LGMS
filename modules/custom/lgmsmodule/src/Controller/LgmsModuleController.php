@@ -74,22 +74,137 @@ class LgmsModuleController extends ControllerBase
       '#markup' => $this->generateBreadcrumbs(),
     ];
 
-    $mock_data = $this->getMockData(); // This method should return your mock data array
+    $mock_data = $this->getMockSubjectGuideData(); // This method should return your mock data array
 
     // Extract unique subjects
-    $subjects = array_unique(array_column($mock_data, 3)); // Assuming the 4th element is the subject
+    foreach ($mock_data as $data) {
+      $subject = $data['subject']; // Assuming subject is a key in your data array
+      $guides = $data['guides'];   // Assuming guides is an array of guide names
 
-    // Sort subjects alphabetically
-    sort($subjects);
 
-    // Build a renderable list of subjects
-    $build['subjects'] = [
-      '#theme' => 'item_list',
-      '#items' => $subjects,
-      '#title' => $this->t('Subjects'),
-    ];
+      // Build the accordion item
+      $accordion_items[] = array(
+        '#type' => 'details',
+        '#open' => FALSE,
+        '#title' => $subject,
+        '#attributes' => array('class' => array('accordion-item')),
+        '#children' => array(
+          '#theme' => 'item_list',
+          '#items' => $guides,
+        ),
+      );
+    }
+
+    $build = array(
+      'accordion' => $accordion_items,
+    );
 
     return $build;
+  }
+
+  function getMockSubjectGuideData() {
+    return array(
+      array(
+        'subject' => 'Mathematics',
+        'guides' => array(
+          'Algebra',
+          'Geometry',
+          'Trigonometry',
+          'Calculus',
+          'Statistics',
+        ),
+      ),
+      array(
+        'subject' => 'Science',
+        'guides' => array(
+          'Biology',
+          'Chemistry',
+          'Physics',
+          'Geology',
+          'Astronomy',
+        ),
+      ),
+      array(
+        'subject' => 'History',
+        'guides' => array(
+          'Ancient Civilizations',
+          'World Wars',
+          'Modern History',
+          'Renaissance',
+          'Industrial Revolution',
+        ),
+      ),
+      array(
+        'subject' => 'Literature',
+        'guides' => array(
+          'Shakespeare',
+          'Victorian Literature',
+          'American Literature',
+          'Modern Fiction',
+          'Poetry',
+        ),
+      ),
+      array(
+        'subject' => 'Computer Science',
+        'guides' => array(
+          'Algorithms',
+          'Data Structures',
+          'Database Management',
+          'Web Development',
+          'Artificial Intelligence',
+        ),
+      ),
+      array(
+        'subject' => 'Art',
+        'guides' => array(
+          'Painting',
+          'Sculpture',
+          'Photography',
+          'Architecture',
+          'Film',
+        ),
+      ),
+      array(
+        'subject' => 'Music',
+        'guides' => array(
+          'Music Theory',
+          'Classical Music',
+          'Jazz',
+          'Rock',
+          'Electronic Music',
+        ),
+      ),
+      array(
+        'subject' => 'Languages',
+        'guides' => array(
+          'English',
+          'Spanish',
+          'French',
+          'German',
+          'Mandarin',
+        ),
+      ),
+      array(
+        'subject' => 'Psychology',
+        'guides' => array(
+          'Behavioral Psychology',
+          'Cognitive Psychology',
+          'Developmental Psychology',
+          'Social Psychology',
+          'Clinical Psychology',
+        ),
+      ),
+      array(
+        'subject' => 'Business',
+        'guides' => array(
+          'Marketing',
+          'Finance',
+          'Management',
+          'Entrepreneurship',
+          'Accounting',
+        ),
+      ),
+    );
   }
 
   private function getMockData()
