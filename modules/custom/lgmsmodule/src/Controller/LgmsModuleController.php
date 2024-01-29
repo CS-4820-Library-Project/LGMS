@@ -250,13 +250,13 @@ class LgmsModuleController extends ControllerBase
     // Add a sorting dropdown form above the table.
     $build['sorting_form'] = \Drupal::formBuilder()->getForm('Drupal\lgmsmodule\Form\SortingForm');
 
-    $header = [
-      'owner' => $this->t('Owner'),
-      'guide_name' => $this->t('Guide Name'),
-      'last_updated' => $this->t('Last Updated'),
-    ];
+    // $header = [
+    //   'owner' => $this->t('Owner'),
+    //   'guide_name' => $this->t('Guide Name'),
+    //   'last_updated' => $this->t('Last Updated'),
+    // ];
 
-    $base_avatar_path = 'public://avatar/';
+    // $base_avatar_path = 'public://avatar/';
 
     $mock_data = $this->getMockData();
 
