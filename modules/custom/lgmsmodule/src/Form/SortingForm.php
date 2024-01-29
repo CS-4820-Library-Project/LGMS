@@ -60,16 +60,16 @@ class SortingForm extends FormBase
     ];
 
     $mock_data = [
-      ['Jayvion Simon', 'Getting Started narrowing a big core topic down', '2023-07-21', 'subject A', 'type A'],
-      ['Deja Brady', 'Nikolaus - Leuschke', '2023-04-26', 'subject b', 'type b'],
-      ['Harrison Stein', 'Gleichner, Mueller and Tromp', '2023-09-28', 'subject c', 'type c'],
-      ['Lucian Obrien', 'Hegmann, Kreiger and Bayer', '2023-04-10', 'subject d', 'type d'],
-      ['Reece Chung', 'Lueilwitz and Sons', '2023-05-12', 'subject e', 'type e'],
-      ['Jayvion Simon', 'Getting Started narrowing a big core topic down', '2023-07-21', 'subject f', 'type f'],
-      ['Deja Brady', 'Nikolaus - Leuschke', '2023-04-26', 'subject g', 'type g'],
-      ['Harrison Stein', 'Gleichner, Mueller and Tromp', '2023-09-28', 'subject h', 'type h'],
-      ['Lucian Obrien', 'Hegmann, Kreiger and Bayer', '2023-04-10', 'subject i', 'type i'],
-      ['Reece Chung', 'Lueilwitz and Sons', '2023-05-12', 'subject j', 'type j'],
+      ['Guide to Ancient Greek Literature', 'Dr. Helena Markos', '2023-01-15', 'Literature', 'Reference'],
+      ['Understanding Quantum Mechanics', 'Prof. Albert Newman', '2022-11-20', 'Physics', 'Tutorial'],
+      ['Renaissance Art Techniques', 'Maria Vasquez', '2023-02-09', 'Art', 'Case Study'],
+      ['Modern Web Development Practices', 'James Lee', '2023-01-05', 'Computer Science', 'Tutorial'],
+      ['Introduction to Behavioral Psychology', 'Emma Clarkson', '2022-12-15', 'Psychology', 'Reference'],
+      ['Astronomy for Beginners', 'Neil Burton', '2023-01-25', 'Astronomy', 'Tutorial'],
+      ['History of the Industrial Revolution', 'Prof. Samuel Johnson', '2022-10-30', 'History', 'Reference'],
+      ['Basics of Organic Chemistry', 'Lisa Young', '2023-03-05', 'Chemistry', 'Tutorial'],
+      ['Guide to Baroque Music', 'Alexander G. Bell', '2022-09-15', 'Music', 'Case Study'],
+      ['Fundamentals of Calculus', 'Dr. Emily White', '2023-01-18', 'Mathematics', 'Reference'],
     ];
 
     // Sort the data based on the selected sorting option.

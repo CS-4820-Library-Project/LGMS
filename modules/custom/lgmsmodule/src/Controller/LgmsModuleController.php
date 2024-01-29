@@ -15,55 +15,77 @@ class LgmsModuleController extends ControllerBase
   public function byOwner()
   {
     $build = [];
-
     // Your existing breadcrumb and setup code here
-    $build['breadcrumb'] = [
-      '#markup' => $this->generateBreadcrumbs(),
-    ];
-
-    $mock_data = $this->getMockData(); // This method should return your mock data array
-
-    // Extract unique owners
-    $owners = array_unique(array_column($mock_data, 0)); // Assuming the 1st element is the owner
-
-    // Sort owners alphabetically
-    sort($owners);
-
-    // Build a renderable list of owners
-    $build['owners'] = [
-      '#theme' => 'item_list',
-      '#items' => $owners,
-      '#title' => $this->t('Owners'),
-    ];
-
-    return $build;
-  }
-
-  public function byType()
-  {
-    $build = [];
-
     $build['breadcrumb'] = [
       '#markup' => $this->generateBreadcrumbs(),
     ];
 
     $mock_data = $this->getMockData();
 
-    // Process data to get unique types
-    $types = array_unique(array_column($mock_data, 4));
+    // Group data by owners
+    $data_by_owners = [];
+    foreach ($mock_data as $data) {
+      $owner = $data[0]; // Assuming the 1st element is the owner
+      $data_by_owners[$owner][] = $data[1]; // Assuming the 2nd element is the detail you want to list
+    }
 
-    // Build a table for types
-    $build['types'] = [
-      '#type' => 'table',
-      '#header' => [$this->t('Type')],
-      '#rows' => array_map(function ($type) {
-        return [$type];
-      }, $types),
-      '#empty' => $this->t('No types available.'),
-    ];
+    // Create accordion items
+    $accordion_items = [];
+    foreach ($data_by_owners as $owner => $details) {
+      $accordion_items[] = [
+        '#type' => 'details',
+        '#open' => FALSE,
+        '#title' => $owner,
+        '#children' => [
+          '#theme' => 'item_list',
+          '#items' => $details,
+        ],
+      ];
+    }
+
+    $build['owners_accordion'] = $accordion_items;
 
     return $build;
   }
+
+
+  public function byType()
+  {
+    $build = [];
+
+    // Your existing breadcrumb and setup code here
+    $build['breadcrumb'] = [
+      '#markup' => $this->generateBreadcrumbs(),
+    ];
+
+    $mock_data = $this->getMockData();
+
+    // Group data by types
+    $data_by_types = [];
+    foreach ($mock_data as $data) {
+      $type = $data[4]; // Assuming the 5th element is the type
+      $data_by_types[$type][] = $data[1]; // Assuming the 2nd element is the detail you want to list
+    }
+
+    // Create accordion items
+    $accordion_items = [];
+    foreach ($data_by_types as $type => $details) {
+      $accordion_items[] = [
+        '#type' => 'details',
+        '#open' => FALSE,
+        '#title' => $type,
+        '#children' => [
+          '#theme' => 'item_list',
+          '#items' => $details,
+        ],
+      ];
+    }
+
+    $build['types_accordion'] = $accordion_items;
+
+    return $build;
+  }
+
 
   public function bySubject()
   {
@@ -210,19 +232,20 @@ class LgmsModuleController extends ControllerBase
   private function getMockData()
   {
     return [
-      // ... Your mock data array ...
-      ['Jayvion Simon', 'Getting Started narrowing a big core topic down', '2023-07-21', 'subject A', 'type A'],
-      ['Deja Brady', 'Nikolaus - Leuschke', '2023-04-26', 'subject b', 'type b'],
-      ['Harrison Stein', 'Gleichner, Mueller and Tromp', '2023-09-28', 'subject c', 'type c'],
-      ['Lucian Obrien', 'Hegmann, Kreiger and Bayer', '2023-04-10', 'subject d', 'type d'],
-      ['Reece Chung', 'Lueilwitz and Sons', '2023-05-12', 'subject e', 'type e'],
-      ['Jayvion Simon', 'Getting Started narrowing a big core topic down', '2023-07-21', 'subject f', 'type f'],
-      ['Deja Brady', 'Nikolaus - Leuschke', '2023-04-26', 'subject g', 'type g'],
-      ['Harrison Stein', 'Gleichner, Mueller and Tromp', '2023-09-28', 'subject h', 'type h'],
-      ['Lucian Obrien', 'Hegmann, Kreiger and Bayer', '2023-04-10', 'subject i', 'type i'],
-      ['Reece Chung', 'Lueilwitz and Sons', '2023-05-12', 'subject j', 'type j'],
+      ['Guide to Ancient Greek Literature', 'Dr. Helena Markos', '2023-01-15', 'Literature', 'Reference'],
+      ['Understanding Quantum Mechanics', 'Prof. Albert Newman', '2022-11-20', 'Physics', 'Tutorial'],
+      ['Renaissance Art Techniques', 'Maria Vasquez', '2023-02-09', 'Art', 'Case Study'],
+      ['Modern Web Development Practices', 'James Lee', '2023-01-05', 'Computer Science', 'Tutorial'],
+      ['Introduction to Behavioral Psychology', 'Emma Clarkson', '2022-12-15', 'Psychology', 'Reference'],
+      ['Astronomy for Beginners', 'Neil Burton', '2023-01-25', 'Astronomy', 'Tutorial'],
+      ['History of the Industrial Revolution', 'Prof. Samuel Johnson', '2022-10-30', 'History', 'Reference'],
+      ['Basics of Organic Chemistry', 'Lisa Young', '2023-03-05', 'Chemistry', 'Tutorial'],
+      ['Guide to Baroque Music', 'Alexander G. Bell', '2022-09-15', 'Music', 'Case Study'],
+      ['Fundamentals of Calculus', 'Dr. Emily White', '2023-01-18', 'Mathematics', 'Reference'],
+      // ... more items ...
     ];
   }
+
 
   private function generateBreadcrumbs()
   {
