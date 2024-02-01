@@ -18,8 +18,25 @@ class SortingForm extends FormBase
 
   public function buildForm(array $form, FormStateInterface $form_state,  $headers = NULL, $rows = NULL)
   {
-    // Build a dropdown menu for sorting
-    $form['sort_by'] = [
+    $form['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+
+    // Wrap the search and sort elements in a flex container.
+    $form['search_sort_container'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['search-sort-container']],
+    ];
+
+    // Add the search input inside the container.
+    $form['search_sort_container']['search'] = [
+      '#type' => 'search',
+      '#attributes' => [
+        'class' => ['lgms-search'],
+        'placeholder' => $this->t('Search by guide name, owner, or last modification date'),
+      ],
+    ];
+
+    // Add the sorting select inside the container.
+    $form['search_sort_container']['sort_by'] = [
       '#type' => 'select',
       '#title' => $this->t('Sort by'),
       '#options' => [
@@ -40,8 +57,8 @@ class SortingForm extends FormBase
       ],
     ];
 
-    // Table Wrapper
-    $form['table_wrapper'] = [
+    // Table container that will be updated via AJAX.
+    $form['table'] = [
       '#type' => 'container',
       '#attributes' => ['id' => 'lgms-table-wrapper'],
     ];
@@ -86,4 +103,3 @@ class SortingForm extends FormBase
     // No submission logic needed for the AJAX-driven form.
   }
 }
-

@@ -5,3 +5,8 @@ lgmsmodule:
   dependencies:
     - core/jquery
     - core/drupal
+
+# File: lgmsmodule/lgmsmodule.libraries.yml
+  css:
+    theme:
+      css/lgmsmodule.styles.css: {}

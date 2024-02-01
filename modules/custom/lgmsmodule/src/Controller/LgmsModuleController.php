@@ -24,14 +24,6 @@ class LgmsModuleController extends ControllerBase
     $landingMethods = new LandingPageHelper();
     $build = [];
 
-    // Search Bar
-    $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
-
-    $build['search'] = [
-      '#type' => 'search',
-      '#attributes' => ['class' => ['lgms-search'], 'placeholder' => $this->t('Search by guide name, Owner, or Last Update date'),],
-    ];
-
     // Get the sorting parameter from the URL if it's not provided as a parameter.
     if ($sort_by === NULL) {
       $sort_by = \Drupal::request()->query->get('sort_by', 'guide_Name'); // Default to sorting by owner.
