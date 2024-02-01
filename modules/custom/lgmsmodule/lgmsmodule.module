@@ -1,5 +1,8 @@
 <?php
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
 
@@ -61,6 +64,75 @@ function add_terms(array $terms, string $vid): void {
   }
 }
 
+/**
+ * Create mock guides.
+ */
+function create_mock_guides() {
+  // Load term IDs for guide types.
+  $type_terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => 'lgms_guide_type']);
+  $type_tids = array_keys($type_terms);
+
+  // Load term IDs for guide subjects.
+  $subject_terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => 'lgms_guide_subject']);
+  $subject_tids = array_keys($subject_terms);
+
+  // Load term IDs for guide groups.
+  $group_terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => 'lgms_guide_group']);
+  $group_tids = array_keys($group_terms);
+
+  for ($i = 1; $i <= 50; $i++) {
+    $guide_node = \Drupal\node\Entity\Node::create([
+      'type' => 'guide',
+      'title' => 'Guide ' . $i . ': ' . $subject_terms[array_rand($subject_tids)]->getName(),
+      'field_guide_type' => ['target_id' => $type_tids[array_rand($type_tids)]],
+      'field_guide_subject' => ['target_id' => $subject_tids[array_rand($subject_tids)]],
+      'field_guide_group' => ['target_id' => $group_tids[array_rand($group_tids)]],
+    ]);
+    $guide_node->save();
+  }
+}
+
+/**
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function create_guide_field_storage() {
+  $field_storage = FieldStorageConfig::loadByName('node', 'field_guide_subject');
+  if (!$field_storage) {
+    FieldStorageConfig::create([
+      'field_name' => 'field_guide_subject',
+      'entity_type' => 'node',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'taxonomy_term',
+      ],
+    ])->save();
+  }
+}
+
+/**
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function create_guide_field_instance() {
+  $field_instance = FieldConfig::loadByName('node', 'guide', 'field_guide_subject');
+  if (!$field_instance) {
+    FieldConfig::create([
+      'field_name' => 'field_guide_subject',
+      'entity_type' => 'node',
+      'bundle' => 'guide',
+      'label' => 'Subject Taxonomy',
+      'settings' => [
+        'handler' => 'default:taxonomy_term',
+        'handler_settings' => [
+          'target_bundles' => [
+            'LGMS Guide Subject' => 'LGMS Guide Subject',
+          ],
+        ],
+      ],
+    ])->save();
+  }
+}
+
+
 
 /**
  * Implements hook_install().
@@ -90,6 +162,11 @@ function lgmsModule_install() {
     'Psychology ',
     'Music',
     'Modern Languages',
+    'Computer Science',
+    'History',
+    'Geography',
+    'Philosophy',
+    'Art and Design',
   );
   add_terms($terms, 'LGMS Guide Subject');
 
@@ -106,4 +183,30 @@ function lgmsModule_install() {
   );
   add_terms($terms, 'LGMS Guide Group');
 
+  create_guide_field_storage();
+  create_guide_field_instance();
+
+  // Check if the form display exists. If not, create it.
+  $form_display = EntityFormDisplay::load('node.guide.default');
+  if (!$form_display) {
+    $form_display = EntityFormDisplay::create([
+      'targetEntityType' => 'node',
+      'bundle' => 'guide',
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+  }
+
+  // Set the Subject Taxonomy field to be visible on the form.
+  $form_display->setComponent('field_guide_subject', [
+    'type' => 'options_select', // Change the widget type if needed.
+    'weight' => 0, // Set the weight to position the field right after the title (-49 or -48 depending on the title weight).
+  ]);
+
+  // If other fields need to be set as well, repeat setComponent for each.
+
+  // Save the form display configuration.
+  $form_display->save();
+
+  #create_mock_guides();
 }
