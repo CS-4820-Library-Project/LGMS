@@ -1,7 +1,7 @@
 name: 'LGMS'
 type: module
 core_version_requirement: ^10
-description: 'Testing module for LGMS!'
+description: 'Provides a library guide management system.'
 package: 'UPEI'
 dependencies:
   - drupal:system

@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - lgmsmodule
+name: 'Guide'
+type: guide
+description: 'Use <em>Guide</em> content type to create custom library guides.'
+help: ''
+new_revision: false
+preview_mode: 1
+display_submitted: true

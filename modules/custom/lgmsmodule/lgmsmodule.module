@@ -17,46 +17,57 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
 
 
 /**
- * @param String $vid the id of the vocab
- * @param String $name the name of the vocab
+ * Creates a taxonomy vocabulary if it doesn't already exist.
+ *
+ * @param string $vid The machine name of the vocabulary.
+ * @param string $name The human-readable name of the vocabulary.
  * @return void
  * @throws \Drupal\Core\Entity\EntityStorageException
- * creates a taxonomy
  */
-function create_vocab(String $vid, String $name): void
-{
-  $vocabulary = Vocabulary::create([
-    'vid' => $vid,
-    'name' => $name,
-  ]);
-  $vocabulary->save();
-}
-
-/**
- * @param array $terms the terms to add
- * @param String $vid the id of the vocab
- * @return void
- * @throws \Drupal\Core\Entity\EntityStorageException
- * Adds terms to the taxonomy
- */
-function add_terms(array $terms, String $vid): void
-{
-  foreach ($terms as $term_name) {
-    $new_term = Term::create([
+function create_vocab(string $vid, string $name): void {
+  if (!\Drupal\taxonomy\Entity\Vocabulary::load($vid)) {
+    $vocabulary = \Drupal\taxonomy\Entity\Vocabulary::create([
       'vid' => $vid,
-      'name' => $term_name,
+      'name' => $name,
     ]);
-
-    $new_term->enforceIsNew();
-    $new_term->save();
+    $vocabulary->save();
   }
 }
+
+
+/**
+ * Adds terms to a taxonomy vocabulary if they don't already exist.
+ *
+ * @param array $terms The terms to add.
+ * @param string $vid The machine name of the vocabulary.
+ * @return void
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function add_terms(array $terms, string $vid): void {
+  foreach ($terms as $term_name) {
+    // Check if the term already exists.
+    $existing_terms = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_term')
+      ->loadByProperties(['name' => $term_name, 'vid' => $vid]);
+
+    if (empty($existing_terms)) {
+      $new_term = \Drupal\taxonomy\Entity\Term::create([
+        'vid' => $vid,
+        'name' => $term_name,
+      ]);
+      $new_term->enforceIsNew();
+      $new_term->save();
+    }
+  }
+}
+
 
 /**
  * Implements hook_install().
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function lgmsModule_install() {
+
   // Create a new Guide Type taxonomy.
   create_vocab('LGMS Guide Type', 'Guide Type');
 
