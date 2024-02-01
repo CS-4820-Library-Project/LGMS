@@ -1,0 +1,27 @@
+name: roblib_2023
+type: theme
+'base theme': stable9
+starterkit: true
+version: VERSION
+libraries:
+  - roblib_2023/superfish
+  - roblib_2023/base
+  - roblib_2023/messages
+  - core/normalize
+core_version_requirement: ^10
+regions:
+  header: 'Header Navbar'
+  primary_menu: 'Primary menu'
+  secondary_menu: 'Secondary menu'
+  highlighted: 'Highlighted'
+  help: 'Help'
+  content: 'Content'
+  sidebar_first: 'Left sidebar'
+  sidebar_second: 'Right sidebar'
+  footer: 'Footer'
+  subfooter: 'Subfooter'
+  breadcrumb: 'Breadcrumb'
+  hidden: 'Hidden'
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'
+generator: 'starterkit_theme:10.0.1'

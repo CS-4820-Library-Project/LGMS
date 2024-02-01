@@ -1,0 +1,44 @@
+SITE:
+    Local:
+        Url: 'https://d10_dev.lndo.site/'
+    Remote:
+        Url: 'https://library.upei.ca/'
+        Path: user
+PORT: 8000
+BSREWRITE:
+    Css:
+
+        Match: '/themes/custom/roblib_2023/css/global-style.css'
+        Replace: '/css/global-style.css'
+    Js:
+        Match: "/themes/custom/roblib_2023/js/custom_js.js"
+        Replace: "/js/custom_js.js"
+PATHS:
+    Watch:
+      #changes in these compiled files trigged reload
+      - ./css/*.css
+      - ./js/*.js
+    Scss:
+        Dir: ./css/sass
+        Libraries:
+            #- libraries/guff
+            #- bower_components/foundation-sites/scss
+            #- bower_components/motion-ui/src
+            - node_modules/modularscale-sass/stylesheets
+            #- node_modules/vanilla-framework/scss
+            - node_modules/foundation-sites/scss
+            - node_modules/foundation-sites/scss/util
+            - node_modules/motion-ui/src
+            - icons/fontawesome/scss
+            - node_modules
+    Css:
+        Dir: css
+        #FileName: app.css
+    Js:
+        Src: ./js/src/*.js
+        Dest: js
+        FileName: 'ia-islandimagined.behaviors.js'
+    Img:
+        Src: img/src
+        Dest: img
+

@@ -1,0 +1,222 @@
+<style>
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.4s;
+}
+
+.active, .accordion:hover {
+  background-color: #ccc;
+}
+
+.panel {
+  padding: 0 18px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+</style>
+
+<p>
+    Hot topics this week: <a href="/wireless">Wireless configuration;</a>&nbsp;<a href="/printing">Printing</a>
+</p>
+<button class="accordion">Books</button>
+<div class="panel">
+<ul>
+    <li>
+        <a href="/books">Find books on a topic</a> -&nbsp;see also the <a href="/sg">subject guide</a> for your topic
+    </li>
+    <li>
+        <a href="/books/find">Find books on the shelves</a> (also video:&nbsp;<a href="http://resources.library.upei.ca/libtours/LearningObjects/RM-Call_Numbers/index.html">how to use a Call Number</a>)
+    </li>
+    <li>
+        <a href="/borrowing-renewing-returning-library-materials">Checkout and renewal of print books</a>
+    </li>
+    <li>
+        <a href="/ebooks">Ebooks</a>&nbsp;
+    </li>
+</ul>
+</div>
+
+<button class="accordion">Articles</button>
+<div class="panel">
+<ul>
+    <li>
+        <a href="/articles">Find articles on a topic</a> - see also the <a href="/sg">subject guide</a> for your topic
+    </li>
+    <li>
+        <a href="/peer-reviewed-articles-how-find">Peer-reviewed articles</a>
+    </li>
+    <li>
+        <a href="/howto/citation">Reading an article citation</a>&nbsp;
+    </li>
+</ul>
+</div>
+
+<button class="accordion">Study Spaces</button>
+<div class="panel">
+<ul>
+    <li>
+        <a href="/floorplans">Floor plans</a>
+    </li>
+    <li>
+        <a href="/quiet">Quiet</a>
+    </li>
+    <li>
+        <a href="/study_rooms">Group</a>
+    </li>
+</ul>
+</div>
+
+<button class="accordion">Technology</button>
+<div class="panel">
+<ul>
+    <li>
+        <a href="/printing">Printing</a>&nbsp;
+    </li>
+    <li>
+        <a href="/scan">Scanning</a>&nbsp;
+    </li>
+    <li>
+        <a href="/computers">Workstations</a>&nbsp;
+    </li>
+    <li>
+        <a href="/laptop">Laptops</a> you can check out
+    </li>
+    <li>
+        Your laptop in the library:
+        <ul>
+            <li>
+                <a href="/wireless">wireless network</a>
+            </li>
+            <li>
+                <a href="/laptop/print">laptop printing</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/collaboratory">Multimedia - DVDs, videos, etc</a>.
+    </li>
+    <li>
+        <a href="/3dprinting">3D printing</a>
+    </li>
+</ul>
+</div>
+
+<button class="accordion">Getting Help</button>
+<div class="panel">
+<ul>
+    <li>
+        <a href="/get_help">4 Ways to get help</a>
+    </li>
+    <li>
+        <a href="/askus">AskUs online chat</a>
+    </li>
+    <li>
+        Appointments with <a href="/librarians">subject librarians</a>
+    </li>
+    <li>
+        <a href="/ill">Get material not available at the Library</a>
+    </li>
+</ul>
+</div>
+
+<button class="accordion">Research Tools and Tips</button>
+<div class="panel">
+<ul>
+    <li>
+        <a href="/onesearch_about">OneSearch</a>&nbsp;- the mega search for books, articles, and more
+    </li>
+    <li>
+        <a href="/sg">Subject guides</a>&nbsp;- tips for your discipline
+    </li>
+    <li>
+        <a href="/refworks">RefWorks</a>&nbsp;- how to manage your bibliography citations
+    </li>
+    <li>
+        <a href="/gscholar">Google Scholar</a>
+    </li>
+</ul>
+</div>
+
+<button class="accordion">About the Library</button>
+<div class="panel">
+<ul>
+    <li>
+        <a href="/libraryhistory">Mission/History</a>&nbsp;
+    </li>
+    <li>
+        <a href="/people">Staff</a>
+    </li>
+    <li>
+        <a href="/units">Organization</a>&nbsp;
+    </li>
+    <li>
+        <a href="/visiting">Visiting from off-campus</a>
+    </li>
+</ul>
+</div>
+
+<button class="accordion">Other Info</button>
+<div class="panel">
+<ul>
+    <li>
+        <a href="/reserves">Reserves (for students)</a>&nbsp;
+    </li>
+    <li>
+        <a href="/faculty">Faculty</a>
+    </li>
+    <li>
+        <a href="/alumni/community">Alumni</a>&nbsp;
+    </li>
+    <li>
+        How to find more information on this website
+        <ul>
+            <li>
+                Use <a href="/all-search">All Search</a> to keyword search (e.g. "lost and found")
+            </li>
+            <li>
+                Use the <a href="/site-index">Site Index</a> to browse all page titles (excludes Databases and Reserves)
+            </li>
+            <li>
+                Use the list of links at the "footer" of every page including this one
+            </li>
+        </ul>
+    </li>
+</ul>
+</div>
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    }
+  });
+}
+</script>
+
+{#<div{{ attributes.addClass(classes) }}>#}
+  {#{{ title_prefix }}#}
+  {#{% if label %}#}
+    {#<h3{{ title_attributes }}>{{ label }}</h3>#}
+  {#{% endif %}#}
+  {#{{ title_suffix }}#}
+  {#{% block content %}#}
+    {#{{ content }}#}
+  {#{% endblock %}#}
+{#</div>#}

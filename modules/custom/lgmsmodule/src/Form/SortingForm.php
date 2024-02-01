@@ -81,7 +81,7 @@ class SortingForm extends FormBase
     });
 
     // Build the Table
-    $form['table_wrapper']['content'] = [
+    $form['table']['content'] = [
       '#type' => 'table',
       '#header' => $headers,
       '#rows' => $rows,
@@ -95,7 +95,7 @@ class SortingForm extends FormBase
   public function updateTableCallback(array $form, FormStateInterface $form_state)
   {
     // Refresh the table part of the form with sorted data.
-    return $form['table_wrapper'];
+    return $form['table'];
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state)

@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * @file
+ * Functions to support theming.
+ */
+
+/**
+ * Implements hook_preprocess_image_widget().
+ */
+function roblib_2023_preprocess_image_widget(array &$variables) {
+  $data = &$variables['data'];
+
+  // This prevents image widget templates from rendering preview container HTML
+  // to users that do not have permission to access these previews.
+  // @todo revisit in https://drupal.org/node/953034
+  // @todo revisit in https://drupal.org/node/3114318
+  if (isset($data['preview']['#access']) && $data['preview']['#access'] === FALSE) {
+    unset($data['preview']);
+  }
+}
+function roblib_2023_field__field_proxied_link__database($variables) {
+  // the name of the function came from the devel themer tool after 1st putting dpm() in themename_field()
+
+  // dpm($variables);
+  // this dumps the vars using the devel mod. use it to target the varibles printed below.
+
+  $output = '';
+  $output = '<a href="http://proxy.library.upei.ca/login?url=' . $variables['items'][0]['#element']['display_url'] . '">' . $variables['items'][0]['#element']['title'] .  '</a>';
+
+  return $output;
+}
+
+
+function roblib_2023_preprocess_html(&$variables) {
+  // Add information about the number of sidebars.
+  if (!empty($variables['page']['sidebar_first']) && !empty($variables['page']['sidebar_second'])) {
+    $variables['attributes']['class'][] = 'layout-two-sidebars';
+  }
+  elseif (!empty($variables['page']['sidebar_first'])) {
+    $variables['attributes']['class'][] = 'layout-one-sidebar';
+    $variables['attributes']['class'][] = 'layout-sidebar-left';
+  }
+  elseif (!empty($variables['page']['sidebar_second'])) {
+    $variables['attributes']['class'][] = 'layout-one-sidebar';
+    $variables['attributes']['class'][] = 'layout-sidebar-right';
+  }
+  else {
+    $variables['attributes']['class'][] = 'layout-no-sidebars';
+  }
+
+  if (!empty($variables['page']['featured_top'])) {
+//    $variables['attributes']['class'][] = 'has-featured-top';
+  }
+
+}

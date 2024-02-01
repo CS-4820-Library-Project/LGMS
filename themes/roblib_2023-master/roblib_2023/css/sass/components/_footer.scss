@@ -1,0 +1,131 @@
+.footer_block_container {
+  background: $black;
+  border-bottom: 4px solid #8c2004;
+  padding: $global-padding 0;
+}
+.region-subfooter {
+  background: darken($black, 10%);
+  padding-top: $global-padding;
+  padding-bottom: $global-padding;
+}
+.subfooter_block_container {
+  .container {
+    @include xy-grid-container;
+    @include xy-grid;
+    justify-content: space-between;
+    align-items: center;
+    padding: $global-padding 0;
+  }
+  background: #1a1a1a;
+}
+
+footer {
+  //margin: $global-margin;
+  .footer-links {
+    border-left: 1px solid #676767;
+    padding-left: 0.5rem;
+  }
+  .menu {
+    @include menu-direction(vertical);
+    margin: 0;
+  }
+  .region-footer {
+    display: block;
+    @include breakpoint(medium) {
+      @include xy-grid-container;
+      @include xy-grid;
+      .block {
+        @include xy-cell(auto);
+      }
+    }
+  }
+  .region-subfooter {
+    @include xy-grid-container;
+    //@include xy-grid;
+    //.block {
+    //@include xy-cell(auto);
+    //}
+  }
+  .title {
+    color: #fefefe;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-top: 1rem;
+  }
+  .menu a {
+    color: #ccc;
+    font-size: 0.75rem;
+    padding: 0.3125rem 0;
+  }
+  .socialmedia {
+    display: none;
+  }
+  .social-media {
+    display: flex;
+    flex-direction: row;
+    //justify-content: space-between;
+    li {
+      margin-right: 2rem;
+    }
+    i {
+      font-size: rem-calc(32);
+    }
+  }
+}
+
+.region-footer .container {
+  //@include xy-grid-container;
+  //@include xy-grid;
+  //.block {
+    //@include xy-cell(100%);
+    //@include breakpoint(large) {
+      //@include xy-cell(auto);
+    //}
+  //}
+}
+.region-subfooter .container {
+  @include xy-grid;
+  justify-content: space-around;
+  @include breakpoint(medium) {
+    justify-content: space-between;
+  }
+}
+.footeraddress {
+  .address {
+    color: white;
+    font-size: 0.8em;
+    padding-bottom: 5px;
+    @include breakpoint(small only) {
+      margin-bottom: $global-margin;
+    }
+  }
+  .links-last {
+    display: none;
+    @include breakpoint(medium) {
+      display: flex;
+      color: #a8a9a7;
+    }
+    a {
+      //display:block !important;
+    }
+    //display: flex;
+  }
+  .links-last a {
+    color: #ccc;
+    font-size: 0.8em;
+    line-height: 2;
+    padding: 0 4px;
+  }
+  .links-last a:first-child {
+    color: #ccc;
+    font-size: 0.8em;
+    padding-left: 0px;
+  }
+}
+.socialmedia ul {
+  @include menu-base();
+  a {
+    padding: 0;
+    padding-right: 0.5rem;
+  }
+}
