@@ -9,7 +9,7 @@ lgmsmodule.content:
 lgmsmodule.by_subject:
   path: '/lgms/subject'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::bySubject'
+    _controller: '\Drupal\lgmsmodule\Controller\BySubjectController::bySubject'
     _title: 'Guides by Subject'
   requirements:
     _permission: 'access content'
@@ -17,15 +17,15 @@ lgmsmodule.by_subject:
 lgmsmodule.by_type:
   path: '/lgms/type'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::byType'
+    _controller: '\Drupal\lgmsmodule\Controller\ByTypeController::byType'
     _title: 'Guides by Type'
   requirements:
     _permission: 'access content'
 
 lgmsmodule.by_owner:
-  path: '/lgms/owner'
+  path: '/lgms/Group'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::byOwner'
-    _title: 'Guides by Owner'
+    _controller: '\Drupal\lgmsmodule\Controller\ByGroupController::byGroup'
+    _title: 'Guides by Group'
   requirements:
     _permission: 'access content'
