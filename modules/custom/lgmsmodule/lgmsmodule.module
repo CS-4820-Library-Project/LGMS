@@ -92,14 +92,55 @@ function create_mock_guides() {
   }
 }
 
+///**
+// * @throws \Drupal\Core\Entity\EntityStorageException
+// */
+//function create_guide_field_storage() {
+//  $field_storage = FieldStorageConfig::loadByName('node', 'field_guide_subject');
+//  if (!$field_storage) {
+//    FieldStorageConfig::create([
+//      'field_name' => 'field_guide_subject',
+//      'entity_type' => 'node',
+//      'type' => 'entity_reference',
+//      'settings' => [
+//        'target_type' => 'taxonomy_term',
+//      ],
+//    ])->save();
+//  }
+//}
+//
+///**
+// * @throws \Drupal\Core\Entity\EntityStorageException
+// */
+//function create_guide_field_instance() {
+//  $field_instance = FieldConfig::loadByName('node', 'guide', 'field_guide_subject');
+//  if (!$field_instance) {
+//    FieldConfig::create([
+//      'field_name' => 'field_guide_subject',
+//      'entity_type' => 'node',
+//      'bundle' => 'guide',
+//      'label' => 'Subject Taxonomy',
+//      'settings' => [
+//        'handler' => 'default:taxonomy_term',
+//        'handler_settings' => [
+//          'target_bundles' => [
+//            'LGMS Guide Subject' => 'LGMS Guide Subject',
+//          ],
+//        ],
+//      ],
+//    ])->save();
+//  }
+//}
+
 /**
+ * Creates or updates field storage and instance for a guide field.
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
-function create_guide_field_storage() {
-  $field_storage = FieldStorageConfig::loadByName('node', 'field_guide_subject');
+function create_guide_field_storage($field_name, $label, $vocabulary) {
+  $field_storage = FieldStorageConfig::loadByName('node', $field_name);
   if (!$field_storage) {
     FieldStorageConfig::create([
-      'field_name' => 'field_guide_subject',
+      'field_name' => $field_name,
       'entity_type' => 'node',
       'type' => 'entity_reference',
       'settings' => [
@@ -107,24 +148,19 @@ function create_guide_field_storage() {
       ],
     ])->save();
   }
-}
 
-/**
- * @throws \Drupal\Core\Entity\EntityStorageException
- */
-function create_guide_field_instance() {
-  $field_instance = FieldConfig::loadByName('node', 'guide', 'field_guide_subject');
+  $field_instance = FieldConfig::loadByName('node', 'guide', $field_name);
   if (!$field_instance) {
     FieldConfig::create([
-      'field_name' => 'field_guide_subject',
+      'field_name' => $field_name,
       'entity_type' => 'node',
       'bundle' => 'guide',
-      'label' => 'Subject Taxonomy',
+      'label' => $label,
       'settings' => [
         'handler' => 'default:taxonomy_term',
         'handler_settings' => [
           'target_bundles' => [
-            'LGMS Guide Subject' => 'LGMS Guide Subject',
+            $vocabulary => $vocabulary,
           ],
         ],
       ],
@@ -132,7 +168,26 @@ function create_guide_field_instance() {
   }
 }
 
+/**
+ * Sets the form display configuration for a field.
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function set_form_display_config($field_name, $widget_type, $weight) {
+  $form_display = EntityFormDisplay::load('node.guide.default');
+  if (!$form_display) {
+    $form_display = EntityFormDisplay::create([
+      'targetEntityType' => 'node',
+      'bundle' => 'guide',
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+  }
 
+  $form_display->setComponent($field_name, [
+    'type' => $widget_type,
+    'weight' => $weight,
+  ])->save();
+}
 
 /**
  * Implements hook_install().
@@ -183,30 +238,14 @@ function lgmsModule_install() {
   );
   add_terms($terms, 'LGMS Guide Group');
 
-  create_guide_field_storage();
-  create_guide_field_instance();
+  // Create field storages and instances...
+  create_guide_field_storage('field_guide_subject', 'Subject Taxonomy', 'LGMS Guide Subject');
+  create_guide_field_storage('field_guide_type', 'Type Taxonomy', 'LGMS Guide Type');
+  create_guide_field_storage('field_guide_group', 'Group Taxonomy', 'LGMS Guide Group');
 
-  // Check if the form display exists. If not, create it.
-  $form_display = EntityFormDisplay::load('node.guide.default');
-  if (!$form_display) {
-    $form_display = EntityFormDisplay::create([
-      'targetEntityType' => 'node',
-      'bundle' => 'guide',
-      'mode' => 'default',
-      'status' => TRUE,
-    ]);
-  }
+  // Set form display configurations...
+  set_form_display_config('field_guide_subject', 'options_select', 0);
+  set_form_display_config('field_guide_type', 'options_select', 1);
+  set_form_display_config('field_guide_group', 'options_select', 2);
 
-  // Set the Subject Taxonomy field to be visible on the form.
-  $form_display->setComponent('field_guide_subject', [
-    'type' => 'options_select', // Change the widget type if needed.
-    'weight' => 0, // Set the weight to position the field right after the title (-49 or -48 depending on the title weight).
-  ]);
-
-  // If other fields need to be set as well, repeat setComponent for each.
-
-  // Save the form display configuration.
-  $form_display->save();
-
-  #create_mock_guides();
 }
