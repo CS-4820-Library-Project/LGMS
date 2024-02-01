@@ -38,7 +38,6 @@ class SortingForm extends FormBase
     // Add the sorting select inside the container.
     $form['search_sort_container']['sort_by'] = [
       '#type' => 'select',
-      '#title' => $this->t('Sort by'),
       '#options' => [
         'guide_name_up' => $this->t('Guide Name &#9650;'),
         'guide_name_down' => $this->t('Guide Name &#9660;'),
