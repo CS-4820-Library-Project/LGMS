@@ -5,9 +5,9 @@ dependencies:
     module:
       - lgmsmodule
 name: 'Guide'
-type: guide
+type: 'guide'
 description: 'Use <em>Guide</em> content type to create custom library guides.'
-help: ''
+help: 'Create and manage guides.'
 new_revision: false
 preview_mode: 1
 display_submitted: true
