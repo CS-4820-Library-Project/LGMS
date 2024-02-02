@@ -7,7 +7,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\lgmsmodule\sql\SqlMethods;
+use Drupal\lgmsmodule\sql\sqlMethods;
 
 /**
  * Returns responses for LGMS Module routes.
@@ -20,7 +20,7 @@ class LgmsModuleController extends ControllerBase
    */
   public function content($sort_by = NULL)
   {
-    $sqlMethods = new SqlMethods(\Drupal::database());
+    $sqlMethods = new sqlMethods(\Drupal::database());
     $landingMethods = new LandingPageHelper();
     $build = [];
 

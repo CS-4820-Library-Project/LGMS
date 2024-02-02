@@ -5,7 +5,7 @@ namespace Drupal\lgmsmodule\sql;
 use Drupal\Core\Database\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class SqlMethods {
+class sqlMethods {
   protected Connection $database;
 
   public function __construct(Connection $database) {
