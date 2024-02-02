@@ -3,14 +3,14 @@
 namespace Drupal\lgmsmodule\Controller;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\lgmsmodule\sql\SqlMethods;
+use Drupal\lgmsmodule\sql\sqlMethods;
 
 class ByTypeController {
   public function byType(){
     $build = [];
     $data = [];
-    $sqlMethods = new SqlMethods(\Drupal::database());
-    $landingMethods = new LandingPageHelper();
+    $sqlMethods = new sqlMethods(\Drupal::database());
+    $landingMethods = new landingPageHelper();
 
     $result = $sqlMethods->getFromTable('node__field_type_taxonomy');
 
