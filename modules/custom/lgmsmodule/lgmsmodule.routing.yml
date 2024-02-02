@@ -29,3 +29,12 @@ lgmsmodule.by_owner:
     _title: 'Guides by Group'
   requirements:
     _permission: 'access content'
+
+
+lgmsmodule.all_guides:
+  path: '/all-guides'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::allGuides'
+    _title: 'All Guides'
+  requirements:
+    _permission: 'access content'
