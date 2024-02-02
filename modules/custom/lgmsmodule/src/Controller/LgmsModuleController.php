@@ -21,7 +21,7 @@ class LgmsModuleController extends ControllerBase
   public function content($sort_by = NULL)
   {
     $sqlMethods = new sqlMethods(\Drupal::database());
-    $landingMethods = new LandingPageHelper();
+    $landingMethods = new landingPageHelper();
     $build = [];
 
     // Get the sorting parameter from the URL if it's not provided as a parameter.
