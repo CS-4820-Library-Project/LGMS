@@ -59,7 +59,7 @@ class LgmsModuleController extends ControllerBase
 
 
     // Add a sorting dropdown form above the table.
-    $build['sorting_form'] = \Drupal::formBuilder()->getForm('Drupal\lgmsmodule\Form\SortingForm', $headers, $rows);
+   // $build['sorting_form'] = \Drupal::formBuilder()->getForm('Drupal\lgmsmodule\Form\SortingForm', $headers, $rows);
 
 
     return $build;

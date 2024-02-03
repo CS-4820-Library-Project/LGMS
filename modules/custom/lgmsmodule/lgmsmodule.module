@@ -5,6 +5,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_theme().
@@ -91,6 +92,14 @@ function create_mock_guides() {
     $guide_node->save();
   }
 }
+
+function lgmsmodule_views_pre_render(ViewExecutable $view)
+{
+  if (isset($view) && ($view->storage->id() == 'lgmstable')) {
+    $view->element['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+  }
+}
+
 
 ///**
 // * @throws \Drupal\Core\Entity\EntityStorageException

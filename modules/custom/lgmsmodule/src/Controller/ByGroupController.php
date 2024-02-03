@@ -12,7 +12,7 @@ class ByGroupController {
     $sqlMethods = new sqlMethods(\Drupal::database());
     $landingMethods = new landingPageHelper();
 
-    $result = $sqlMethods->getFromTable('node__field_group_taxonomy');
+    $result = $sqlMethods->getFromTable('node__field_guide_group');
 
     foreach ($result as $record) {
       $nid = $record->entity_id;
@@ -21,7 +21,7 @@ class ByGroupController {
       $title = $sqlMethods->getTitle($nid);
 
       // Get the taxonomy term.
-        $taxonomyTerm = $sqlMethods->getTaxonomyTerm($record->field_group_taxonomy_target_id);
+        $taxonomyTerm = $sqlMethods->getTaxonomyTerm($record->field_guide_group_target_id);
 
       // Construct the article link.
       $articleLink = $landingMethods->getLink($nid);
