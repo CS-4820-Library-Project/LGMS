@@ -12,7 +12,7 @@ class ByTypeController {
     $sqlMethods = new sqlMethods(\Drupal::database());
     $landingMethods = new landingPageHelper();
 
-    $result = $sqlMethods->getFromTable('node__field_type_taxonomy');
+    $result = $sqlMethods->getFromTable('node__field_guide_type');
 
     foreach ($result as $record) {
       $nid = $record->entity_id;
@@ -21,7 +21,7 @@ class ByTypeController {
       $title = $sqlMethods->getTitle($nid);
 
       // Get the taxonomy term.
-      $taxonomyTerm = $sqlMethods->getTaxonomyTerm($record->field_type_taxonomy_target_id);
+      $taxonomyTerm = $sqlMethods->getTaxonomyTerm($record->field_guide_type_target_id);
 
       // Construct the article link.
       $articleLink = $landingMethods->getLink($nid);

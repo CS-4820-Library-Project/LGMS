@@ -22,7 +22,7 @@ lgmsmodule.by_type:
   requirements:
     _permission: 'access content'
 
-lgmsmodule.by_owner:
+lgmsmodule.by_group:
   path: '/lgms/Group'
   defaults:
     _controller: '\Drupal\lgmsmodule\Controller\ByGroupController::byGroup'

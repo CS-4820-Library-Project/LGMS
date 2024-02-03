@@ -13,7 +13,7 @@ lgmsmodule.by_type:
   route_name: lgmsmodule.by_type
   base_route: lgmsmodule.content
 
-lgmsmodule.by_owner:
-  title: 'By Owner'
-  route_name: lgmsmodule.by_owner
+lgmsmodule.by_group:
+  title: 'By Group'
+  route_name: lgmsmodule.by_group
   base_route: lgmsmodule.content

@@ -12,7 +12,7 @@ class BySubjectController {
     $sqlMethods = new sqlMethods(\Drupal::database());
     $landingMethods = new landingPageHelper();
 
-    $result = $sqlMethods->getFromTable('node__field_subject_taxonomy');
+    $result = $sqlMethods->getFromTable('	node__field_guide_subject');
 
     foreach ($result as $record) {
       $nid = $record->entity_id;
@@ -21,7 +21,7 @@ class BySubjectController {
       $title = $sqlMethods->getTitle($nid);
 
       // Get the taxonomy term.
-      $taxonomyTerm = $sqlMethods->getTaxonomyTerm($record->field_subject_taxonomy_target_id);
+      $taxonomyTerm = $sqlMethods->getTaxonomyTerm($record->field_guide_subject_target_id);
 
       // Construct the article link.
       $articleLink = $landingMethods->getLink($nid);
