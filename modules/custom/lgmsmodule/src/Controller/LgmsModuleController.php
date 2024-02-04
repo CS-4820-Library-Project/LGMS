@@ -7,6 +7,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\lgmsmodule\sql\sqlMethods;
@@ -22,46 +23,72 @@ class LgmsModuleController extends ControllerBase
    */
   public function content($sort_by = NULL)
   {
-    $sqlMethods = new sqlMethods(\Drupal::database());
-    $landingMethods = new landingPageHelper();
-    $build = [];
+//    $sqlMethods = new sqlMethods(\Drupal::database());
+//    $landingMethods = new landingPageHelper();
+//    $build = [];
+//
+//    // Get the sorting parameter from the URL if it's not provided as a parameter.
+//    if ($sort_by === NULL) {
+//      $sort_by = \Drupal::request()->query->get('sort_by', 'guide_Name'); // Default to sorting by owner.
+//    }
+//
+//
+//    $headers = [
+//      ['data' => $this->t('Guide Name')],
+//      ['data' => $this->t('Owner')],
+//      ['data' => $this->t('Last Updated')],
+//    ];
+//
+//    // Fetch titles of all "Article" nodes from the database.
+//    $result = $sqlMethods->getGuides();
+//
+//    // Build table rows.
+//    $rows = [];
+//    foreach ($result as $nid => $record) {
+//      $name = $sqlMethods->getOwner($record->uid);
+//
+//      $articleLink = $landingMethods->getLink($nid);
+//
+//      $rows[] = [
+//        array('data' => new FormattableMarkup('<a href=":link">@name</a>',
+//          [':link' => $articleLink,
+//            '@name' => $record->title])),
+//        $name,
+//        date('Y-m-d', $record->changed),
+//      ];
+//    }
+//
+//
+//    // Add a sorting dropdown form above the table.
+//   // $build['sorting_form'] = \Drupal::formBuilder()->getForm('Drupal\lgmsmodule\Form\SortingForm', $headers, $rows);
+//
+//
+//    return $build;
 
-    // Get the sorting parameter from the URL if it's not provided as a parameter.
-    if ($sort_by === NULL) {
-      $sort_by = \Drupal::request()->query->get('sort_by', 'guide_Name'); // Default to sorting by owner.
+    {
+      $build = [];
+      $view = Views::getView('lgmstable');
+
+      if (is_object($view)) {
+        // Set the display id
+        $view->setDisplay('default');
+
+        // Get the title from the view
+        $title = $view->getTitle();
+
+        // Render the view
+        $rendered_view = $view->render();
+
+        // Add the title and the rendered view to the build array
+        $build['table'] = [
+          //'title' => [
+          //'#markup' => '<h2>' . $title . '</h2>',
+          //],
+          'view' => $rendered_view,
+        ];
+      }
+
+      return $build;
     }
-
-
-    $headers = [
-      ['data' => $this->t('Guide Name')],
-      ['data' => $this->t('Owner')],
-      ['data' => $this->t('Last Updated')],
-    ];
-
-    // Fetch titles of all "Article" nodes from the database.
-    $result = $sqlMethods->getGuides();
-
-    // Build table rows.
-    $rows = [];
-    foreach ($result as $nid => $record) {
-      $name = $sqlMethods->getOwner($record->uid);
-
-      $articleLink = $landingMethods->getLink($nid);
-
-      $rows[] = [
-        array('data' => new FormattableMarkup('<a href=":link">@name</a>',
-          [':link' => $articleLink,
-            '@name' => $record->title])),
-        $name,
-        date('Y-m-d', $record->changed),
-      ];
-    }
-
-
-    // Add a sorting dropdown form above the table.
-   // $build['sorting_form'] = \Drupal::formBuilder()->getForm('Drupal\lgmsmodule\Form\SortingForm', $headers, $rows);
-
-
-    return $build;
   }
 }
