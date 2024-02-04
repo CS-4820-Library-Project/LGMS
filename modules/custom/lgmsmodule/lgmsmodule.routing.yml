@@ -30,10 +30,34 @@ lgmsmodule.by_group:
   requirements:
     _permission: 'access content'
 
-lgmsmodule.lgmsDashboard:
+lgmsmodule.dashboard_overview:
   path: '/lgms/dashboard'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::dashboardPage'
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::overview'
     _title: 'Dashboard Overview'
   requirements:
-    _permission: 'access content'
+    _permission: 'access dashboard'
+
+lgmsmodule.dashboard_new:
+  path: '/lgms/dashboard/new'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::new'
+    _title: 'New Item'
+  requirements:
+    _permission: 'add new item'
+
+lgmsmodule.dashboard_import:
+  path: '/lgms/dashboard/import'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::import'
+    _title: 'Import Items'
+  requirements:
+    _permission: 'import items'
+
+lgmsmodule.dashboard_edit:
+  path: '/lgms/dashboard/edit'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::edit'
+    _title: 'Edit Items'
+  requirements:
+    _permission: 'edit items'

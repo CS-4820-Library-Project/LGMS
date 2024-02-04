@@ -15,9 +15,9 @@ class lgmsDashboardController extends ControllerBase {
    * @return array
    *   A render array containing the page content.
    */
-  public function dashboardPage() {
+  public function overview() {
       $build = [];
-      $view = Views::getView('lgmstable');
+      $view = Views::getView('lgms_dashboard_table');
 
       if (is_object($view)) {
         // Set the display id
@@ -37,7 +37,18 @@ class lgmsDashboardController extends ControllerBase {
           'view' => $rendered_view,
         ];
       }
-
       return $build;
     }
+
+     public function new() {
+    // Generate the content for creating new items.
+  }
+
+  public function import() {
+    // Generate the content for importing items.
+  }
+
+  public function edit() {
+    // Generate the content for editing items.
+  }
 }
