@@ -23,9 +23,17 @@ lgmsmodule.by_type:
     _permission: 'access content'
 
 lgmsmodule.by_group:
-  path: '/lgms/Group'
+  path: '/lgms/group'
   defaults:
     _controller: '\Drupal\lgmsmodule\Controller\ByGroupController::byGroup'
     _title: 'Guides by Group'
+  requirements:
+    _permission: 'access content'
+
+lgmsmodule.lgmsDashboard:
+  path: '/lgms/dashboard'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::dashboardPage'
+    _title: 'Dashboard Overview'
   requirements:
     _permission: 'access content'
