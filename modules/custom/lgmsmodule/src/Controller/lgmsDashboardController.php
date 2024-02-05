@@ -3,6 +3,7 @@
 namespace Drupal\lgmsmodule\Controller;
 use Drupal\views\Views;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\node\Entity\Node;
 
 /**
  * Controller for the Dashboard page.
@@ -42,13 +43,30 @@ class lgmsDashboardController extends ControllerBase {
 
      public function new() {
     // Generate the content for creating new items.
-  }
+      $node = Node::create(['type' => 'guide']);
+        $form = $this->entityFormBuilder()->getForm($node);
+
+      return $form;
+        $build = [];
+
+      }
 
   public function import() {
     // Generate the content for importing items.
+      $node = Node::create(['type' => 'guide']);
+        $form = $this->entityFormBuilder()->getForm($node);
+
+      return $form;
+        $build = [];
   }
 
   public function edit() {
     // Generate the content for editing items.
+
+      $node = Node::create(['type' => 'guide']);
+        $form = $this->entityFormBuilder()->getForm($node);
+
+      return $form;
+        $build = [];
   }
 }
