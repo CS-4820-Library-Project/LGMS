@@ -1,0 +1,17 @@
+.region-sidebar-first .block,
+.region-sidebar-second .block {
+  @include card-container();
+  font-family: 'Roboto Condensed', sans-serif;
+  h3 {
+    @include card-divider;
+    background: #333;
+    color: #fff;
+    margin-bottom: 0;
+    //line-height: 0;
+    padding: .5rem 1rem 0.2rem 1rem;
+    border-bottom: 4px solid $green;
+  }
+  .field--name-body {
+    @include card-section;
+  }
+}

@@ -1,0 +1,56 @@
+{%
+set classes = [
+'region',
+'region-' ~ region|clean_class,
+]
+%}
+      {#{% include '@roblib_2023/templates/components/subfooter_content.html.twig' %}#}
+{% if content %}
+  <div{{ attributes.addClass(classes) }}>
+    {{ content }}
+    {#copied from old footer#}
+    <div class="container">
+
+
+      <div id="block-block-17" class="block block--block  block-block-17 block--block-17">
+        <div class="block__content">
+          <div class="footeraddress">
+            <div class="addressleft">
+              <div class="address">550 University Avenue, Charlottetown<br>
+                Prince Edward Island, Canada C1A 4P3</div>
+
+              <div style="color:white;font-size: .8em;padding-bottom:5px;">On traditional and unceded Mi'kmaq territory</div>
+
+              <div class="links-last"><a href="http://www.upei.ca/emergency/">Emergency Preparedness</a> | <a href="http://home.upei.ca/about-upei/publications">Publications</a> | <a href="http://www.upei.ca/policy/gov/brd/gnl/0017">Privacy Policy</a> | <a href="http://home.upei.ca/disclaimer">Disclaimer</a> | <a href="http://home.upei.ca/about-website">About this Website</a> | <a href="http://home.upei.ca/directory">Contact UPEI</a>&nbsp;&nbsp;&nbsp;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="block-block-19" class="block block--block  block-block-19 block--block-19">
+        <div class="block__content">
+          <div id="address_right">
+            <div class="socialmedia">
+              <ul>
+                <li>
+  <i class="fa-solid fa-user"></i>
+                  <a class="noicon facebook" href="http://facebook.com/UniversityofPEI"><img src="//files.upei.ca/misc/social/upei_facebook.png" style="width: 20px; height: 20px;"></a></li>
+                <li><a class="noicon twitter" href="http://twitter.com/upei"><img src="//files.upei.ca/misc/social/upei_twitter.png" style="width: 20px; height: 20px;"></a></li>
+                <li><a class="noicon youtube" href="http://youtube.com/UofPEI"><img src="//files.upei.ca/misc/social/upei_youtube.png" style="width: 20px; height: 20px;"></a></li>
+                <li><a class="noicon flickr" href="http://flickr.com/groups/upei"><img src="//files.upei.ca/misc/social/upei_flickr.png" style="width: 30px; height: 30px;"></a>
+                  <ul>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <div class="footerlogo"><a href="http://www.upei.ca"><img src="//files.upei.ca/misc/shieldfooter.png" style="width: 142px; height: 56px;"></a></div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+    {#end paste#}
+  </div>
+{% endif %}

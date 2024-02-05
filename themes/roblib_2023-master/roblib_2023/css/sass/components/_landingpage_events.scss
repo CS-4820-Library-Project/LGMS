@@ -1,0 +1,41 @@
+.news-grid .view-content {
+  @include breakpoint(large) {
+    @include flex-grid-row(null, $grid-row-width, null, true, 1em);
+    @include flex-grid-layout(2, '.views-row');
+    .views-row:nth-child(odd) {
+      padding-right: $global-margin;
+    }
+    .views-row:nth-child(even) {
+      padding-left: $global-margin;
+    }
+  }
+}
+.news-grid__tile {
+  .field__label {
+    display: none;
+  }
+  &:hover {
+    color: $red;
+    text-decoration: underline;
+  }
+  img {
+    //max-width: rem-calc(240);
+    //max-height:rem-calc(200);
+    height: rem-calc(160);
+    width: auto;
+  }
+  height: rem-calc(200);
+  a {
+    float: right; //@include button();
+    //padding:0;
+  }
+  p a {
+  }
+  h3 {
+    font-weight: bold;
+    font-size: rem-calc(20);
+  }
+}
+.news-grid__text {
+  overflow: hidden;
+}

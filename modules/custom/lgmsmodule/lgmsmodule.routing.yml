@@ -1,7 +1,7 @@
-lgmsmodule.content:
+lgmsmodule.all_guides:
   path: '/lgms'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::content'
+    _controller: '\Drupal\lgmsmodule\Controller\AllGuidesController::allGuides'
     _title: 'LGMS Module Landing Page'
   requirements:
     _permission: 'access content'
@@ -9,7 +9,7 @@ lgmsmodule.content:
 lgmsmodule.by_subject:
   path: '/lgms/subject'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::bySubject'
+    _controller: '\Drupal\lgmsmodule\Controller\BySubjectController::bySubject'
     _title: 'Guides by Subject'
   requirements:
     _permission: 'access content'
@@ -17,15 +17,47 @@ lgmsmodule.by_subject:
 lgmsmodule.by_type:
   path: '/lgms/type'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::byType'
+    _controller: '\Drupal\lgmsmodule\Controller\ByTypeController::byType'
     _title: 'Guides by Type'
   requirements:
     _permission: 'access content'
 
-lgmsmodule.by_owner:
-  path: '/lgms/owner'
+lgmsmodule.by_group:
+  path: '/lgms/group'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::byOwner'
-    _title: 'Guides by Owner'
+    _controller: '\Drupal\lgmsmodule\Controller\ByGroupController::byGroup'
+    _title: 'Guides by Group'
   requirements:
     _permission: 'access content'
+
+lgmsmodule.dashboard_overview:
+  path: '/lgms/dashboard'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::overview'
+    _title: 'Dashboard Overview'
+  requirements:
+    _permission: 'access dashboard'
+
+lgmsmodule.dashboard_new:
+  path: '/lgms/dashboard/new'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::new'
+    _title: 'New Item'
+  requirements:
+    _permission: 'add new item'
+
+lgmsmodule.dashboard_import:
+  path: '/lgms/dashboard/import'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::import'
+    _title: 'Import Items'
+  requirements:
+    _permission: 'import items'
+
+lgmsmodule.dashboard_edit:
+  path: '/lgms/dashboard/edit'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::edit'
+    _title: 'Edit Items'
+  requirements:
+    _permission: 'edit items'

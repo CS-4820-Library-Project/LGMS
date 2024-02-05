@@ -1,0 +1,11 @@
+<ul class="menu icons icon-top">
+  <li><a href="#"><i class="fa-brands fa-weixin"></i> <span>Ask Us</span></a></li>
+  <li><a href="#"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></a></li>
+  <li><a href="#"><i class="fa-solid fa-laptop"></i> <span>Computers</span></a></li>
+  <li><a href="#"><i class="fa-solid fa-print"></i> <span>Print/Scan</span></a></li>
+  <li><a href="#"><i class="fa-solid fa-image"></i> <span>PEI Collections</span></a></li>
+  <li><a href="#"><i class="fa-solid fa-info-circle"></i> <span>Tours/Tutorials</span></a></li>
+  <li><a href="#"><i class="fa-solid fa-users"></i> <span>Book a Space</span></a></li>
+  <li><a href="#"><i class="fa-solid fa-book"></i> <span>Subject Guides</span></a></li>
+  <li><a href="#"><i class="fa-solid fa-info-circle"></i> <span>FAQ</span></a></li>
+</ul>
