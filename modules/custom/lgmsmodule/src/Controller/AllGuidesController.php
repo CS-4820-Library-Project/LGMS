@@ -24,7 +24,7 @@ class AllGuidesController extends ControllerBase
   public function allGuides(): array
   {
     $build = [];
-    $view = Views::getView('lgmstable');
+    $view = Views::getView('LGMS_Table');
 
     if (is_object($view)) {
       // Set the display id
