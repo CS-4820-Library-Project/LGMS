@@ -6,6 +6,7 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\views\Entity\View;
@@ -21,6 +22,21 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
       'template' => 'lgmsmodule-content',
     ],
   ];
+}
+
+/**
+ * @throws EntityStorageException
+ */
+function create_guide_node($title, $subject, $type, $group): void {
+  $node = Node::create([
+    'type'        => 'guide',
+    'title'       => $title,
+    'field_lgms_guide_subject' => ['target_id' => $subject],
+    'field_lgms_guide_type' => ['target_id' => $type],
+    'field_lgms_guide_group' => ['target_id' => $group],
+  ]);
+
+  $node->save();
 }
 
 
@@ -60,33 +76,6 @@ function add_terms(array $terms, string $vid): void {
   }
 }
 
-/**
- * Create mock guides.
- */
-function create_mock_guides() {
-  // Load term IDs for guide types.
-  $type_terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => 'lgms_guide_type']);
-  $type_tids = array_keys($type_terms);
-
-  // Load term IDs for guide subjects.
-  $subject_terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => 'lgms_guide_subject']);
-  $subject_tids = array_keys($subject_terms);
-
-  // Load term IDs for guide groups.
-  $group_terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => 'lgms_guide_group']);
-  $group_tids = array_keys($group_terms);
-
-  for ($i = 1; $i <= 50; $i++) {
-    $guide_node = \Drupal\node\Entity\Node::create([
-      'type' => 'guide',
-      'title' => 'Guide ' . $i . ': ' . $subject_terms[array_rand($subject_tids)]->getName(),
-      'field_guide_type' => ['target_id' => $type_tids[array_rand($type_tids)]],
-      'field_guide_subject' => ['target_id' => $subject_tids[array_rand($subject_tids)]],
-      'field_guide_group' => ['target_id' => $group_tids[array_rand($group_tids)]],
-    ]);
-    $guide_node->save();
-  }
-}
 
 /**
  * Links the JavaScript to the all Guides Table.
@@ -98,6 +87,25 @@ function lgmsmodule_views_pre_render(ViewExecutable $view): void
   if (($view->storage->id() == 'LGMS_Table')) {
     $view->element['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
   }
+}
+
+/**
+ * Gets a random term ID from a given vocabulary.
+ *
+ * @param string $vid The machine name of the vocabulary.
+ *
+ * @return int|null The random term ID or NULL if not found.
+ */
+function get_random_term_id($vid) {
+  $term_ids = \Drupal::entityQuery('taxonomy_term')
+    ->condition('vid', $vid)
+    ->accessCheck(TRUE)
+    ->execute();
+  if (!empty($term_ids)) {
+    return array_rand($term_ids);
+  }
+
+  return NULL;
 }
 
 /**
@@ -247,6 +255,20 @@ function lgmsModule_install(): void
   set_form_display_config('field_lgms_guide_subject', 'options_select', 0);
   set_form_display_config('field_lgms_guide_type', 'options_select', 1);
   set_form_display_config('field_lgms_guide_group', 'options_select', 2);
+
+  // 10 Mock guides
+  for ($i = 1; $i <= 10; $i++) {
+    $guide_subject_term_id = get_random_term_id('LGMS_Guide_Subject');
+    $guide_type_term_id = get_random_term_id('LGMS_Guide_Type');
+    $guide_group_term_id = get_random_term_id('LGMS_Guide_Group');
+
+    create_guide_node(
+      "Mock Guide $i",
+      $guide_subject_term_id,
+      $guide_type_term_id,
+      $guide_group_term_id
+    );
+  }
 
 }
 
