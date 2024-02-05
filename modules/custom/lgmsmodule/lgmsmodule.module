@@ -1,10 +1,14 @@
 <?php
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutable;
 
 /**
@@ -26,16 +30,14 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
  * @param string $vid The machine name of the vocabulary.
  * @param string $name The human-readable name of the vocabulary.
  * @return void
- * @throws \Drupal\Core\Entity\EntityStorageException
+ * @throws EntityStorageException
  */
 function create_vocab(string $vid, string $name): void {
-  if (!\Drupal\taxonomy\Entity\Vocabulary::load($vid)) {
-    $vocabulary = \Drupal\taxonomy\Entity\Vocabulary::create([
-      'vid' => $vid,
-      'name' => $name,
-    ]);
-    $vocabulary->save();
-  }
+  $vocabulary = Vocabulary::create([
+    'vid' => $vid,
+    'name' => $name,
+  ]);
+  $vocabulary->save();
 }
 
 
@@ -45,23 +47,16 @@ function create_vocab(string $vid, string $name): void {
  * @param array $terms The terms to add.
  * @param string $vid The machine name of the vocabulary.
  * @return void
- * @throws \Drupal\Core\Entity\EntityStorageException
+ * @throws EntityStorageException
  */
 function add_terms(array $terms, string $vid): void {
   foreach ($terms as $term_name) {
-    // Check if the term already exists.
-    $existing_terms = \Drupal::entityTypeManager()
-      ->getStorage('taxonomy_term')
-      ->loadByProperties(['name' => $term_name, 'vid' => $vid]);
-
-    if (empty($existing_terms)) {
-      $new_term = \Drupal\taxonomy\Entity\Term::create([
-        'vid' => $vid,
-        'name' => $term_name,
-      ]);
-      $new_term->enforceIsNew();
-      $new_term->save();
-    }
+    $new_term = Term::create([
+      'vid' => $vid,
+      'name' => $term_name,
+    ]);
+    $new_term->enforceIsNew();
+    $new_term->save();
   }
 }
 
@@ -93,59 +88,24 @@ function create_mock_guides() {
   }
 }
 
-function lgmsmodule_views_pre_render(ViewExecutable $view)
+/**
+ * Links the JavaScript to the all Guides Table.
+ * @param ViewExecutable $view
+ * @return void
+ */
+function lgmsmodule_views_pre_render(ViewExecutable $view): void
 {
-  if (isset($view) && ($view->storage->id() == 'lgmstable')) {
+  if (($view->storage->id() == 'LGMS_Table')) {
     $view->element['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
   }
 }
 
-
-///**
-// * @throws \Drupal\Core\Entity\EntityStorageException
-// */
-//function create_guide_field_storage() {
-//  $field_storage = FieldStorageConfig::loadByName('node', 'field_guide_subject');
-//  if (!$field_storage) {
-//    FieldStorageConfig::create([
-//      'field_name' => 'field_guide_subject',
-//      'entity_type' => 'node',
-//      'type' => 'entity_reference',
-//      'settings' => [
-//        'target_type' => 'taxonomy_term',
-//      ],
-//    ])->save();
-//  }
-//}
-//
-///**
-// * @throws \Drupal\Core\Entity\EntityStorageException
-// */
-//function create_guide_field_instance() {
-//  $field_instance = FieldConfig::loadByName('node', 'guide', 'field_guide_subject');
-//  if (!$field_instance) {
-//    FieldConfig::create([
-//      'field_name' => 'field_guide_subject',
-//      'entity_type' => 'node',
-//      'bundle' => 'guide',
-//      'label' => 'Subject Taxonomy',
-//      'settings' => [
-//        'handler' => 'default:taxonomy_term',
-//        'handler_settings' => [
-//          'target_bundles' => [
-//            'LGMS Guide Subject' => 'LGMS Guide Subject',
-//          ],
-//        ],
-//      ],
-//    ])->save();
-//  }
-//}
-
 /**
  * Creates or updates field storage and instance for a guide field.
- * @throws \Drupal\Core\Entity\EntityStorageException
+ * @throws EntityStorageException
  */
-function create_guide_field_storage($field_name, $label, $vocabulary) {
+function create_guide_field_storage($field_name, $label, $vocabulary): void
+{
   $field_storage = FieldStorageConfig::loadByName('node', $field_name);
   if (!$field_storage) {
     FieldStorageConfig::create([
@@ -179,9 +139,10 @@ function create_guide_field_storage($field_name, $label, $vocabulary) {
 
 /**
  * Sets the form display configuration for a field.
- * @throws \Drupal\Core\Entity\EntityStorageException
+ * @throws EntityStorageException
  */
-function set_form_display_config($field_name, $widget_type, $weight) {
+function set_form_display_config($field_name, $widget_type, $weight): void
+{
   $form_display = EntityFormDisplay::load('node.guide.default');
   if (!$form_display) {
     $form_display = EntityFormDisplay::create([
@@ -200,12 +161,13 @@ function set_form_display_config($field_name, $widget_type, $weight) {
 
 /**
  * Implements hook_install().
- * @throws \Drupal\Core\Entity\EntityStorageException
+ * @throws EntityStorageException
  */
-function lgmsModule_install() {
+function lgmsModule_install(): void
+{
 
   // Create a new Guide Type taxonomy.
-  create_vocab('LGMS Guide Type', 'Guide Type');
+  create_vocab('LGMS_Guide_Type', 'Guide Type');
 
   // Add terms to the Guide Type taxonomy
   $terms = array(
@@ -214,29 +176,58 @@ function lgmsModule_install() {
     'Topic Guide',
     'Course Guide',
   );
-  add_terms($terms, 'LGMS Guide Type');
+  add_terms($terms, 'LGMS_Guide_Type');
 
 
   // Create a new Guide Subject taxonomy.
-  create_vocab('LGMS Guide Subject', 'Guide Subject');
+  create_vocab('LGMS_Guide_Subject', 'Guide Subject');
 
   // Add terms to the Guide Subject taxonomy
   $terms = array(
-    'Biology',
-    'Psychology ',
-    'Music',
-    'Modern Languages',
+    'Anthropology',
+    'Biology ',
+    'Biotechnology',
+    'Business & Management',
+    'Chemistry',
+    'Communication & Mass Media',
     'Computer Science',
+    'Drama & Theater Arts',
+    'Earth & Atmospheric Sciences',
+    'Economics',
+    'Education',
+    'Engineering',
+    'Environmental Sciences',
+    'Ethnic & Cultural Studies',
+    'Geography & Cartography',
+    'Health & Medicine',
     'History',
-    'Geography',
-    'Philosophy',
-    'Art and Design',
+    'Language & Linguistics',
+    'Law',
+    'Library & Information Science',
+    'Literature & Writing',
+    'Marketing',
+    'Mathematics',
+    'Music',
+    'Nursing & Allied Health',
+    'Nutrition & Dietetics',
+    'Physics',
+    'Political Science',
+    'Politics & Government',
+    'Psychology',
+    'Religion & Philosophy',
+    'Science',
+    'Sociology',
+    'Sports & Leisure',
+    'Sports Medicine',
+    'Veterinary Medicine',
+    'Visual Arts',
+    'Women\'s Studies & Feminism',
   );
-  add_terms($terms, 'LGMS Guide Subject');
+  add_terms($terms, 'LGMS_Guide_Subject');
 
 
   // Create a new Guide Group taxonomy.
-  create_vocab('LGMS Guide Group', 'Guide Group');
+  create_vocab('LGMS_Guide_Group', 'Guide Group');
 
   // Add terms to the Guide Group taxonomy
   $terms = array(
@@ -245,16 +236,69 @@ function lgmsModule_install() {
     'Group 3',
     'Group 4',
   );
-  add_terms($terms, 'LGMS Guide Group');
+  add_terms($terms, 'LGMS_Guide_Group');
 
   // Create field storages and instances...
-  create_guide_field_storage('field_guide_subject', 'Subject Taxonomy', 'LGMS Guide Subject');
-  create_guide_field_storage('field_guide_type', 'Type Taxonomy', 'LGMS Guide Type');
-  create_guide_field_storage('field_guide_group', 'Group Taxonomy', 'LGMS Guide Group');
+  create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject');
+  create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type');
+  create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group');
 
   // Set form display configurations...
-  set_form_display_config('field_guide_subject', 'options_select', 0);
-  set_form_display_config('field_guide_type', 'options_select', 1);
-  set_form_display_config('field_guide_group', 'options_select', 2);
+  set_form_display_config('field_lgms_guide_subject', 'options_select', 0);
+  set_form_display_config('field_lgms_guide_type', 'options_select', 1);
+  set_form_display_config('field_lgms_guide_group', 'options_select', 2);
 
+}
+
+/**
+ * Implements hook_uninstall().
+ * @throws EntityStorageException
+ */
+function lgmsModule_uninstall(): void
+{
+  // Delete the Guide Type taxonomy vocabulary and its terms.
+  delete_vocab_and_terms('LGMS_Guide_Type');
+
+  // Delete the Guide Subject taxonomy vocabulary and its terms.
+  delete_vocab_and_terms('LGMS_Guide_Subject');
+
+  // Delete the Guide Group taxonomy vocabulary and its terms.
+  delete_vocab_and_terms('LGMS_Guide_Group');
+
+  // Delete field storages.
+  delete_guide_field_storage('field_lgms_guide_subject');
+  delete_guide_field_storage('field_lgms_guide_type');
+  delete_guide_field_storage('field_lgms_guide_group');
+}
+
+/**
+ * Deletes a vocabulary and its terms.
+ * @throws EntityStorageException
+ */
+function delete_vocab_and_terms($vocab_machine_name): void
+{
+  $vocabulary = Vocabulary::load($vocab_machine_name);
+  if ($vocabulary) {
+    try {
+      $terms = \Drupal::entityTypeManager()
+        ->getStorage('taxonomy_term')
+        ->loadByProperties(['vid' => $vocab_machine_name]);
+
+      foreach ($terms as $term) {
+        $term->delete();
+      }
+    } catch (InvalidPluginDefinitionException|PluginNotFoundException $e) {
+    }
+    $vocabulary->delete();
+  }
+}
+
+/**
+ * Deletes storage Fields
+ * @throws EntityStorageException
+ */
+function delete_guide_field_storage($field_storage_name): void
+{
+  $field_storage = FieldStorageConfig::load($field_storage_name);
+  $field_storage?->delete();
 }

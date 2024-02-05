@@ -1,19 +1,13 @@
-uuid: 15998392-7682-447e-8110-1b924ace5ed2
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.field_guide_group
-    - field.storage.node.field_guide_subject
-    - field.storage.node.field_guide_type
     - node.type.guide
   module:
     - node
     - user
-_core:
-  default_config_hash: C8b80MXM5bL4EN5QrCRd44M9sioz4KlgiBAWay9X-xM
-id: lgmstable
-label: 'lgms Table'
+id: LGMS_Table
+label: 'LGMS Table'
 module: views
 description: 'Table To show the List of Guides'
 tag: ''
@@ -140,15 +134,15 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        field_guide_group:
-          id: field_guide_group
-          table: node__field_guide_group
-          field: field_guide_group
+        field_lgms_guide_subject:
+          id: field_lgms_guide_subject
+          table: node__field_lgms_guide_subject
+          field: field_lgms_guide_subject
           relationship: none
           group_type: group
           admin_label: ''
           plugin_id: field
-          label: 'Group Taxonomy'
+          label: 'Subject'
           exclude: false
           alter:
             alter_text: false
@@ -203,78 +197,15 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        field_guide_subject:
-          id: field_guide_subject
-          table: node__field_guide_subject
-          field: field_guide_subject
+        field_lgms_guide_type:
+          id: field_lgms_guide_type
+          table: node__field_lgms_guide_type
+          field: field_lgms_guide_type
           relationship: none
           group_type: group
           admin_label: ''
           plugin_id: field
-          label: 'Subject Taxonomy'
-          exclude: false
-          alter:
-            alter_text: false
-            text: ''
-            make_link: false
-            path: ''
-            absolute: false
-            external: false
-            replace_spaces: false
-            path_case: none
-            trim_whitespace: false
-            alt: ''
-            rel: ''
-            link_class: ''
-            prefix: ''
-            suffix: ''
-            target: ''
-            nl2br: false
-            max_length: 0
-            word_boundary: true
-            ellipsis: true
-            more_link: false
-            more_link_text: ''
-            more_link_path: ''
-            strip_tags: false
-            trim: false
-            preserve_tags: ''
-            html: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: true
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_empty: false
-          empty_zero: false
-          hide_alter_empty: true
-          click_sort_column: target_id
-          type: entity_reference_label
-          settings:
-            link: false
-          group_column: target_id
-          group_columns: {  }
-          group_rows: true
-          delta_limit: 0
-          delta_offset: 0
-          delta_reversed: false
-          delta_first_last: false
-          multi_type: separator
-          separator: ', '
-          field_api_classes: false
-        field_guide_type:
-          id: field_guide_type
-          table: node__field_guide_type
-          field: field_guide_type
-          relationship: none
-          group_type: group
-          admin_label: ''
-          plugin_id: field
-          label: 'Type Taxonomy'
+          label: 'Type'
           exclude: false
           alter:
             alter_text: false
@@ -545,9 +476,8 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
-        - 'config:field.storage.node.field_guide_group'
-        - 'config:field.storage.node.field_guide_subject'
-        - 'config:field.storage.node.field_guide_type'
+        - 'config:field.storage.node.field_lgms_guide_subject'
+        - 'config:field.storage.node.field_lgms_guide_type'
   block_1:
     id: block_1
     display_title: Block
@@ -565,6 +495,5 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
-        - 'config:field.storage.node.field_guide_group'
-        - 'config:field.storage.node.field_guide_subject'
-        - 'config:field.storage.node.field_guide_type'
+        - 'config:field.storage.node.field_lgms_guide_subject'
+        - 'config:field.storage.node.field_lgms_guide_type'

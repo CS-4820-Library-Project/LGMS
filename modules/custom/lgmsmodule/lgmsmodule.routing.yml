@@ -1,7 +1,7 @@
-lgmsmodule.content:
+lgmsmodule.all_guides:
   path: '/lgms'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\LgmsModuleController::content'
+    _controller: '\Drupal\lgmsmodule\Controller\AllGuidesController::allGuides'
     _title: 'LGMS Module Landing Page'
   requirements:
     _permission: 'access content'

@@ -1,22 +1,22 @@
 lgmsmodule.all_guides:
   title: 'All Guides'
-  route_name: lgmsmodule.content
-  base_route: lgmsmodule.content
+  route_name: lgmsmodule.all_guides
+  base_route: lgmsmodule.all_guides
 
 lgmsmodule.by_subject:
   title: 'By Subject'
   route_name: lgmsmodule.by_subject
-  base_route: lgmsmodule.content
+  base_route: lgmsmodule.all_guides
 
 lgmsmodule.by_type:
   title: 'By Type'
   route_name: lgmsmodule.by_type
-  base_route: lgmsmodule.content
+  base_route: lgmsmodule.all_guides
 
 lgmsmodule.by_group:
   title: 'By Group'
   route_name: lgmsmodule.by_group
-  base_route: lgmsmodule.content
+  base_route: lgmsmodule.all_guides
 
 lgmsmodule.dashboard_overview_tab:
   title: 'Overview'
