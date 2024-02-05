@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'drupal/legacy-project',
-        'pretty_version' => 'dev-design/Landingpage',
-        'version' => 'dev-design/Landingpage',
-        'reference' => '5361492e70a0c443d1797a6f598d0311f79f9d14',
+        'pretty_version' => 'dev-dev',
+        'version' => 'dev-dev',
+        'reference' => 'bb6e7037210978547b60b11afbc1e918ff736d02',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -263,9 +263,9 @@
             ),
         ),
         'drupal/legacy-project' => array(
-            'pretty_version' => 'dev-design/Landingpage',
-            'version' => 'dev-design/Landingpage',
-            'reference' => '5361492e70a0c443d1797a6f598d0311f79f9d14',
+            'pretty_version' => 'dev-dev',
+            'version' => 'dev-dev',
+            'reference' => 'bb6e7037210978547b60b11afbc1e918ff736d02',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

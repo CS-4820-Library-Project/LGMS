@@ -17,3 +17,27 @@ lgmsmodule.by_group:
   title: 'By Group'
   route_name: lgmsmodule.by_group
   base_route: lgmsmodule.content
+
+lgmsmodule.dashboard_overview_tab:
+  title: 'Overview'
+  route_name: lgmsmodule.dashboard_overview
+  base_route: lgmsmodule.dashboard_overview
+  weight: 0
+
+lgmsmodule.dashboard_new_tab:
+  title: 'New'
+  route_name: lgmsmodule.dashboard_new
+  base_route: lgmsmodule.dashboard_overview
+  weight: 1
+
+lgmsmodule.dashboard_import_tab:
+  title: 'Import'
+  route_name: lgmsmodule.dashboard_import
+  base_route: lgmsmodule.dashboard_overview
+  weight: 2
+
+lgmsmodule.dashboard_edit_tab:
+  title: 'Edit'
+  route_name: lgmsmodule.dashboard_edit
+  base_route: lgmsmodule.dashboard_overview
+  weight: 3
