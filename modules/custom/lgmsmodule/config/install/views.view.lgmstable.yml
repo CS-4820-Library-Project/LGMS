@@ -1,11 +1,7 @@
-uuid: 15998392-7682-447e-8110-1b924ace5ed2
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.field_guide_group
-    - field.storage.node.field_guide_subject
-    - field.storage.node.field_guide_type
     - node.type.guide
   module:
     - node
@@ -140,10 +136,10 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        field_guide_group:
-          id: field_guide_group
-          table: node__field_guide_group
-          field: field_guide_group
+        field_lgms_guide_group:
+          id: field_lgms_guide_group
+          table: node__field_lgms_guide_group
+          field: field_lgms_guide_group
           relationship: none
           group_type: group
           admin_label: ''
@@ -203,10 +199,10 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        field_guide_subject:
-          id: field_guide_subject
-          table: node__field_guide_subject
-          field: field_guide_subject
+        field_lgms_guide_subject:
+          id: field_lgms_guide_subject
+          table: node__field_lgms_guide_subject
+          field: field_lgms_guide_subject
           relationship: none
           group_type: group
           admin_label: ''
@@ -266,10 +262,10 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        field_guide_type:
-          id: field_guide_type
-          table: node__field_guide_type
-          field: field_guide_type
+        field_lgms_guide_type:
+          id: field_lgms_guide_type
+          table: node__field_lgms_guide_type
+          field: field_lgms_guide_type
           relationship: none
           group_type: group
           admin_label: ''
@@ -545,9 +541,9 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
-        - 'config:field.storage.node.field_guide_group'
-        - 'config:field.storage.node.field_guide_subject'
-        - 'config:field.storage.node.field_guide_type'
+        - 'config:field.storage.node.field_lgms_guide_group'
+        - 'config:field.storage.node.field_lgms_guide_subject'
+        - 'config:field.storage.node.field_lgms_guide_type'
   block_1:
     id: block_1
     display_title: Block
@@ -565,6 +561,6 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
-        - 'config:field.storage.node.field_guide_group'
-        - 'config:field.storage.node.field_guide_subject'
-        - 'config:field.storage.node.field_guide_type'
+        - 'config:field.storage.node.field_lgms_guide_group'
+        - 'config:field.storage.node.field_lgms_guide_subject'
+        - 'config:field.storage.node.field_lgms_guide_type'

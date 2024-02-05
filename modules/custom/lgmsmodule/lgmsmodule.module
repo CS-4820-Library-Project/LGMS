@@ -5,6 +5,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutable;
 
 /**
@@ -29,13 +30,11 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function create_vocab(string $vid, string $name): void {
-  if (!\Drupal\taxonomy\Entity\Vocabulary::load($vid)) {
-    $vocabulary = \Drupal\taxonomy\Entity\Vocabulary::create([
-      'vid' => $vid,
-      'name' => $name,
-    ]);
-    $vocabulary->save();
-  }
+  $vocabulary = Vocabulary::create([
+    'vid' => $vid,
+    'name' => $name,
+  ]);
+  $vocabulary->save();
 }
 
 
@@ -49,19 +48,12 @@ function create_vocab(string $vid, string $name): void {
  */
 function add_terms(array $terms, string $vid): void {
   foreach ($terms as $term_name) {
-    // Check if the term already exists.
-    $existing_terms = \Drupal::entityTypeManager()
-      ->getStorage('taxonomy_term')
-      ->loadByProperties(['name' => $term_name, 'vid' => $vid]);
-
-    if (empty($existing_terms)) {
-      $new_term = \Drupal\taxonomy\Entity\Term::create([
-        'vid' => $vid,
-        'name' => $term_name,
-      ]);
-      $new_term->enforceIsNew();
-      $new_term->save();
-    }
+    $new_term = Term::create([
+      'vid' => $vid,
+      'name' => $term_name,
+    ]);
+    $new_term->enforceIsNew();
+    $new_term->save();
   }
 }
 
@@ -93,59 +85,24 @@ function create_mock_guides() {
   }
 }
 
-function lgmsmodule_views_pre_render(ViewExecutable $view)
+/**
+ * Links the JavaScript to the all Guides Table.
+ * @param ViewExecutable $view
+ * @return void
+ */
+function lgmsmodule_views_pre_render(ViewExecutable $view): void
 {
-  if (isset($view) && ($view->storage->id() == 'lgmstable')) {
+  if (($view->storage->id() == 'lgmstable')) {
     $view->element['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
   }
 }
-
-
-///**
-// * @throws \Drupal\Core\Entity\EntityStorageException
-// */
-//function create_guide_field_storage() {
-//  $field_storage = FieldStorageConfig::loadByName('node', 'field_guide_subject');
-//  if (!$field_storage) {
-//    FieldStorageConfig::create([
-//      'field_name' => 'field_guide_subject',
-//      'entity_type' => 'node',
-//      'type' => 'entity_reference',
-//      'settings' => [
-//        'target_type' => 'taxonomy_term',
-//      ],
-//    ])->save();
-//  }
-//}
-//
-///**
-// * @throws \Drupal\Core\Entity\EntityStorageException
-// */
-//function create_guide_field_instance() {
-//  $field_instance = FieldConfig::loadByName('node', 'guide', 'field_guide_subject');
-//  if (!$field_instance) {
-//    FieldConfig::create([
-//      'field_name' => 'field_guide_subject',
-//      'entity_type' => 'node',
-//      'bundle' => 'guide',
-//      'label' => 'Subject Taxonomy',
-//      'settings' => [
-//        'handler' => 'default:taxonomy_term',
-//        'handler_settings' => [
-//          'target_bundles' => [
-//            'LGMS Guide Subject' => 'LGMS Guide Subject',
-//          ],
-//        ],
-//      ],
-//    ])->save();
-//  }
-//}
 
 /**
  * Creates or updates field storage and instance for a guide field.
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
-function create_guide_field_storage($field_name, $label, $vocabulary) {
+function create_guide_field_storage($field_name, $label, $vocabulary): void
+{
   $field_storage = FieldStorageConfig::loadByName('node', $field_name);
   if (!$field_storage) {
     FieldStorageConfig::create([
@@ -181,7 +138,8 @@ function create_guide_field_storage($field_name, $label, $vocabulary) {
  * Sets the form display configuration for a field.
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
-function set_form_display_config($field_name, $widget_type, $weight) {
+function set_form_display_config($field_name, $widget_type, $weight): void
+{
   $form_display = EntityFormDisplay::load('node.guide.default');
   if (!$form_display) {
     $form_display = EntityFormDisplay::create([
@@ -202,10 +160,11 @@ function set_form_display_config($field_name, $widget_type, $weight) {
  * Implements hook_install().
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
-function lgmsModule_install() {
+function lgmsModule_install(): void
+{
 
   // Create a new Guide Type taxonomy.
-  create_vocab('LGMS Guide Type', 'Guide Type');
+  create_vocab('LGMS_Guide_Type', 'Guide Type');
 
   // Add terms to the Guide Type taxonomy
   $terms = array(
@@ -214,29 +173,58 @@ function lgmsModule_install() {
     'Topic Guide',
     'Course Guide',
   );
-  add_terms($terms, 'LGMS Guide Type');
+  add_terms($terms, 'LGMS_Guide_Type');
 
 
   // Create a new Guide Subject taxonomy.
-  create_vocab('LGMS Guide Subject', 'Guide Subject');
+  create_vocab('LGMS_Guide_Subject', 'Guide Subject');
 
   // Add terms to the Guide Subject taxonomy
   $terms = array(
-    'Biology',
-    'Psychology ',
-    'Music',
-    'Modern Languages',
+    'Anthropology',
+    'Biology ',
+    'Biotechnology',
+    'Business & Management',
+    'Chemistry',
+    'Communication & Mass Media',
     'Computer Science',
+    'Drama & Theater Arts',
+    'Earth & Atmospheric Sciences',
+    'Economics',
+    'Education',
+    'Engineering',
+    'Environmental Sciences',
+    'Ethnic & Cultural Studies',
+    'Geography & Cartography',
+    'Health & Medicine',
     'History',
-    'Geography',
-    'Philosophy',
-    'Art and Design',
+    'Language & Linguistics',
+    'Law',
+    'Library & Information Science',
+    'Literature & Writing',
+    'Marketing',
+    'Mathematics',
+    'Music',
+    'Nursing & Allied Health',
+    'Nutrition & Dietetics',
+    'Physics',
+    'Political Science',
+    'Politics & Government',
+    'Psychology',
+    'Religion & Philosophy',
+    'Science',
+    'Sociology',
+    'Sports & Leisure',
+    'Sports Medicine',
+    'Veterinary Medicine',
+    'Visual Arts',
+    'Women\'s Studies & Feminism',
   );
-  add_terms($terms, 'LGMS Guide Subject');
+  add_terms($terms, 'LGMS_Guide_Subject');
 
 
   // Create a new Guide Group taxonomy.
-  create_vocab('LGMS Guide Group', 'Guide Group');
+  create_vocab('LGMS_Guide_Group', 'Guide Group');
 
   // Add terms to the Guide Group taxonomy
   $terms = array(
@@ -245,16 +233,605 @@ function lgmsModule_install() {
     'Group 3',
     'Group 4',
   );
-  add_terms($terms, 'LGMS Guide Group');
+  add_terms($terms, 'LGMS_Guide_Group');
 
   // Create field storages and instances...
-  create_guide_field_storage('field_guide_subject', 'Subject Taxonomy', 'LGMS Guide Subject');
-  create_guide_field_storage('field_guide_type', 'Type Taxonomy', 'LGMS Guide Type');
-  create_guide_field_storage('field_guide_group', 'Group Taxonomy', 'LGMS Guide Group');
+  create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject');
+  create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type');
+  create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group');
 
   // Set form display configurations...
-  set_form_display_config('field_guide_subject', 'options_select', 0);
-  set_form_display_config('field_guide_type', 'options_select', 1);
-  set_form_display_config('field_guide_group', 'options_select', 2);
+  set_form_display_config('field_lgms_guide_subject', 'options_select', 0);
+  set_form_display_config('field_lgms_guide_type', 'options_select', 1);
+  set_form_display_config('field_lgms_guide_group', 'options_select', 2);
 
 }
+
+/*function createTable()
+{
+  $view = View::create([
+    'langcode' => 'en',
+    'status' => TRUE,
+    'dependencies' => [
+      'config' => [
+        'node.type.guide',
+      ],
+      'module' => [
+        'node',
+        'user',
+      ],
+    ],
+    'id' => 'lgmstable',
+    'label' => 'lgms Table',
+    'module' => 'views',
+    'description' => 'Table To show the List of Guides',
+    'tag' => '',
+    'base_table' => 'node_field_data',
+    'base_field' => 'nid',
+    'display' => [
+      'default' => [
+        'id' => 'default',
+        'display_title' => 'Default',
+        'display_plugin' => 'default',
+        'position' => 0,
+        'display_options' => [
+          'title' => 'Guides List',
+          'fields' => [
+            'title' => [
+              'id' => 'title',
+              'table' => 'node_field_data',
+              'field' => 'title',
+              'entity_type' => 'node',
+              'plugin_id' => 'field',
+              'label' => 'Title',
+              'exclude' => FALSE,
+              'alter' => [
+                'alter_text' => FALSE,
+                'make_link' => FALSE,
+                'absolute' => FALSE,
+                'word_boundary' => FALSE,
+                'ellipsis' => FALSE,
+                'strip_tags' => FALSE,
+                'trim' => FALSE,
+                'html' => FALSE,
+              ],
+              'element_type' => '',
+              'element_class' => '',
+              'element_label_type' => '',
+              'element_label_class' => '',
+              'element_label_colon' => TRUE,
+              'element_wrapper_type' => '',
+              'element_wrapper_class' => '',
+              'element_default_classes' => TRUE,
+              'empty' => '',
+              'hide_empty' => FALSE,
+              'empty_zero' => FALSE,
+              'hide_alter_empty' => TRUE,
+              'click_sort_column' => 'value',
+              'type' => 'string',
+              'settings' => [
+                'link_to_entity' => TRUE,
+              ],
+              'group_column' => 'value',
+              'group_rows' => TRUE,
+              'delta_limit' => 0,
+              'delta_offset' => 0,
+              'delta_reversed' => FALSE,
+              'delta_first_last' => FALSE,
+              'multi_type' => 'separator',
+              'separator' => ', ',
+              'field_api_classes' => FALSE,
+            ],
+            'uid' => [
+              'id' => 'uid',
+              'table' => 'node_field_data',
+              'field' => 'uid',
+              'relationship' => 'none',
+              'group_type' => 'group',
+              'admin_label' => '',
+              'entity_type' => 'node',
+              'entity_field' => 'uid',
+              'plugin_id' => 'field',
+              'label' => 'Owner',
+              'exclude' => false,
+              'alter' => [
+                'alter_text' => false,
+                'text' => '',
+                'make_link' => false,
+                'path' => '',
+                'absolute' => false,
+                'external' => false,
+                'replace_spaces' => false,
+                'path_case' => 'none',
+                'trim_whitespace' => false,
+                'alt' => '',
+                'rel' => '',
+                'link_class' => '',
+                'prefix' => '',
+                'suffix' => '',
+                'target' => '',
+                'nl2br' => false,
+                'max_length' => 0,
+                'word_boundary' => true,
+                'ellipsis' => true,
+                'more_link' => false,
+                'more_link_text' => '',
+                'more_link_path' => '',
+                'strip_tags' => false,
+                'trim' => false,
+                'preserve_tags' => '',
+                'html' => false,
+              ],
+              'element_type' => '',
+              'element_class' => '',
+              'element_label_type' => '',
+              'element_label_class' => '',
+              'element_label_colon' => true,
+              'element_wrapper_type' => '',
+              'element_wrapper_class' => '',
+              'element_default_classes' => true,
+              'empty' => '',
+              'hide_empty' => false,
+              'empty_zero' => false,
+              'hide_alter_empty' => true,
+              'click_sort_column' => 'target_id',
+              'type' => 'entity_reference_label',
+              'settings' => [
+                'link' => false,
+              ],
+              'group_column' => 'target_id',
+              'group_rows' => true,
+              'delta_limit' => 0,
+              'delta_offset' => 0,
+              'delta_reversed' => false,
+              'delta_first_last' => false,
+              'multi_type' => 'separator',
+              'separator' => ', ',
+              'field_api_classes' => false,
+            ],
+            'field_guide_group' => [
+              'id' => 'field_guide_group',
+              'table' => 'node__field_guide_group',
+              'field' => 'field_guide_group',
+              'relationship' => 'none',
+              'group_type' => 'group',
+              'admin_label' => '',
+              'plugin_id' => 'field',
+              'label' => 'Group Taxonomy',
+              'exclude' => false,
+              'alter' => [
+                'alter_text' => false,
+                'make_link' => false,
+                'path' => '',
+                'absolute' => false,
+                'external' => false,
+                'replace_spaces' => false,
+                'path_case' => 'none',
+                'trim_whitespace' => false,
+                'alt' => '',
+                'rel' => '',
+                'link_class' => '',
+                'prefix' => '',
+                'suffix' => '',
+                'target' => '',
+                'nl2br' => false,
+                'max_length' => 0,
+                'word_boundary' => true,
+                'ellipsis' => true,
+                'more_link' => false,
+                'more_link_text' => '',
+                'more_link_path' => '',
+                'strip_tags' => false,
+                'trim' => false,
+                'preserve_tags' => '',
+                'html' => false,
+              ],
+              'element_type' => '',
+              'element_class' => '',
+              'element_label_type' => '',
+              'element_label_class' => '',
+              'element_label_colon' => true,
+              'element_wrapper_type' => '',
+              'element_wrapper_class' => '',
+              'element_default_classes' => true,
+              'empty' => '',
+              'hide_empty' => false,
+              'empty_zero' => false,
+              'hide_alter_empty' => true,
+              'click_sort_column' => 'target_id',
+              'type' => 'entity_reference_label',
+              'settings' => [
+                'link' => false,
+              ],
+              'group_column' => 'target_id',
+              'group_rows' => true,
+              'delta_limit' => 0,
+              'delta_offset' => 0,
+              'delta_reversed' => false,
+              'delta_first_last' => false,
+              'multi_type' => 'separator',
+              'separator' => ', ',
+              'field_api_classes' => false,
+            ],
+            'field_guide_subject' => [
+              'id' => 'field_guide_subject',
+              'table' => 'node__field_guide_subject',
+              'field' => 'field_guide_subject',
+              'relationship' => 'none',
+              'group_type' => 'group',
+              'admin_label' => '',
+              'plugin_id' => 'field',
+              'label' => 'Subject Taxonomy',
+              'exclude' => false,
+              'alter' => [
+                'alter_text' => false,
+                'make_link' => false,
+                'path' => '',
+                'absolute' => false,
+                'external' => false,
+                'replace_spaces' => false,
+                'path_case' => 'none',
+                'trim_whitespace' => false,
+                'alt' => '',
+                'rel' => '',
+                'link_class' => '',
+                'prefix' => '',
+                'suffix' => '',
+                'target' => '',
+                'nl2br' => false,
+                'max_length' => 0,
+                'word_boundary' => true,
+                'ellipsis' => true,
+                'more_link' => false,
+                'more_link_text' => '',
+                'more_link_path' => '',
+                'strip_tags' => false,
+                'trim' => false,
+                'preserve_tags' => '',
+                'html' => false,
+              ],
+              'element_type' => '',
+              'element_class' => '',
+              'element_label_type' => '',
+              'element_label_class' => '',
+              'element_label_colon' => true,
+              'element_wrapper_type' => '',
+              'element_wrapper_class' => '',
+              'element_default_classes' => true,
+              'empty' => '',
+              'hide_empty' => false,
+              'empty_zero' => false,
+              'hide_alter_empty' => true,
+              'click_sort_column' => 'target_id',
+              'type' => 'entity_reference_label',
+              'settings' => [
+                'link' => false,
+              ],
+              'group_column' => 'target_id',
+              'group_rows' => true,
+              'delta_limit' => 0,
+              'delta_offset' => 0,
+              'delta_reversed' => false,
+              'delta_first_last' => false,
+              'multi_type' => 'separator',
+              'separator' => ', ',
+              'field_api_classes' => false,
+            ],
+            'field_guide_type' => [
+              'id' => 'field_guide_type',
+              'table' => 'node__field_guide_type',
+              'field' => 'field_guide_type',
+              'relationship' => 'none',
+              'group_type' => 'group',
+              'admin_label' => '',
+              'plugin_id' => 'field',
+              'label' => 'Type Taxonomy',
+              'exclude' => false,
+              'alter' => [
+                'alter_text' => false,
+                'make_link' => false,
+                'path' => '',
+                'absolute' => false,
+                'external' => false,
+                'replace_spaces' => false,
+                'path_case' => 'none',
+                'trim_whitespace' => false,
+                'alt' => '',
+                'rel' => '',
+                'link_class' => '',
+                'prefix' => '',
+                'suffix' => '',
+                'target' => '',
+                'nl2br' => false,
+                'max_length' => 0,
+                'word_boundary' => true,
+                'ellipsis' => true,
+                'more_link' => false,
+                'more_link_text' => '',
+                'more_link_path' => '',
+                'strip_tags' => false,
+                'trim' => false,
+                'preserve_tags' => '',
+                'html' => false,
+              ],
+              'element_type' => '',
+              'element_class' => '',
+              'element_label_type' => '',
+              'element_label_class' => '',
+              'element_label_colon' => true,
+              'element_wrapper_type' => '',
+              'element_wrapper_class' => '',
+              'element_default_classes' => true,
+              'empty' => '',
+              'hide_empty' => false,
+              'empty_zero' => false,
+              'hide_alter_empty' => true,
+              'click_sort_column' => 'target_id',
+              'type' => 'entity_reference_label',
+              'settings' => [
+                'link' => false,
+              ],
+              'group_column' => 'target_id',
+              'group_rows' => true,
+              'delta_limit' => 0,
+              'delta_offset' => 0,
+              'delta_reversed' => false,
+              'delta_first_last' => false,
+              'multi_type' => 'separator',
+              'separator' => ', ',
+              'field_api_classes' => false,
+            ],
+            'changed' => [
+              'changed' => [
+                'id' => 'changed',
+                'table' => 'node_field_data',
+                'field' => 'changed',
+                'relationship' => 'none',
+                'group_type' => 'group',
+                'admin_label' => '',
+                'entity_type' => 'node',
+                'entity_field' => 'changed',
+                'plugin_id' => 'field',
+                'label' => 'Changed',
+                'exclude' => false,
+                'alter' => [
+                  'alter_text' => false,
+                  'make_link' => false,
+                  'path' => '',
+                  'absolute' => false,
+                  'external' => false,
+                  'replace_spaces' => false,
+                  'path_case' => 'none',
+                  'trim_whitespace' => false,
+                  'alt' => '',
+                  'rel' => '',
+                  'link_class' => '',
+                  'prefix' => '',
+                  'suffix' => '',
+                  'target' => '',
+                  'nl2br' => false,
+                  'max_length' => 0,
+                  'word_boundary' => true,
+                  'ellipsis' => true,
+                  'more_link' => false,
+                  'more_link_text' => '',
+                  'more_link_path' => '',
+                  'strip_tags' => false,
+                  'trim' => false,
+                  'preserve_tags' => '',
+                  'html' => false,
+                ],
+                'element_type' => '',
+                'element_class' => '',
+                'element_label_type' => '',
+                'element_label_class' => '',
+                'element_label_colon' => true,
+                'element_wrapper_type' => '',
+                'element_wrapper_class' => '',
+                'element_default_classes' => true,
+                'empty' => '',
+                'hide_empty' => false,
+                'empty_zero' => false,
+                'hide_alter_empty' => true,
+                'click_sort_column' => 'value',
+                'type' => 'timestamp',
+                'settings' => [
+                  'date_format' => 'html_date',
+                  'custom_date_format' => '',
+                  'timezone' => 'America/Halifax',
+                  'tooltip' => [
+                    'date_format' => 'long',
+                    'custom_date_format' => '',
+                  ],
+                  'time_diff' => [
+                    'enabled' => false,
+                    'future_format' => '@interval hence',
+                    'past_format' => '@interval ago',
+                    'granularity' => 2,
+                    'refresh' => 60,
+                    'description' => '',
+                  ],
+                ],
+                'group_column' => 'value',
+                'group_rows' => true,
+                'delta_limit' => 0,
+                'delta_offset' => 0,
+                'delta_reversed' => false,
+                'delta_first_last' => false,
+                'multi_type' => 'separator',
+                'separator' => ', ',
+                'field_api_classes' => false,
+              ],
+            ],
+            'pager' => [
+              'type' => 'none',
+              'options' => [
+                'offset' => 0,
+              ],
+            ],
+            'access' => [
+              'type' => 'perm',
+              'options' => [
+                'perm' => 'access content',
+              ],
+            ],
+            'cache' => [
+              'type' => 'tag',
+              'options' => [],
+            ],
+            'empty' => [],
+            'sorts' => [
+              'title' => [
+                'id' => 'title',
+                'table' => 'node_field_data',
+                'field' => 'title',
+                'order' => 'ASC',
+                'entity_type' => 'node',
+                'entity_field' => 'title',
+                'plugin_id' => 'standard',
+                'expose' => [
+                  'label' => '',
+                  'field_identifier' => '',
+                ],
+                'exposed'=> 'false',
+              ],
+            ],
+            'arguments' => [],
+            'filters' => [
+              'status' => [
+                'id' => 'status',
+                'table' => 'node_field_data',
+                'field' => 'status',
+                'entity_type' => 'node',
+                'entity_field' => 'status',
+                'plugin_id' => 'boolean',
+                'value' => '1', // '1' for published, '0' for unpublished
+                'group' => 1,
+                'expose' => [
+                  'operator' => '',
+                ],
+              ],
+              'type' => [
+                'id' => 'type',
+                'table' => 'node_field_data',
+                'field' => 'type',
+                'entity_type' => 'node',
+                'entity_field' => 'type',
+                'plugin_id' => 'bundle',
+                'operator' => 'in',
+                'value' => [
+                  'guide' => 'guide',
+                ],
+              ],
+            ],
+            'style' => [
+              'type' => 'table',
+              'options' => [
+                'grouping' => [],
+                'row_class' => '',
+                'default_row_class' => TRUE,
+                'columns' => [
+                  'title' => 'title',
+                  'uid' => 'uid',
+                  'field_guide_group' => 'field_guide_group',
+                  'field_guide_subject' => 'field_guide_subject',
+                  'field_guide_type' => 'field_guide_type',
+                  'changed' => 'changed',
+                ],
+                'default' => 'title',
+                'info' => [
+                  'style' => [
+                    'type' => 'table',
+                    'options' => [
+                      'grouping' => [],
+                      'row_class' => '',
+                      'default_row_class' => TRUE,
+                      'columns' => [
+                        'title' => 'title',
+                        'uid' => 'uid',
+                        'field_guide_group' => 'field_guide_group',
+                        'field_guide_subject' => 'field_guide_subject',
+                        'field_guide_type' => 'field_guide_type',
+                        'changed' => 'changed',
+                      ],
+                      'info' => [
+                        'title' => [
+                          'sortable' => TRUE,
+                          'default_sort_order' => 'asc',
+                          'align' => '',
+                          'separator' => '',
+                          'empty_column' => FALSE,
+                        ],
+                      ],
+                      'default' => 'title',
+                      'override' => TRUE,
+                      'sticky' => FALSE,
+                      'summary' => '',
+                      'empty_table' => FALSE,
+                      'caption' => '',
+                      'description' => '',
+                      'class' => 'your-custom-class',
+                    ],
+                  ],
+                ],
+                'override' => TRUE,
+                'sticky' => FALSE,
+                'summary' => '',
+                'empty_table' => FALSE,
+                'caption' => '',
+                'description' => '',
+                'class' => 'lgms-table',
+              ],
+            ],
+            'row' => [
+              'type' => 'fields',
+            ],
+            'query' => [
+              'type' => 'views_query',
+              'options' => [
+                'query_comment' => '',
+                'disable_sql_rewrite' => FALSE,
+                'distinct' => FALSE,
+                'replica' => FALSE,
+                'query_tags' => [],
+              ],
+            ],
+            'relationships' => [],
+            'css_class' => 'lgms-table',
+            'use_ajax' => FALSE,
+            'header' => [],
+            'footer' => [],
+            'display_extenders' => [],
+          ],
+          'cache_metadata' => [
+            'max-age' => -1,
+            'contexts' => [
+              'languages:language_content',
+              'languages:language_interface',
+              'url.query_args',
+              'user.node_grants:view',
+              'user.permissions',
+            ],
+            'tags' => [
+              'config:field.storage.node.field_guide_group',
+              'config:field.storage.node.field_guide_subject',
+              'config:field.storage.node.field_guide_type',
+            ],
+          ],
+        ],
+        'block_1' => [
+          'id' => 'block_1',
+          'display_title' => 'Block',
+          'display_plugin' => 'block',
+          'position' => 1
+          // Configuration for 'block_1' display
+          // Define it similarly if needed
+        ],
+      ]
+    ]
+  ]);
+
+  // Save the view
+  $view->save();
+}
+*/
