@@ -35,4 +35,26 @@ class landingPageHelper {
 
     return $accordion_items;
   }
+
+  public function getLGMSSearchBar()
+  {
+    $block_manager = \Drupal::service('plugin.manager.block');
+    $config = [];
+
+    $plugin_block = $block_manager->createInstance('lgms_tables_search_block', $config);
+    // Return empty render array if user doesn't have access.
+    $access_result = $plugin_block->access(\Drupal::currentUser());
+
+    // Return empty render array if user doesn't have access.
+    if (is_object($access_result) && $access_result->isForbidden() || is_bool($access_result) && !$access_result) {
+
+      return  [];
+    }
+
+    $render = $plugin_block->build();
+    // Add the cache tags/contexts.
+    \Drupal::service('renderer')->addCacheableDependency($render, $plugin_block);
+
+    return $render;
+  }
 }

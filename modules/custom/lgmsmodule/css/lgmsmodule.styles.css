@@ -2,12 +2,17 @@
 /* File: lgmsmodule/css/lgmsmodule.styles.css */
 .search-sort-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 20px; /* Adjust as needed for your theme */
+  justify-content: space-between;
 }
 
 .lgms-search {
   flex-grow: 1;
   margin-right: 20px; /* Space between search and sort */
+  width: 100%;
+}
+
+.js-form-item {
+  width: 85%;
 }

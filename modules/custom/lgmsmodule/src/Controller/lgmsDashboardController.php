@@ -17,7 +17,8 @@ class lgmsDashboardController extends ControllerBase {
    *   A render array containing the page content.
    */
   public function overview() {
-      $build = [];
+    $build = [];
+    $landingMethods = new landingPageHelper();
       $view = Views::getView('lgms_dashboard_table');
 
       if (is_object($view)) {
@@ -37,11 +38,11 @@ class lgmsDashboardController extends ControllerBase {
           ];
         }
 
+        // Render the searchbar block
+        $build['searchbar'] =  $landingMethods->getLGMSSearchBar();
+
         // Add the title and the rendered view to the build array
         $build['table'] = [
-          //'title' => [
-          //'#markup' => '<h2>' . $title . '</h2>',
-          //],
           'view' => $rendered_view,
         ];
       }

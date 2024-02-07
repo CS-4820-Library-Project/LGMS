@@ -5,15 +5,15 @@ namespace Drupal\lgmsmodule\Plugin\Block;
 use Drupal\Core\Block\BlockBase;
 
 /**
- * Provides a 'Hello' Block.
+ * Provides a 'Search Bar' Block.
  *
  * @Block(
- *   id = "hello_block",
- *   admin_label = @Translation("Hello block"),
- *   category = @Translation("Hello World"),
+ *   id = "lgms_tables_search_block",
+ *   admin_label = @Translation("LGMS Table Search Bar"),
+ *   category = @Translation("LGMS"),
  * )
  */
-class HelloBlock extends BlockBase {
+class LgmsTableSearchBlock extends BlockBase {
 
   /**
    * {@inheritdoc}

@@ -5,6 +5,7 @@ namespace Drupal\lgmsmodule\Controller;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\views\Views;
@@ -24,6 +25,7 @@ class AllGuidesController extends ControllerBase
   public function allGuides(): array
   {
     $build = [];
+    $landingMethods = new landingPageHelper();
     $view = Views::getView('lgms_all_guides_table');
 
     if (is_object($view)) {
@@ -43,15 +45,28 @@ class AllGuidesController extends ControllerBase
         ];
       }
 
-      // Add the title and the rendered view to the build array
+      // Add a container
+      $build['top_row'] = [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['search-sort-container']],
+      ];
+
+      // Render the searchbar block
+      $build['top_row']['searchbar'] =  $landingMethods->getLGMSSearchBar();
+
+      // Render the dashboard button
+      $build['top_row']['button'] = [
+        '#type' => 'button',
+        '#value' => 'My DashBoard',
+        '#attributes' => ['class' => ['button']],
+      ];
+
       $build['table'] = [
-        //'title' => [
-        //'#markup' => '<h2>' . $title . '</h2>',
-        //],
         'view' => $rendered_view,
       ];
     }
 
     return $build;
   }
+
 }

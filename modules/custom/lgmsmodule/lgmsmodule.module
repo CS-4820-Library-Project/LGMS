@@ -76,19 +76,6 @@ function add_terms(array $terms, string $vid): void {
   }
 }
 
-
-/**
- * Links the JavaScript to the all Guides Table.
- * @param ViewExecutable $view
- * @return void
- */
-function lgmsmodule_views_pre_render(ViewExecutable $view): void
-{
-  if (($view->storage->id() == 'lgms_all_guides_table') || ($view->storage->id() == 'lgms_dashboard_table')) {
-    $view->element['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
-  }
-}
-
 /**
  * Gets a random term ID from a given vocabulary.
  *
