@@ -20,16 +20,22 @@ class ByGroupController {
       // Get the article title.
       $title = $sqlMethods->getTitle($nid);
 
-      // Get the taxonomy term.
+      if($title != null) {
+        // Get the taxonomy term.
         $taxonomyTerm = $sqlMethods->getTaxonomyTerm($record->field_lgms_guide_group_target_id);
 
-      // Construct the article link.
-      $articleLink = $landingMethods->getLink($nid);
+        // Construct the article link.
+        $articleLink = $landingMethods->getLink($nid);
 
-      // Build the row with the article link and title.
-      $data[$taxonomyTerm][] = new FormattableMarkup('<a href=":link">@name</a>',
-        [':link' => $articleLink,
-          '@name' => $title]);
+        // Build the row with the article link and title.
+        $data[$taxonomyTerm][] = [
+          'text' => $title, // Text to sort by
+          'markup' => new FormattableMarkup('<a href=":link">@name</a>',
+            [':link' => $articleLink,
+              '@name' => $title]
+          )
+        ];
+      }
     }
 
     $build['accordion'] = $landingMethods->buildAccordion($data);

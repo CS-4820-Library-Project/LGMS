@@ -6,10 +6,10 @@ dependencies:
   module:
     - node
     - user
-id: LGMS_Table
-label: 'LGMS Table'
+id: lgms_all_guides_table
+label: 'LGMS All Guides Table'
 module: views
-description: 'Table To show the List of Guides'
+description: 'Table To show the List of all published Guides'
 tag: ''
 base_table: node_field_data
 base_field: nid
@@ -20,7 +20,7 @@ display:
     display_plugin: default
     position: 0
     display_options:
-      title: 'Guides List'
+      title: 'All Guides List'
       fields:
         title:
           id: title
@@ -32,7 +32,7 @@ display:
           entity_type: node
           entity_field: title
           plugin_id: field
-          label: Title
+          label: 'Guide Name'
           exclude: false
           alter:
             alter_text: false
@@ -142,7 +142,7 @@ display:
           group_type: group
           admin_label: ''
           plugin_id: field
-          label: 'Subject'
+          label: Subject
           exclude: false
           alter:
             alter_text: false
@@ -205,7 +205,7 @@ display:
           group_type: group
           admin_label: ''
           plugin_id: field
-          label: 'Type'
+          label: Type
           exclude: false
           alter:
             alter_text: false
@@ -396,9 +396,8 @@ display:
           columns:
             title: title
             uid: uid
-            field_guide_group: field_guide_group
-            field_guide_subject: field_guide_subject
-            field_guide_type: field_guide_type
+            field_lgms_guide_subject: field_lgms_guide_subject
+            field_lgms_guide_type: field_lgms_guide_type
             changed: changed
           default: title
           info:
@@ -416,21 +415,14 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            field_guide_group:
+            field_lgms_guide_subject:
               sortable: true
               default_sort_order: asc
               align: views-align-center
               separator: ''
               empty_column: false
               responsive: ''
-            field_guide_subject:
-              sortable: true
-              default_sort_order: asc
-              align: views-align-center
-              separator: ''
-              empty_column: false
-              responsive: ''
-            field_guide_type:
+            field_lgms_guide_type:
               sortable: true
               default_sort_order: asc
               align: views-align-center
@@ -450,7 +442,6 @@ display:
           empty_table: false
           caption: ''
           description: ''
-          class: lgms-table
       row:
         type: fields
       query:
@@ -463,7 +454,7 @@ display:
           query_tags: {  }
       relationships: {  }
       css_class: lgms-table
-      use_ajax: false
+      use_ajax: true
       header: {  }
       footer: {  }
       display_extenders: {  }
