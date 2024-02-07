@@ -34,7 +34,14 @@ class AllGuidesController extends ControllerBase
       $title = $view->getTitle();
 
       // Render the view
-      $rendered_view = $view->render();
+      $rendered_view = $view->buildRenderable('default', []);
+
+      // Add contextual links if the user has the permission to edit the view
+      if (\Drupal::currentUser()->hasPermission('administer views')) {
+        $rendered_view['#contextual_links']['views'] = [
+          'route_parameters' => ['view' => 'lgms_all_guides_table', 'display_id' => 'default'],
+        ];
+      }
 
       // Add the title and the rendered view to the build array
       $build['table'] = [
