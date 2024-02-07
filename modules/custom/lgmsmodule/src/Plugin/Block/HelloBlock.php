@@ -19,10 +19,16 @@ class HelloBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function build() {
-    //This is just an example of how blocks are created
-    return [
-      '#markup' => $this->t('Hello, World!'),
+    $build = [];
+
+    $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+
+    $build['search'] = [
+      '#type' => 'search',
+      '#attributes' => ['class' => ['lgms-search'], 'placeholder' => $this->t('Search by guide name...'),],
     ];
+
+    return $build;
   }
 
 }

@@ -95,7 +95,7 @@ function create_mock_guides() {
  */
 function lgmsmodule_views_pre_render(ViewExecutable $view): void
 {
-  if (($view->storage->id() == 'LGMS_Table')) {
+  if (($view->storage->id() == 'lgms_all_guides_table') || ($view->storage->id() == 'lgms_dashboard_table')) {
     $view->element['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
   }
 }

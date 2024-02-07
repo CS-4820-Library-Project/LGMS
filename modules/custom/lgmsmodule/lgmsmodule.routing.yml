@@ -44,7 +44,7 @@ lgmsmodule.dashboard_new:
     _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::new'
     _title: 'New Item'
   requirements:
-    _permission: 'add new item'
+    _permission: 'create guide content'
 
 lgmsmodule.dashboard_import:
   path: '/lgms/dashboard/import'
@@ -52,7 +52,7 @@ lgmsmodule.dashboard_import:
     _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::import'
     _title: 'Import Items'
   requirements:
-    _permission: 'import items'
+    _permission: 'create guide content'
 
 lgmsmodule.dashboard_edit:
   path: '/lgms/dashboard/edit'
@@ -60,4 +60,4 @@ lgmsmodule.dashboard_edit:
     _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::edit'
     _title: 'Edit Items'
   requirements:
-    _permission: 'edit items'
+    _permission: 'edit own guide content+edit any guide content'
