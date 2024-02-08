@@ -1,7 +1,9 @@
 <?php
 
 namespace Drupal\lgmsmodule\Controller;
-class landingPageHelper {
+
+class landingPageHelper
+{
   public function getLink(String $nid): string
   {
     return 'http://' . $_SERVER['HTTP_HOST'] . \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $nid])->toString();

@@ -55,9 +55,10 @@ class AllGuidesController extends ControllerBase
       $build['top_row']['searchbar'] =  $landingMethods->getLGMSSearchBar();
 
       // Render the dashboard button
-      $build['top_row']['button'] = [
-        '#type' => 'button',
-        '#value' => 'My DashBoard',
+      $build['top_row']['link'] = [
+        '#title' => 'My Dashboard',
+        '#type' => 'link',
+        '#url' => Url::fromUri('internal:/lgms/dashboard'),
         '#attributes' => ['class' => ['button']],
       ];
 
@@ -68,5 +69,4 @@ class AllGuidesController extends ControllerBase
 
     return $build;
   }
-
 }
