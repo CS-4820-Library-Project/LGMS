@@ -1,36 +1,75 @@
-<img alt="LGMS Logo" src="https://iili.io/J1FmZp1.png" height="150px">
+<img alt="Drupal Logo" src="https://www.drupal.org/files/Wordmark_blue_RGB.png" height="60px">
 
-# Library Guide Management System (LGMS) Module
+Drupal is an open source content management platform supporting a variety of
+websites ranging from personal weblogs to large community-driven websites. For
+more information, visit the Drupal website, [Drupal.org][Drupal.org], and join
+the [Drupal community][Drupal community].
 
-## Overview
-The LGMS module is an open-source, web-based system designed for educational organizations like university libraries. It allows librarians to create, manage, and share information-rich guides with end users such as students, professors, and researchers. This Drupal 10 module aims to provide a user-friendly interface for librarians to create, modify, and organize content without needing programming knowledge.
+## Contributing
 
-## Key Features
-- **Guide Creation and Management**: Librarians can create guides, pages, and boxes with diverse content including text, images, videos, and links.
-- **User Roles and Permissions**: Customizable permissions for different user roles within the module.
-- **Content Categorization**: Advanced categorization of guides using predefined taxonomy vocabularies like Guide Types, Subjects, and Groups.
-- **Responsive Design**: Ensures compatibility across various devices, adhering to Web Content Accessibility Guidelines (WCAG).
-- **Integration with Drupal 10**: Seamlessly integrates with Drupal 10, leveraging its content management capabilities.
+Drupal is developed on [Drupal.org][Drupal.org], the home of the international
+Drupal community since 2001!
 
-## Installation
-1. Ensure Drupal 10 is installed on your system.
-2. Download the LGMS module from the provided repository.
-3. Follow Drupal’s standard module installation process to integrate LGMS into your Drupal setup.
+[Drupal.org][Drupal.org] hosts Drupal's [GitLab repository][GitLab repository],
+its [issue queue][issue queue], and its [documentation][documentation]. Before
+you start working on code, be sure to search the [issue queue][issue queue] and
+create an issue if your aren't able to find an existing issue.
+
+Every issue on Drupal.org automatically creates a new community-accessible fork
+that you can contribute to. Learn more about the code contribution process on
+the [Issue forks & merge requests page][issue forks].
 
 ## Usage
-- After installation, log in with librarian credentials to access the module’s features.
-- Use the intuitive UI to create and manage guides, pages, and boxes.
-- Utilize the taxonomy system for efficient categorization of guides.
-- Customize user roles and permissions as per your organization's requirements.
 
-## System Requirements
-- Drupal 10
-- PHP, HTML/CSS, SQL, and JavaScript knowledge for advanced customization.
-- Compatible with standard web browsers and devices.
+For a brief introduction, see [USAGE.txt](/core/USAGE.txt). You can also find
+guides, API references, and more by visiting Drupal's [documentation
+page][documentation].
 
-## License
-The LGMS module is open-source and distributed under the MIT license.
+You can quickly extend Drupal's core feature set by installing any of its
+[thousands of free and open source modules][modules]. With Drupal and its
+module ecosystem, you can often build most or all of what your project needs
+before writing a single line of code.
 
+## Changelog
 
+Drupal keeps detailed [change records][changelog]. You can search Drupal's
+changes for a record of every notable breaking change and new feature since
+2011.
 
+## Security
 
+For a list of security announcements, see the [Security advisories
+page][Security advisories] (available as [an RSS feed][security RSS]). This
+page also describes how to subscribe to these announcements via email.
+
+For information about the Drupal security process, or to find out how to report
+a potential security issue to the Drupal security team, see the [Security team
+page][security team].
+
+## Need a helping hand?
+
+Visit the [Support page][support] or browse [over a thousand Drupal
+providers][service providers] offering design, strategy, development, and
+hosting services.
+
+## Legal matters
+
+Know your rights when using Drupal by reading Drupal core's
+[license](/core/LICENSE.txt).
+
+Learn about the [Drupal trademark and logo policy here][trademark].
+
+[Drupal.org]: https://www.drupal.org
+[Drupal community]: https://www.drupal.org/community
+[GitLab repository]: https://git.drupalcode.org/project/drupal
+[issue queue]: https://www.drupal.org/project/issues/drupal
+[issue forks]: https://www.drupal.org/drupalorg/docs/gitlab-integration/issue-forks-merge-requests
+[documentation]: https://www.drupal.org/documentation
+[changelog]: https://www.drupal.org/list-changes/drupal
+[modules]: https://www.drupal.org/project/project_module
+[security advisories]: https://www.drupal.org/security
+[security RSS]: https://www.drupal.org/security/rss.xml
+[security team]: https://www.drupal.org/drupal-security-team
+[service providers]: https://www.drupal.org/drupal-services
+[support]: https://www.drupal.org/support
+[trademark]: https://www.drupal.com/trademark
