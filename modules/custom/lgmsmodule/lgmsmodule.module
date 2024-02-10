@@ -256,19 +256,27 @@ function lgmsModule_install(): void
   set_form_display_config('field_lgms_guide_type', 'options_select', 1);
   set_form_display_config('field_lgms_guide_group', 'options_select', 2);
 
-  // 10 Mock guides
-  for ($i = 1; $i <= 10; $i++) {
-    $guide_subject_term_id = get_random_term_id('LGMS_Guide_Subject');
-    $guide_type_term_id = get_random_term_id('LGMS_Guide_Type');
-    $guide_group_term_id = get_random_term_id('LGMS_Guide_Group');
-
-    create_guide_node(
-      "Mock Guide $i",
-      $guide_subject_term_id,
-      $guide_type_term_id,
-      $guide_group_term_id
-    );
+  // Load the 'guide' content type.
+  $content_type = \Drupal\node\Entity\NodeType::load('guide');
+  if ($content_type) {
+    // Disable the display of author and date information. Do it manually sturucture/content-type/guide/edit/display-options
+    $content_type->set('display_submitted', FALSE);
+    $content_type->save();
   }
+
+  // 10 Mock guides
+//  for ($i = 1; $i <= 10; $i++) {
+//    $guide_subject_term_id = get_random_term_id('LGMS_Guide_Subject');
+//    $guide_type_term_id = get_random_term_id('LGMS_Guide_Type');
+//    $guide_group_term_id = get_random_term_id('LGMS_Guide_Group');
+//
+//    create_guide_node(
+//      "Mock Guide $i",
+//      $guide_subject_term_id,
+//      $guide_type_term_id,
+//      $guide_group_term_id
+//    );
+//  }
 
 }
 
