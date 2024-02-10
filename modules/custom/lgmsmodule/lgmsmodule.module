@@ -284,7 +284,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
       foreach ($guide_pages as $guide_page) {
         $link = Link::createFromRoute($guide_page->getTitle(), 'entity.node.canonical', ['node' => $guide_page->id()])->toString();
-        #$description = $guide_page->body->summary ?: $guide_page->body->value;
 
         // Render the title as a link and the body as a text.
         $build['guide_pages_list'][] = [
@@ -295,11 +294,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
             '#markup' => '<h2>' . $link . '</h2>',
             '#allowed_tags' => ['h2', 'a'], // Allow specific tags to render correctly.
           ],
-//          'body' => [
-//            '#type' => 'markup',
-//            '#markup' => '<p>' . $description . '</p>',
-//            '#allowed_tags' => ['p', 'a', 'strong', 'em', 'br'], // Expand allowed tags as needed.
-//          ],
         ];
       }
     }
