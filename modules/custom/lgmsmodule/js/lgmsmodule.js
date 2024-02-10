@@ -15,3 +15,16 @@
     }
   };
 })(jQuery);
+document.querySelectorAll('.js-form-item').forEach(function(item) {
+  if (item.querySelector('.lgms-search')) {
+    item.className = 'has-lgms-search ' + item.className;
+  }
+
+  if (item.querySelector('.lgms-dashboard-search')) {
+    item.className = 'has-lgms-dashboard-search ' + item.className;
+  }
+
+  if (item.querySelector('.lgms-all_guides-search')) {
+    item.className = 'has-lgms-all-guides-search ' + item.className;
+  }
+});

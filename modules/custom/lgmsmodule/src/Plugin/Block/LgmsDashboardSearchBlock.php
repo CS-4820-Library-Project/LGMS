@@ -8,12 +8,12 @@ use Drupal\Core\Block\BlockBase;
  * Provides a 'Search Bar' Block.
  *
  * @Block(
- *   id = "lgms_all_guides_search_block",
- *   admin_label = @Translation("LGMS All Guides Search Bar"),
+ *   id = "lgms_dashboard_search_block",
+ *   admin_label = @Translation("LGMS Dashboard Search Bar"),
  *   category = @Translation("LGMS"),
  * )
  */
-class LgmsTableSearchBlock extends BlockBase {
+class LgmsDashboardSearchBlock extends BlockBase {
 
   /**
    * {@inheritdoc}
@@ -25,7 +25,7 @@ class LgmsTableSearchBlock extends BlockBase {
 
     $build['search'] = [
       '#type' => 'search',
-      '#attributes' => ['class' => ['lgms-search lgms-all_guides-search'], 'placeholder' => $this->t('Search by guide name...'),],
+      '#attributes' => ['class' => ['lgms-search lgms-dashboard-search'], 'placeholder' => $this->t('Search by guide name...'),],
     ];
 
     return $build;

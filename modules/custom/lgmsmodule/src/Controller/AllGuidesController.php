@@ -27,6 +27,7 @@ class AllGuidesController extends ControllerBase
     $build = [];
     $landingMethods = new landingPageHelper();
     $view = Views::getView('lgms_all_guides_table');
+    $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
 
     if (is_object($view)) {
       // Set the display id
@@ -48,14 +49,19 @@ class AllGuidesController extends ControllerBase
       // Add a container
       $build['top_row'] = [
         '#type' => 'container',
-        '#attributes' => ['class' => ['search-sort-container']],
+        '#attributes' => ['class' => ['lgms_all_guides_search_button_container']],
       ];
 
       // Render the searchbar block
-      $build['top_row']['searchbar'] =  $landingMethods->getLGMSSearchBar();
+      $build['top_row']['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_all_guides_search_block');
 
       // Render the dashboard button
-      $build['top_row']['link'] = [
+      $build['top_row']['buttonDev'] = [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['buttonDev']],
+      ];
+
+      $build['top_row']['buttonDev']['link'] = [
         '#title' => 'My Dashboard',
         '#type' => 'link',
         '#url' => Url::fromUri('internal:/lgms/dashboard'),

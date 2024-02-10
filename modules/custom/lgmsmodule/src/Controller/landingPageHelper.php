@@ -38,12 +38,12 @@ class landingPageHelper
     return $accordion_items;
   }
 
-  public function getLGMSSearchBar()
+  public function getLGMSSearchBar(String $blockID)
   {
     $block_manager = \Drupal::service('plugin.manager.block');
     $config = [];
 
-    $plugin_block = $block_manager->createInstance('lgms_tables_search_block', $config);
+    $plugin_block = $block_manager->createInstance($blockID, $config);
     // Return empty render array if user doesn't have access.
     $access_result = $plugin_block->access(\Drupal::currentUser());
 

@@ -1,18 +1,33 @@
 
 /* File: lgmsmodule/css/lgmsmodule.styles.css */
-.search-sort-container {
+.lgms_all_guides_search_button_container {
   display: flex;
   align-items: center;
   margin-bottom: 20px; /* Adjust as needed for your theme */
   justify-content: space-between;
 }
 
-.lgms-search {
+.lgms-dashboard-search {
   flex-grow: 1;
   margin-right: 20px; /* Space between search and sort */
   width: 100%;
 }
 
-.js-form-item {
-  width: 85%;
+.lgms-all_guides-search {
+  flex-grow: 1;
+  margin-right: 8px; /* Space between search and sort */
+  width: 75%;
+}
+
+.has-lgms-dashboard-search{
+  width: 100%;
+}
+
+.has-lgms-all-guides-search{
+  margin-right: 8px;
+  width: 75%;
+}
+
+.button {
+  margin-right: 0;
 }
