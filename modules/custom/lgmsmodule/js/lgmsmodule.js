@@ -1,21 +1,4 @@
 (function ($) {
-  Drupal.behaviors.addInputElement = {
-    attach: function (context, settings) {
-      // Create the input element
-      if ($('.lgms-table .lgms-search').length === 0) {
-        // Create the input element
-        var inputElement = $('<input>', {
-          type: 'text',
-          class: 'form-element lgms-search',
-          style: 'width: 100%;',
-          placeholder: 'Search by guide name, owner, or last modification date'
-        });
-
-        // Append the input element to the div with class 'lgms-table .view-filters'
-        $('.lgms-table').prepend(inputElement);
-      }
-    }
-  };
   Drupal.behaviors.lgmsSearch = {
     attach: function (context, settings) {
       $('.lgms-search', context).on('input', function () {
@@ -32,3 +15,29 @@
     }
   };
 })(jQuery);
+document.querySelectorAll('.js-form-item').forEach(function(item) {
+  if (item.querySelector('.lgms-search')) {
+    item.className = 'has-lgms-search ' + item.className;
+  }
+
+  if (item.querySelector('.lgms-dashboard-search')) {
+    item.className = 'has-lgms-dashboard-search ' + item.className;
+  }
+
+  if (item.querySelector('.lgms-all_guides-search')) {
+    item.className = 'has-lgms-all-guides-search ' + item.className;
+  }
+});
+
+(function ($, Drupal) {
+  Drupal.behaviors.myPopupBehavior = {
+    attach: function (context, settings) {
+      $('.add-guide-box-link', context).once('myPopupBehavior').click(function (e) {
+        e.preventDefault(); // Prevent default link behavior
+        var url = $(this).attr('href');
+        // Open popup window
+        window.open(url, 'GuideBoxPopup', 'innerWidth=800,height=600');
+      });
+    }
+  };
+})(jQuery, Drupal);

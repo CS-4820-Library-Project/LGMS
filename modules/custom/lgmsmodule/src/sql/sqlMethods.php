@@ -23,6 +23,7 @@ class sqlMethods {
     $query = $this->database->select('node_field_data', 'nd')
       ->fields('nd', ['title'])
       ->condition('nd.nid', $nid)
+      ->condition('nd.status', 1)
       ->condition('nd.type', 'guide'); // Added condition for 'guide' content type
 
     return $query->execute()->fetchField();

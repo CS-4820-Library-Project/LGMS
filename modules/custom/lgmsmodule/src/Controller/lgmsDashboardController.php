@@ -17,8 +17,10 @@ class lgmsDashboardController extends ControllerBase {
    *   A render array containing the page content.
    */
   public function overview() {
-      $build = [];
-      $view = Views::getView('lgms_dashboard_table');
+    $build = [];
+    $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+    $landingMethods = new landingPageHelper();
+    $view = Views::getView('lgms_dashboard_table');
 
       if (is_object($view)) {
         // Set the display id
@@ -28,13 +30,20 @@ class lgmsDashboardController extends ControllerBase {
         $title = $view->getTitle();
 
         // Render the view
-        $rendered_view = $view->render();
+        $rendered_view = $view->buildRenderable('default', []);
+
+        // Add contextual links if the user has the permission to edit the view
+        if (\Drupal::currentUser()->hasPermission('administer views')) {
+          $rendered_view['#contextual_links']['views'] = [
+            'route_parameters' => ['view' => 'lgms_dashboard_table', 'display_id' => 'default'],
+          ];
+        }
+
+        // Render the searchbar block
+        $build['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_dashboard_search_block');
 
         // Add the title and the rendered view to the build array
         $build['table'] = [
-          //'title' => [
-          //'#markup' => '<h2>' . $title . '</h2>',
-          //],
           'view' => $rendered_view,
         ];
       }

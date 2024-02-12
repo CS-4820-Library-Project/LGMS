@@ -20,8 +20,8 @@ interface ThemeHandlerInterface {
    *   - info: The contents of the .info.yml file.
    *   - stylesheets: A two dimensional array, using the first key for the
    *     media attribute (e.g. 'all'), the second for the name of the file
-   *     (e.g. landing-page.css). The value is a complete filepath (e.g.
-   *     themes/olivero/landing-page.css). Not set if no stylesheets are defined in the
+   *     (e.g. style.css). The value is a complete filepath (e.g.
+   *     themes/olivero/style.css). Not set if no stylesheets are defined in the
    *     .info.yml file.
    *   - scripts: An associative array of JavaScripts, using the filename as key
    *     and the complete filepath as value. Not set if no scripts are defined

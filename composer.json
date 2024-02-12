@@ -21,7 +21,8 @@
         "drupal/core-project-message": "^10.2",
         "drupal/core-recommended": "^10.2",
         "drupal/core-vendor-hardening": "^10.2",
-        "drupal/vani": "^10.0"
+        "drupal/vani": "^10.0",
+        "drush/drush": "^12.4"
     },
     "conflict": {
         "drupal/drupal": "*"
