@@ -28,3 +28,16 @@ document.querySelectorAll('.js-form-item').forEach(function(item) {
     item.className = 'has-lgms-all-guides-search ' + item.className;
   }
 });
+
+(function ($, Drupal) {
+  Drupal.behaviors.myPopupBehavior = {
+    attach: function (context, settings) {
+      $('.add-guide-box-link', context).once('myPopupBehavior').click(function (e) {
+        e.preventDefault(); // Prevent default link behavior
+        var url = $(this).attr('href');
+        // Open popup window
+        window.open(url, 'GuideBoxPopup', 'innerWidth=800,height=600');
+      });
+    }
+  };
+})(jQuery, Drupal);
