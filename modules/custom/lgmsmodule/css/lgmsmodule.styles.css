@@ -31,3 +31,33 @@
 .button {
   margin-right: 0;
 }
+/* CSS file: lgms-guide-styles.css */
+
+.guide-container {
+  background-color: #f2f2f2; /* Light grey background */
+  border: 1px solid #ccc; /* Grey border */
+  padding: 20px; /* Padding all around */
+  margin-bottom: 20px; /* Space below the block */
+}
+
+.guide-container h2 {
+ // background-color: #a52a2a; /* Dark red background for the title */
+  color: #fff; /* White text color */
+  padding: 10px; /* Padding inside the title bar */
+  margin: -20px; /* Negative margin to align with the block's edges */
+  margin-bottom: 20px; /* Space below the title */
+}
+
+.guide-container .item-list {
+  list-style-type: none; /* Remove default list styling */
+}
+
+.guide-container .item-list li {
+  padding: 5px 0; /* Spacing for list items */
+  border-bottom: 1px solid #ccc; /* Separator for list items */
+}
+
+.guide-container .item-list li:last-child {
+  border-bottom: none; /* No border for the last item */
+}
+
