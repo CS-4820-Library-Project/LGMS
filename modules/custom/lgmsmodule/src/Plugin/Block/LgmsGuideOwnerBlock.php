@@ -3,8 +3,10 @@
 namespace Drupal\lgmsmodule\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -76,7 +78,7 @@ class LgmsGuideOwnerBlock extends BlockBase implements ContainerFactoryPluginInt
     $node = $this->routeMatch->getParameter('node');
 
     $author = $node->getOwner();
-    $account = \Drupal\user\Entity\User::load($author->id());
+    $account = User::load($author->id());
 
     // Get user name and email.
     $name = $account->getDisplayName();
@@ -88,27 +90,70 @@ class LgmsGuideOwnerBlock extends BlockBase implements ContainerFactoryPluginInt
       $user_picture = $account->get('user_picture')->entity->getFileUri();
     }
 
-    // Render user information.
     $content = [];
+    // Render user information.
+    $content["wrapper"] = [
+      '#type' => 'container',
+      '#attributes' => [ 'style' => 'padding: 16px;'],
+    ];
+
     if (!empty($user_picture)) {
-      $content['user_picture'] = [
-        '#theme' => 'image_style',
-        '#style_name' => 'thumbnail',
+      $content["wrapper"]['user_picture'] = [
+        '#theme' => 'image',
         '#uri' => $user_picture,
+        '#attributes' => [
+          'style' => 'width: 243px;height: 287px;object-fit:cover; margin-bottom: 16px;'
+        ],
+
       ];
     }
     if (!empty($name)) {
-      $content['name'] = [
-        '#markup' => '<p>' . $name . '</p>',
+      $content["wrapper"]['name'] = [
+        '#markup' => '<p><strong>Name: </strong>' . $name . '</p>',
       ];
     }
     if (!empty($email)) {
-      $content['email'] = [
-        '#markup' => '<p>' . $email . '</p>',
+      $content["wrapper"]['email'] = [
+        '#markup' => '<p><strong>Email: </strong><a>' . $email . '</a></p>',
       ];
     }
 
-    return $content;
+    $content["wrapper"]['subject'] = [
+      '#markup' => '<p><strong>Subjects:</strong></p>',
+    ];
+
+    // Load all nodes of type "guide" created by the current user.
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', 'guide')
+      ->condition('uid', $author->id())
+      ->accessCheck(TRUE); // Add access check here.
+    $nids = $query->execute();
+
+    // Load and process each guide node.
+    foreach ($nids as $nid) {
+      $node = Node::load($nid);
+
+      // Get the value of the field_lgms_guide_subject field.
+      $target_id = $node->get('field_lgms_guide_subject')->getString();
+      $term = Term::load($target_id);
+      // Get the actual value of the term.
+
+      if ($term) {
+        $term_name = $term->getName();
+        $term_names[] = $term_name;
+      }
+    }
+
+    // Output the term names within a <ul>.
+    if (!empty($term_names)) {
+      $content["wrapper"]['subjects'] = [
+        '#theme' => 'item_list',
+        '#items' => array_unique($term_names),
+      ];
+    }
+
+    // Wrapper div with padding around content elements.
+    return  $content;
   }
 
   /**
