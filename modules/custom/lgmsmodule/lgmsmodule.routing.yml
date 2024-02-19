@@ -61,3 +61,11 @@ lgmsmodule.dashboard_edit:
     _title: 'Edit Items'
   requirements:
     _permission: 'edit own guide content+edit any guide content'
+
+custom_guide_box.form:
+  path: '/custom-guide-box-form'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\CustomGuideBoxForm'
+    _title: 'Add Guide Box'
+  requirements:
+    _permission: 'access content'
