@@ -19,6 +19,7 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Implements hook_theme().
@@ -109,20 +110,26 @@ function get_random_term_id($vid) {
  * Creates or updates field storage and instance for a guide field.
  * @throws EntityStorageException
  */
-function create_guide_field_storage($field_name, $label, $vocabulary): void
+function create_guide_field_storage($field_name, $label, $vocabulary,$cardi): void
 {
   $field_storage = FieldStorageConfig::loadByName('node', $field_name);
   if (!$field_storage) {
-    FieldStorageConfig::create([
+   $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'node',
       'type' => 'entity_reference',
       'settings' => [
         'target_type' => 'taxonomy_term',
       ],
-    ])->save();
+    ]);
+    $field_storage->save();
   }
 
+  if ($field_storage && $cardi) {
+    // Set the cardinality to unlimited.
+    $field_storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $field_storage->save();
+  }
   $field_instance = FieldConfig::loadByName('node', 'guide', $field_name);
   if (!$field_instance) {
     FieldConfig::create([
@@ -481,10 +488,10 @@ function lgmsModule_install(): void
   add_terms($terms, 'LGMS_Guide_Group');
 
   // Create field storages and instances...
-  create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject');
-  create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type');
-  create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group');
-  create_guide_field_storage('field_guide_description', 'Description', 'LGMS_Guide_Group');
+  create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject',TRUE);
+  create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type',FALSE);
+  create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group',FALSE);
+  create_guide_field_storage('field_guide_description', 'Description', 'LGMS_Guide_Group',FALSE);
 
   // Set form display configurations...
   set_form_display_config('field_lgms_guide_subject', 'options_select', 0);
@@ -558,6 +565,24 @@ function lgmsModule_install(): void
 
 }
 
+// /**
+//  * Updates field storage to allow multiple values.
+//  *
+//  * @param string $field_name The machine name of the field.
+//  * @throws EntityStorageException
+//  */
+// function update_field_storage_cardinality($field_name): void {
+//   $field_storage = FieldStorageConfig::loadByName('node', $field_name);
+//   if ($field_storage) {
+//     // Set the cardinality to unlimited.
+//     $field_storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+//     $field_storage->save();
+//   }
+// }
+
+// // Call the function to update the cardinality.
+// update_field_storage_cardinality('field_lgms_guide_subject');
+
 /**
  * Implements hook_uninstall().
  * @throws EntityStorageException
@@ -577,7 +602,7 @@ function lgmsModule_uninstall(): void
   delete_guide_field_storage('field_lgms_guide_subject');
   delete_guide_field_storage('field_lgms_guide_type');
   delete_guide_field_storage('field_lgms_guide_group');
-
+  delete_guide_field_storage('field_guide_description');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
