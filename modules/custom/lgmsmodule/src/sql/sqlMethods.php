@@ -83,4 +83,17 @@ class sqlMethods {
 
     return $query->execute()->fetchAll();
   }
+
+  public function getGuideNodeIdByPageId($pageNodeId)
+  {
+    $query = $this->database->select('node__field_parent_guide', 'n')
+      ->fields('n', ['field_parent_guide_target_id'])
+      ->condition('entity_id', $pageNodeId)
+      ->condition('bundle', 'guide_page')
+      ->range(0, 1);
+
+    $result = $query->execute()->fetchField();
+
+    return $result ? (int)$result : NULL;
+  }
 }

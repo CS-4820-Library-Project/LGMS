@@ -59,7 +59,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
         '#markup' => $link,
       ];
     }
-    if (\Drupal::currentUser()->hasPermission('administer views')) {
+    if (\Drupal::currentUser()->hasPermission('create guide page')) {
 
       $add_page_url = \Drupal\Core\Url::fromRoute('node.add', ['node_type' => 'guide_page'], [
         'query' => ['field_guide_reference' => $current_guide_id],
@@ -74,15 +74,18 @@ class LgmsGuidePageViewBlock extends BlockBase {
     return $build;
   }
 
-  public function getCurrentGuideId() {
+  public function getCurrentGuideId()
+  {
     $current_node = \Drupal::routeMatch()->getParameter('node');
-   // print_r($current_node);
-    if ($current_node && $current_node->getType() == 'guide') {
+    if ($current_node->getType() == 'guide') {
+      return $current_node->id();
+    }
+    elseif ($current_node->getType() == 'guide_page') {
 
-      $guide_id = $current_node->get('field_guide_reference')->target_id;
-      return $guide_id;
+      $sqlMethods = new sqlMethods(\Drupal::database());
+      return $sqlMethods->getGuideNodeIdByPageId($current_node->id());
+
     }
     return NULL;
   }
-
 }
