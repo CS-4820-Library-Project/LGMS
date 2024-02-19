@@ -1,5 +1,6 @@
 <?php
-
+use function t;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -148,6 +149,7 @@ function create_guide_field_storage($field_name, $label, $vocabulary,$cardi): vo
     ])->save();
   }
 }
+
 
 /**
  * Sets the form display configuration for a field.
@@ -494,7 +496,7 @@ function lgmsModule_install(): void
   create_guide_field_storage('field_guide_description', 'Description', 'LGMS_Guide_Group',FALSE);
 
   // Set form display configurations...
-  set_form_display_config('field_lgms_guide_subject', 'options_select', 0);
+  set_form_display_config('field_lgms_guide_subject', 'options_buttons', 0);
   set_form_display_config('field_lgms_guide_type', 'options_select', 1);
   set_form_display_config('field_lgms_guide_group', 'options_select', 2);
   set_form_display_config('field_guide_description', 'text_textarea', 3);
