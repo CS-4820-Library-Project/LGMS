@@ -18,6 +18,7 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutable;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Implements hook_theme().
@@ -243,7 +244,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
   }
 }
 
-function createBodyField($entity_type, $bundle, $field_name, $field_id): void {
+function createBodyField($entity_type, $bundle, $field_name, $field_id, $status): void {
   // Create field storage if it doesn't exist.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
   if (!$storage) {
@@ -292,7 +293,7 @@ function createBodyField($entity_type, $bundle, $field_name, $field_id): void {
         'targetEntityType' => $entity_type,
         'bundle' => $bundle,
         'mode' => 'default',
-        'status' => TRUE,
+        'status' => $status,
       ]);
     }
     $view_display->setComponent($field_id, [
@@ -312,6 +313,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
     // Check if it's a guide page.
     if($entity->bundle() === 'guide') {
+      $build['desc'] = ['#markup' => $entity->get("field_guide_description")->value,];
       // Get the list of guide pages
       $query = \Drupal::entityQuery('node')
         ->condition('type', 'guide_page')
@@ -321,7 +323,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
       if (empty($result)) { /**This Should change to redirecting to create a page*/
         $url = Url::fromRoute('node.add', ['node_type' => 'guide_page'], ['query' => ['field_parent_page' => $entity->id()]]);
-        $link = Link::fromTextAndUrl(t('Create Guide Page'), $url)->toRenderable();
+        $link = Link::fromTextAndUrl(new TranslatableMarkup('Create Guide Page'), $url)->toRenderable();
         $link['#attributes']['class'][] = 'add-guide-box-link';
         $build['add_guide_page_box_link'] = $link;
         return;
@@ -482,14 +484,19 @@ function lgmsModule_install(): void
   create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject');
   create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type');
   create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group');
+  create_guide_field_storage('field_guide_description', 'Description', 'LGMS_Guide_Group');
 
   // Set form display configurations...
   set_form_display_config('field_lgms_guide_subject', 'options_select', 0);
   set_form_display_config('field_lgms_guide_type', 'options_select', 1);
   set_form_display_config('field_lgms_guide_group', 'options_select', 2);
+  set_form_display_config('field_guide_description', 'text_textarea', 3);
 
+
+  createBodyField('node', 'guide', 'Description', 'field_guide_description', FALSE);
   // Load the 'guide' content type.
   $content_type = NodeType::load('guide');
+
   if ($content_type) {
     // Disable the display of author and date information. Do it manually sturucture/content-type/guide/edit/display-options
     $content_type->set('display_submitted', FALSE);
@@ -531,7 +538,7 @@ function lgmsModule_install(): void
     []
   );
 
-  createBodyField('node', 'guide_box', 'Body', 'field_body_box');
+  createBodyField('node', 'guide_box', 'Body', 'field_body_box',TRUE);
 
 
 
