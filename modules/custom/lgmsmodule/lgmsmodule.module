@@ -243,6 +243,47 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
   }
 }
 
+function createWeightField($entity_type, $bundle, $field_name, $field_id) {
+  // Ensure that the field storage exists.
+  $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
+  if (!$storage) {
+    $storage = FieldStorageConfig::create([
+      'field_name' => $field_id, // Make sure this matches the field_id
+      'entity_type' => $entity_type,
+      'type' => 'integer',
+    ]);
+    $storage->save();
+  }
+
+  // Now create the field instance.
+  $field = FieldConfig::loadByName($entity_type, $bundle, $field_name);
+  if (!$field) {
+    FieldConfig::create([
+      'field_storage' => $storage, // Link to the field storage
+      'bundle' => $bundle,
+      'field_name' => $field_name,
+      'label' => 'Weight',
+      'required' => FALSE,
+    ])->save();
+  }
+
+  // Configure form display for the body field.
+  $form_display = EntityFormDisplay::load($entity_type . '.' . $bundle . '.default');
+  if (!$form_display) {
+    $form_display = EntityFormDisplay::create([
+      'targetEntityType' => $entity_type,
+      'bundle' => $bundle,
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+  }
+  $form_display->setComponent($field_id, [
+    'type' => 'number',
+    'weight' => 10,
+    'placeholder' => 0,
+  ])->save();
+}
+
 function createBodyField($entity_type, $bundle, $field_name, $field_id): void {
   // Create field storage if it doesn't exist.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
@@ -301,6 +342,49 @@ function createBodyField($entity_type, $bundle, $field_name, $field_id): void {
   }
 }
 
+/**
+ * Implements hook_node_insert().
+ */
+function lgmsmodule_node_insert(NodeInterface $node) {
+  lgmsmodule_refresh_cache($node);
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function lgmsmodule_node_update(NodeInterface $node) {
+  lgmsmodule_refresh_cache($node);
+}
+
+/**
+ * Helper function to refresh cache.
+ */
+function lgmsmodule_refresh_cache(NodeInterface $node) {
+  if ($node->bundle() === 'guide_box') {
+    // Get the 'parent_page' ID from the 'guide_box'
+    $parent_page_id = $node->get('field_parent_page')->target_id;
+
+    // Clear the cache of the page
+    if ($parent_page_id) {
+      $custom_cache_tag = 'lgmsmodule_node_view:' . $parent_page_id;
+      \Drupal::service('cache_tags.invalidator')->invalidateTags([$custom_cache_tag]);
+    }
+
+    // Clear the cache of the guide
+    $parent_page = Node::load($parent_page_id);
+    lgmsmodule_refresh_cache($parent_page);
+  } elseif ($node->bundle() === 'guide_page') {
+    // Invalidate cache for 'guide_page' as before
+    $parent_guide_id = $node->get('field_parent_guide')->target_id;
+
+    if ($parent_guide_id) {
+      $custom_cache_tag = 'lgmsmodule_node_view:' . $parent_guide_id;
+      \Drupal::service('cache_tags.invalidator')->invalidateTags([$custom_cache_tag]);
+    }
+  }
+}
+
+
 
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
@@ -308,6 +392,12 @@ function createBodyField($entity_type, $bundle, $field_name, $field_id): void {
 function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
   if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+
+    // Add a custom cache tag to the build array
+    $custom_cache_tag = 'lgmsmodule_node_view:' . $entity->id();
+    $build['#cache']['tags'][] = $custom_cache_tag;
+
+
     $page = null;
 
     // Check if it's a guide page.
@@ -322,7 +412,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       if (empty($result)) { /**This Should change to redirecting to create a page*/
         $url = Url::fromRoute('node.add', ['node_type' => 'guide_page'], ['query' => ['field_parent_page' => $entity->id()]]);
         $link = Link::fromTextAndUrl(t('Create Guide Page'), $url)->toRenderable();
-        $link['#attributes']['class'][] = 'add-guide-box-link';
+        $link['#attributes']['class'][] = 'link';
         $build['add_guide_page_box_link'] = $link;
         return;
       }
@@ -351,38 +441,55 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       if (empty($result)) {
         $url = Url::fromRoute('node.add', ['node_type' => 'guide_box'], ['query' => ['field_parent_page' => $page->id()]]);
         $link = Link::fromTextAndUrl(t('Create Guide Box'), $url)->toRenderable();
-        $link['#attributes']['class'][] = 'add-guide-box-link';
+        $link['#attributes']['class'][] = 'link';
         $build['add_guide_page_box_link'] = $link;
         return;
       }
 
       $guide_boxes = Node::loadMultiple($result);
 
+      $orderedBoxes = [];
       foreach ($guide_boxes as $guide_box) {
-        if ($guide_box->hasField('field_body_box') && !$guide_box->get('field_body_box')->isEmpty()) {
-          $build['guide_pages_boxes'][] = [
-            '#type' => 'container',
-            '#attributes' => ['class' => ['guide-box-container']],
-            'title' => [
-              '#type' => 'html_tag',
-              '#tag' => 'h2',
-              '#value' => $guide_box->label(),
-              '#attributes' => ['class' => ['guide-box-title']],
-            ],
-            'body' => [
-              '#type' => 'processed_text',
-              '#text' => $guide_box->get('field_body_box')->value,
-              '#format' => $guide_box->get('field_body_box')->format,
-              '#attributes' => ['class' => ['guide-box-body']],
-            ],
-          ];
+        if ($guide_box->hasField('field_body_box') && !$guide_box->get('field_body_box')->isEmpty() && $guide_box->hasField('field_box_weight')) {
+          $weight = $guide_box->get('field_box_weight')->isEmpty() ? 1000 : $guide_box->get('field_box_weight')->value;
+          $orderedBoxes[$guide_box->id()] = ['weight' => $weight, 'data' => $guide_box];
         }
+      }
+
+      // Sort the guide boxes by weight.
+      uasort($orderedBoxes, function($a, $b) {
+        return $a['weight'] <=> $b['weight'];
+      });
+
+      foreach ($orderedBoxes as $guide_box_data) {
+        $guide_box = $guide_box_data['data'];
+
+        $build['guide_pages_boxes'][] = [
+          '#type' => 'container',
+          '#attributes' => ['class' => ['guide-box-container']],
+          'title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'h2',
+            '#value' => $guide_box->label(),
+            '#attributes' => ['class' => ['guide-box-title']],
+          ],
+          'body' => [
+            '#type' => 'processed_text',
+            '#text' => $guide_box->get('field_body_box')->value,
+            '#format' => $guide_box->get('field_body_box')->format,
+            '#attributes' => ['class' => ['guide-box-body']],
+          ],
+        ];
+
+        $build['guide_pages_boxes'][]['#contextual_links']['nodes'] = [
+          'route_parameters' => ['node' => $guide_box->id()],
+        ];
       }
     }
     $options = [
       'attributes' => [
-        'class' => ['use-ajax', 'add-guide-box-link'],
-        'data-dialog-type' => 'modal', // Optional: for using Drupal's built-in dialog/modal system
+        'class' => ['use-ajax', 'link'],
+        'data-dialog-type' => 'modal',
       ],
     ];
 
@@ -532,6 +639,7 @@ function lgmsModule_install(): void
   );
 
   createBodyField('node', 'guide_box', 'Body', 'field_body_box');
+  createWeightField('node', 'guide_box', 'Weight', 'field_box_weight');
 
 
 
