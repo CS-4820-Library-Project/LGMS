@@ -59,7 +59,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
         '#markup' => $link,
       ];
     }
-    if (\Drupal::currentUser()->hasPermission('create guide page')) {
+    if (\Drupal::currentUser()->hasPermission('create guide page')  && $current_guide_id!= null) {
 
       $add_page_url = \Drupal\Core\Url::fromRoute('node.add', ['node_type' => 'guide_page'], [
         'query' => ['field_guide_reference' => $current_guide_id],
