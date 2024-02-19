@@ -52,6 +52,7 @@ class lgmsDashboardController extends ControllerBase {
 
      public function new() {
     // Generate the content for creating new items.
+    // add a new guide.
       $node = Node::create(['type' => 'guide']);
         $form = $this->entityFormBuilder()->getForm($node);
 

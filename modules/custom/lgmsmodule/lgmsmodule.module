@@ -1,5 +1,6 @@
 <?php
-
+use function t;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -18,6 +19,8 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewExecutable;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Implements hook_theme().
@@ -108,20 +111,26 @@ function get_random_term_id($vid) {
  * Creates or updates field storage and instance for a guide field.
  * @throws EntityStorageException
  */
-function create_guide_field_storage($field_name, $label, $vocabulary): void
+function create_guide_field_storage($field_name, $label, $vocabulary,$cardi): void
 {
   $field_storage = FieldStorageConfig::loadByName('node', $field_name);
   if (!$field_storage) {
-    FieldStorageConfig::create([
+   $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'node',
       'type' => 'entity_reference',
       'settings' => [
         'target_type' => 'taxonomy_term',
       ],
-    ])->save();
+    ]);
+    $field_storage->save();
   }
 
+  if ($field_storage && $cardi) {
+    // Set the cardinality to unlimited.
+    $field_storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $field_storage->save();
+  }
   $field_instance = FieldConfig::loadByName('node', 'guide', $field_name);
   if (!$field_instance) {
     FieldConfig::create([
@@ -140,6 +149,7 @@ function create_guide_field_storage($field_name, $label, $vocabulary): void
     ])->save();
   }
 }
+
 
 /**
  * Sets the form display configuration for a field.
@@ -243,7 +253,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
   }
 }
 
-function createBodyField($entity_type, $bundle, $field_name, $field_id): void {
+function createBodyField($entity_type, $bundle, $field_name, $field_id, $status): void {
   // Create field storage if it doesn't exist.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
   if (!$storage) {
@@ -292,7 +302,7 @@ function createBodyField($entity_type, $bundle, $field_name, $field_id): void {
         'targetEntityType' => $entity_type,
         'bundle' => $bundle,
         'mode' => 'default',
-        'status' => TRUE,
+        'status' => $status,
       ]);
     }
     $view_display->setComponent($field_id, [
@@ -312,6 +322,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
     // Check if it's a guide page.
     if($entity->bundle() === 'guide') {
+      $build['desc'] = ['#markup' => $entity->get("field_guide_description")->value,];
       // Get the list of guide pages
       $query = \Drupal::entityQuery('node')
         ->condition('type', 'guide_page')
@@ -321,7 +332,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
       if (empty($result)) { /**This Should change to redirecting to create a page*/
         $url = Url::fromRoute('node.add', ['node_type' => 'guide_page'], ['query' => ['field_parent_page' => $entity->id()]]);
-        $link = Link::fromTextAndUrl(t('Create Guide Page'), $url)->toRenderable();
+        $link = Link::fromTextAndUrl(new TranslatableMarkup('Create Guide Page'), $url)->toRenderable();
         $link['#attributes']['class'][] = 'add-guide-box-link';
         $build['add_guide_page_box_link'] = $link;
         return;
@@ -479,17 +490,22 @@ function lgmsModule_install(): void
   add_terms($terms, 'LGMS_Guide_Group');
 
   // Create field storages and instances...
-  create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject');
-  create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type');
-  create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group');
+  create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject',TRUE);
+  create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type',FALSE);
+  create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group',FALSE);
+  create_guide_field_storage('field_guide_description', 'Description', 'LGMS_Guide_Group',FALSE);
 
   // Set form display configurations...
-  set_form_display_config('field_lgms_guide_subject', 'options_select', 0);
+  set_form_display_config('field_lgms_guide_subject', 'options_buttons', 0);
   set_form_display_config('field_lgms_guide_type', 'options_select', 1);
   set_form_display_config('field_lgms_guide_group', 'options_select', 2);
+  set_form_display_config('field_guide_description', 'text_textarea', 3);
 
+
+  createBodyField('node', 'guide', 'Description', 'field_guide_description', FALSE);
   // Load the 'guide' content type.
   $content_type = NodeType::load('guide');
+
   if ($content_type) {
     // Disable the display of author and date information. Do it manually sturucture/content-type/guide/edit/display-options
     $content_type->set('display_submitted', FALSE);
@@ -531,7 +547,7 @@ function lgmsModule_install(): void
     []
   );
 
-  createBodyField('node', 'guide_box', 'Body', 'field_body_box');
+  createBodyField('node', 'guide_box', 'Body', 'field_body_box',TRUE);
 
 
 
@@ -550,6 +566,24 @@ function lgmsModule_install(): void
 //  }
 
 }
+
+// /**
+//  * Updates field storage to allow multiple values.
+//  *
+//  * @param string $field_name The machine name of the field.
+//  * @throws EntityStorageException
+//  */
+// function update_field_storage_cardinality($field_name): void {
+//   $field_storage = FieldStorageConfig::loadByName('node', $field_name);
+//   if ($field_storage) {
+//     // Set the cardinality to unlimited.
+//     $field_storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+//     $field_storage->save();
+//   }
+// }
+
+// // Call the function to update the cardinality.
+// update_field_storage_cardinality('field_lgms_guide_subject');
 
 /**
  * Implements hook_uninstall().
@@ -570,7 +604,7 @@ function lgmsModule_uninstall(): void
   delete_guide_field_storage('field_lgms_guide_subject');
   delete_guide_field_storage('field_lgms_guide_type');
   delete_guide_field_storage('field_lgms_guide_group');
-
+  delete_guide_field_storage('field_guide_description');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
