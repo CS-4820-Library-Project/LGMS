@@ -493,13 +493,11 @@ function lgmsModule_install(): void
   create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject',TRUE);
   create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type',FALSE);
   create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group',FALSE);
-  create_guide_field_storage('field_guide_description', 'Description', 'LGMS_Guide_Group',FALSE);
 
   // Set form display configurations...
   set_form_display_config('field_lgms_guide_subject', 'options_buttons', 0);
   set_form_display_config('field_lgms_guide_type', 'options_select', 1);
   set_form_display_config('field_lgms_guide_group', 'options_select', 2);
-  set_form_display_config('field_guide_description', 'text_textarea', 3);
 
 
   createBodyField('node', 'guide', 'Description', 'field_guide_description', FALSE);
@@ -584,6 +582,7 @@ function lgmsModule_install(): void
 
 // // Call the function to update the cardinality.
 // update_field_storage_cardinality('field_lgms_guide_subject');
+//
 
 /**
  * Implements hook_uninstall().
@@ -604,7 +603,6 @@ function lgmsModule_uninstall(): void
   delete_guide_field_storage('field_lgms_guide_subject');
   delete_guide_field_storage('field_lgms_guide_type');
   delete_guide_field_storage('field_lgms_guide_group');
-  delete_guide_field_storage('field_guide_description');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
