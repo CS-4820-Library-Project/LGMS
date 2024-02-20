@@ -544,6 +544,29 @@ function lgmsModule_install(): void
     'entity_reference_autocomplete',
     []
   );
+  // Add a 'Page Name' field to Guide Page content type.
+  createField(
+    'field_page_name',
+    'node',
+    'guide_page',
+    'Page Name',
+    'string',
+    [],
+    'string_textfield',
+    []
+  );
+
+//add page description field
+  createField(
+    'field_description',
+    'node',
+    'guide_page',
+    'Description',
+    'text_long',
+    [],
+    'text_textarea',
+    ['rows' => 5, 'placeholder' => 'Enter the page description here...']
+  );
 
   createBodyField('node', 'guide_box', 'Body', 'field_body_box',TRUE);
 
