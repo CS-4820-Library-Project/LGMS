@@ -7,6 +7,7 @@ use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
 class CustomGuideBoxForm extends FormBase {
@@ -16,6 +17,12 @@ class CustomGuideBoxForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $current_node_url = \Drupal::request()->query->get('current_node_url');
+    $form['current_node_url'] = [
+      '#type' => 'hidden',
+      '#value' => $current_node_url,
+    ];
+
     $form['#attributes']['id'] = 'form-selector';
 
     // Title field
@@ -47,10 +54,6 @@ class CustomGuideBoxForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-      '#ajax' => [
-        'callback' => '::ajaxSubmitCallback',
-        'event' => 'click',
-      ],
     ];
 
     return $form;
@@ -70,38 +73,11 @@ class CustomGuideBoxForm extends FormBase {
 
     $node->save();
 
-    \Drupal::messenger()->addMessage('Content created successfully.');
-    $form_state->setRebuild();
-  }
+    \Drupal::messenger()->addMessage('Box created successfully.');
 
-  public function ajaxSubmitCallback(array &$form, FormStateInterface $form_state) {
-    // Close the modal after submission
-    $response = new AjaxResponse();
+    $current_url = $form_state->getValue('current_node_url');
+    $node_path = str_replace('LGMS/', '', $current_url);
 
-    // Check if there are any form errors.
-    if ($form_state->hasAnyErrors()) {
-      // Return the form if there are errors.
-      $response->addCommand(new ReplaceCommand('#form-selector', $form));
-    } else {
-      // If the form submission is successful, refresh the page and close the window.
-      $node = Node::create([
-        'type' => 'guide_box',
-        'title' => $form_state->getValue('title'),
-        'field_body_box' => [
-          'value' => $form_state->getValue('body'),
-          'format' => 'full_html',
-        ],
-        'field_parent_page' => ['target_id' => $form_state->getValue('parent_page')],
-      ]);
-
-      $node->save();
-
-      $response->addCommand(new CloseModalDialogCommand());
-      $current_url = \Drupal\Core\Url::fromRoute('<current>');
-      $response->addCommand(new RedirectCommand($current_url->toString()));
-      \Drupal::messenger()->addMessage('Content created successfully.');
-    }
-
-    return $response;
+    $form_state->setRedirectUrl(Url::fromUri('internal:' . $node_path));
   }
 }
