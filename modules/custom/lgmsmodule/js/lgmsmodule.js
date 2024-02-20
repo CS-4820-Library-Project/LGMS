@@ -14,6 +14,12 @@
       });
     }
   };
+  Drupal.behaviors.customLayoutRemover = {
+    attach: function (context, settings) {
+      // Remove the class "layout-container" from all elements.
+      $('.layout-container', context).removeClass('layout-container');
+    }
+  };
 })(jQuery);
 document.querySelectorAll('.js-form-item').forEach(function(item) {
   if (item.querySelector('.lgms-search')) {
