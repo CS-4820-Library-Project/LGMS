@@ -1,8 +1,6 @@
 <?php
 
 use Drupal\lgmsmodule\Controller\landingPageHelper;
-use function t;
-use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Serialization\Json;
@@ -20,9 +18,6 @@ use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
-use Drupal\views\Entity\View;
-use Drupal\views\ViewExecutable;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
@@ -628,10 +623,10 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_lgms_guide_group');
   delete_field_storage('field_guide_description');
   delete_field_storage('field_parent_guide');
-  delete_field_storage ('field_parent_page');
+  delete_field_storage('field_parent_page');
   delete_field_storage('field_description');
-  delete_field_storage ('field_body_box');
-  delete_field_storage ('field_box_weight');
+  delete_field_storage('field_body_box');
+  delete_field_storage('field_box_weight');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
