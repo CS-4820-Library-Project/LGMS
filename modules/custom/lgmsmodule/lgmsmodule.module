@@ -406,6 +406,30 @@ function lgmsModule_install(): void
     []
   );
 
+  // Add a 'Page Name' field to Guide Page content type.
+  createField(
+    'field_page_name',
+    'node',
+    'guide_page',
+    'Page Name',
+    'string',
+    [],
+    'string_textfield',
+    []
+  );
+
+//add page description field
+  createField(
+    'field_description',
+    'node',
+    'guide_page',
+    'Description',
+    'text_long',
+    [],
+    'text_textarea',
+    ['rows' => 5, 'placeholder' => 'Enter the page description here...']
+  );
+
 
   // 10 Mock guides
 //  for ($i = 1; $i <= 10; $i++) {
