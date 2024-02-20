@@ -1,10 +1,6 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\CloseModalDialogCommand;
-use Drupal\Core\Ajax\RedirectCommand;
-use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -17,10 +13,10 @@ class CustomGuideBoxForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $current_node_url = \Drupal::request()->query->get('current_node_url');
-    $form['current_node_url'] = [
+    $current_node = \Drupal::request()->query->get('current_node');
+    $form['current_node'] = [
       '#type' => 'hidden',
-      '#value' => $current_node_url,
+      '#value' => $current_node,
     ];
 
     $form['#attributes']['id'] = 'form-selector';
@@ -32,16 +28,6 @@ class CustomGuideBoxForm extends FormBase {
       '#required' => TRUE,
     ];
 
-    // Parent page entity reference field
-    $form['parent_page'] = [
-      '#type' => 'entity_autocomplete',
-      '#title' => $this->t('Parent Page'),
-      '#target_type' => 'node', // Adjust according to your needs
-      '#selection_settings' => [
-        'target_bundles' => ['guide_page'], // Adjust to your guide page bundle
-      ],
-      '#required' => TRUE,
-    ];
 
     // Body field
     $form['body'] = [
@@ -60,23 +46,45 @@ class CustomGuideBoxForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Handle form submission logic, like saving data
-    $node = Node::create([
+    $curr_node = $form_state->getValue('current_node');
+    $curr_node = Node::load($curr_node);
+    $nid = $curr_node->id();
+
+
+    if ($curr_node->bundle() === 'guide'){
+      // Get the list of guide pages
+      $query = \Drupal::entityQuery('node')
+        ->condition('type', 'guide_page')
+        ->condition('field_parent_guide', $curr_node->id())
+        ->accessCheck(TRUE);
+      $result = $query->execute();
+
+      // Get the first page
+      $first_node_id = reset($result);
+      $page = Node::load($first_node_id);
+
+      $nid = $page->id();
+    }
+
+    $new_node = Node::create([
       'type' => 'guide_box',
       'title' => $form_state->getValue('title'),
       'field_body_box' => [
         'value' => $form_state->getValue('body'),
         'format' => 'full_html',
       ],
-      'field_parent_page' => ['target_id' => $form_state->getValue('parent_page')],
+      'field_parent_page' => ['target_id' => $nid],
     ]);
 
-    $node->save();
+    $new_node->save();
+
 
     \Drupal::messenger()->addMessage('Box created successfully.');
 
-    $current_url = $form_state->getValue('current_node_url');
-    $node_path = str_replace('LGMS/', '', $current_url);
+    $curr_node_url = $curr_node->toUrl()->toString();
+    $curr_node_url = str_replace('LGMS/', '', $curr_node_url);
+
+    $node_path = str_replace('LGMS/', '', $curr_node_url);
 
     $form_state->setRedirectUrl(Url::fromUri('internal:' . $node_path));
   }
