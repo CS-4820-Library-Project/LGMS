@@ -1,4 +1,5 @@
 <?php
+
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
@@ -25,7 +26,8 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 /**
  * Implements hook_theme().
  */
-function lgmsmodule_theme($existing, $type, $theme, $path) {
+function lgmsmodule_theme($existing, $type, $theme, $path)
+{
   return [
     'lgmsmodule_content' => [
       'variables' => ['table' => NULL],
@@ -37,7 +39,8 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
 /**
  * @throws EntityStorageException
  */
-function create_guide_node($title, $subject, $type, $group): void {
+function create_guide_node($title, $subject, $type, $group): void
+{
   $node = Node::create([
     'type' => 'guide',
     'title' => $title,
@@ -59,7 +62,8 @@ function create_guide_node($title, $subject, $type, $group): void {
  * @return void
  * @throws EntityStorageException
  */
-function create_vocab(string $vid, string $name, string $description): void {
+function create_vocab(string $vid, string $name, string $description): void
+{
   $vocabulary = Vocabulary::create([
     'vid' => $vid,
     'name' => $name,
@@ -77,7 +81,8 @@ function create_vocab(string $vid, string $name, string $description): void {
  * @return void
  * @throws EntityStorageException
  */
-function add_terms(array $terms, string $vid): void {
+function add_terms(array $terms, string $vid): void
+{
   foreach ($terms as $term_name) {
     $new_term = Term::create([
       'vid' => $vid,
@@ -95,7 +100,8 @@ function add_terms(array $terms, string $vid): void {
  *
  * @return int|null The random term ID or NULL if not found.
  */
-function get_random_term_id($vid) {
+function get_random_term_id($vid)
+{
   $term_ids = \Drupal::entityQuery('taxonomy_term')
     ->condition('vid', $vid)
     ->accessCheck(TRUE)
@@ -111,11 +117,11 @@ function get_random_term_id($vid) {
  * Creates or updates field storage and instance for a guide field.
  * @throws EntityStorageException
  */
-function create_guide_field_storage($field_name, $label, $vocabulary,$cardi): void
+function create_guide_field_storage($field_name, $label, $vocabulary, $cardi): void
 {
   $field_storage = FieldStorageConfig::loadByName('node', $field_name);
   if (!$field_storage) {
-   $field_storage = FieldStorageConfig::create([
+    $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'node',
       'type' => 'entity_reference',
@@ -253,7 +259,8 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
   }
 }
 
-function createWeightField($entity_type, $bundle, $field_name, $field_id) {
+function createWeightField($entity_type, $bundle, $field_name, $field_id)
+{
   // Ensure that the field storage exists.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
   if (!$storage) {
@@ -294,7 +301,8 @@ function createWeightField($entity_type, $bundle, $field_name, $field_id) {
   ])->save();
 }
 
-function createBodyField($entity_type, $bundle, $field_name, $field_id, $status): void {
+function createBodyField($entity_type, $bundle, $field_name, $field_id, $status): void
+{
   // Create field storage if it doesn't exist.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
   if (!$storage) {
@@ -355,21 +363,24 @@ function createBodyField($entity_type, $bundle, $field_name, $field_id, $status)
 /**
  * Implements hook_node_insert().
  */
-function lgmsmodule_node_insert(NodeInterface $node) {
+function lgmsmodule_node_insert(NodeInterface $node)
+{
   lgmsmodule_refresh_cache($node);
 }
 
 /**
  * Implements hook_node_update().
  */
-function lgmsmodule_node_update(NodeInterface $node) {
+function lgmsmodule_node_update(NodeInterface $node)
+{
   lgmsmodule_refresh_cache($node);
 }
 
 /**
  * Helper function to refresh cache.
  */
-function lgmsmodule_refresh_cache(NodeInterface $node) {
+function lgmsmodule_refresh_cache(NodeInterface $node)
+{
   if ($node->bundle() === 'guide_box') {
     // Get the 'parent_page' ID from the 'guide_box'
     $parent_page_id = $node->get('field_parent_page')->target_id;
@@ -399,7 +410,8 @@ function lgmsmodule_refresh_cache(NodeInterface $node) {
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
-function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
+function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void
+{
   if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
@@ -412,7 +424,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     $page = null;
 
     // Check if it's a guide page.
-    if($entity->bundle() === 'guide') {
+    if ($entity->bundle() === 'guide') {
       $build['desc'] = ['#markup' => $entity->get("field_guide_description")->value,];
       // Get the list of guide pages
       $query = \Drupal::entityQuery('node')
@@ -421,7 +433,8 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         ->accessCheck(TRUE);
       $result = $query->execute();
 
-      if (empty($result)) { /**This Should change to redirecting to create a page*/
+      if (empty($result)) {
+        /**This Should change to redirecting to create a page*/
         $url = Url::fromRoute('node.add', ['node_type' => 'guide_page'], ['query' => ['field_parent_page' => $entity->id()]]);
         $link = Link::fromTextAndUrl(t('Create Guide Page'), $url)->toRenderable();
         $link['#attributes']['class'][] = 'link';
@@ -434,11 +447,11 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       $page = Node::load($first_node_id);
     }
 
-    if($page === null){
+    if ($page === null) {
       $page = $entity;
     }
 
-    if($page instanceof NodeInterface){
+    if ($page instanceof NodeInterface) {
       $build['guide_pages_list'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['guide-pages-list']],
@@ -462,7 +475,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         }
 
         // Sort the guide boxes by weight.
-        uasort($orderedBoxes, function($a, $b) {
+        uasort($orderedBoxes, function ($a, $b) {
           return $a['weight'] <=> $b['weight'];
         });
 
@@ -596,9 +609,9 @@ function lgmsModule_install(): void
   add_terms($terms, 'LGMS_Guide_Group');
 
   // Create field storages and instances...
-  create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject',TRUE);
-  create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type',FALSE);
-  create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group',FALSE);
+  create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject', TRUE);
+  create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type', FALSE);
+  create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group', FALSE);
 
   // Set form display configurations...
   set_form_display_config('field_lgms_guide_subject', 'options_buttons', 0);
@@ -674,23 +687,23 @@ function lgmsModule_install(): void
     ['rows' => 5, 'placeholder' => 'Enter the page description here...']
   );
 
-  createBodyField('node', 'guide_box', 'Body', 'field_body_box',TRUE);
+  createBodyField('node', 'guide_box', 'Body', 'field_body_box', TRUE);
   createWeightField('node', 'guide_box', 'Weight', 'field_box_weight');
 
 
   // 10 Mock guides
-//  for ($i = 1; $i <= 10; $i++) {
-//    $guide_subject_term_id = get_random_term_id('LGMS_Guide_Subject');
-//    $guide_type_term_id = get_random_term_id('LGMS_Guide_Type');
-//    $guide_group_term_id = get_random_term_id('LGMS_Guide_Group');
-//
-//    create_guide_node(
-//      "Mock Guide $i",
-//      $guide_subject_term_id,
-//      $guide_type_term_id,
-//      $guide_group_term_id
-//    );
-//  }
+  //  for ($i = 1; $i <= 10; $i++) {
+  //    $guide_subject_term_id = get_random_term_id('LGMS_Guide_Subject');
+  //    $guide_type_term_id = get_random_term_id('LGMS_Guide_Type');
+  //    $guide_group_term_id = get_random_term_id('LGMS_Guide_Group');
+  //
+  //    create_guide_node(
+  //      "Mock Guide $i",
+  //      $guide_subject_term_id,
+  //      $guide_type_term_id,
+  //      $guide_group_term_id
+  //    );
+  //  }
 
 }
 
@@ -756,7 +769,7 @@ function delete_vocab_and_terms($vocab_machine_name): void
       foreach ($terms as $term) {
         $term->delete();
       }
-    } catch (InvalidPluginDefinitionException|PluginNotFoundException $e) {
+    } catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
     }
     $vocabulary->delete();
   }

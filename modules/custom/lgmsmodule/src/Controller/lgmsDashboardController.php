@@ -70,13 +70,13 @@ class lgmsDashboardController extends ControllerBase {
         $build = [];
   }
 
-  public function edit() {
-    // Generate the content for editing items.
+  //public function edit() {
+  //  // Generate the content for editing items.
 
-      $node = Node::create(['type' => 'guide']);
-        $form = $this->entityFormBuilder()->getForm($node);
+  //    $node = Node::create(['type' => 'guide']);
+  //      $form = $this->entityFormBuilder()->getForm($node);
 
-      return $form;
-        $build = [];
-  }
+  //    return $form;
+  //      $build = [];
+  //}
 }

@@ -54,13 +54,13 @@ lgmsmodule.dashboard_import:
   requirements:
     _permission: 'create guide content'
 
-lgmsmodule.dashboard_edit:
-  path: '/lgms/dashboard/edit'
-  defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::edit'
-    _title: 'Edit Items'
-  requirements:
-    _permission: 'edit own guide content+edit any guide content'
+#lgmsmodule.dashboard_edit:
+#  path: '/lgms/dashboard/edit'
+#  defaults:
+#    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::edit'
+#    _title: 'Edit Items'
+#  requirements:
+#    _permission: 'edit own guide content+edit any guide content'
 
 custom_guide_box.form:
   path: '/custom-guide-box-form'

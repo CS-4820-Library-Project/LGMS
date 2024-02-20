@@ -36,8 +36,8 @@ lgmsmodule.dashboard_import_tab:
   base_route: lgmsmodule.dashboard_overview
   weight: 2
 
-lgmsmodule.dashboard_edit_tab:
-  title: 'Edit'
-  route_name: lgmsmodule.dashboard_edit
-  base_route: lgmsmodule.dashboard_overview
-  weight: 3
+#lgmsmodule.dashboard_edit_tab:
+#  title: 'Edit'
+#  route_name: lgmsmodule.dashboard_edit
+#  base_route: lgmsmodule.dashboard_overview
+#  weight: 3
