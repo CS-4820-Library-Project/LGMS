@@ -1,5 +1,4 @@
 <?php
-use function t;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
