@@ -1,0 +1,5 @@
+services:
+  lgmsmodule.theme_negotiator:
+    class: Drupal\lgmsmodule\Theme\ThemeNegotiator
+    tags:
+      - { name: theme_negotiator, priority: 1000 }
