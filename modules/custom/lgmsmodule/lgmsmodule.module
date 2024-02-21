@@ -1,4 +1,5 @@
 <?php
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
 use Drupal\lgmsmodule\Controller\landingPageHelper;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
@@ -32,6 +33,46 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
   ];
 }
 
+/**
+ * Implements hook_block_access().
+ */
+function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation, \Drupal\Core\Session\AccountInterface $account) {
+  // Get the current route.
+  $current_route = \Drupal::routeMatch()->getRouteName();
+  $node = \Drupal::routeMatch()->getParameter('node');
+  $routes = [
+    'entity.node.edit_form',
+    'entity.node.delete_form',
+    'entity.node.version_history',
+    'entity.node.devel_load',
+    'entity.node.devel_load_with_references',
+    'entity.node.devel_render',
+    'entity.node.devel_definition',
+  ];
+
+
+  // Check if the current route is for a node edit form.
+  if ($node && $node->getType() == 'guide' && in_array($current_route, $routes) && $block->id() === 'lgmsguideownerblock') {
+    // Block access to the block on node edit pages.
+    return \Drupal\Core\Access\AccessResult::forbidden();
+  }
+
+  // Allow access to the block for other routes.
+  return \Drupal\Core\Access\AccessResult::allowed();
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function lgmsmodule_preprocess_page(&$variables) {
+  // Check if the current page is a guide node
+  if ($node = \Drupal::routeMatch()->getParameter('node')) {
+
+    if ($node->getType() == 'guide') {
+      $variables['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+    }
+  }
+}
 
 /**
  * Creates a taxonomy vocabulary if it doesn't already exist.
@@ -144,7 +185,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
         'targetEntityType' => $entity_type,
         'bundle' => $bundle,
         'mode' => 'default',
-        'status' => $status,
+        'status' => TRUE,
       ]);
     }
 
