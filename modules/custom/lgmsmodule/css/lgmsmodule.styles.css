@@ -59,3 +59,14 @@
   margin-top: 10px;
   text-decoration: none;
 }
+
+.two-column-layout {
+  display: flex;
+  flex-wrap: wrap;
+}
+.left-column {
+  width: 22.5%;
+}
+.right-column {
+  width: 72.5%;
+}

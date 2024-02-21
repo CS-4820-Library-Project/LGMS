@@ -1,5 +1,7 @@
 <?php
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+
+use Drupal\lgmsmodule\Controller\landingPageHelper;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Serialization\Json;
@@ -17,9 +19,6 @@ use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
-use Drupal\views\Entity\View;
-use Drupal\views\ViewExecutable;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
@@ -32,21 +31,6 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
       'template' => 'lgmsmodule-content',
     ],
   ];
-}
-
-/**
- * @throws EntityStorageException
- */
-function create_guide_node($title, $subject, $type, $group): void {
-  $node = Node::create([
-    'type' => 'guide',
-    'title' => $title,
-    'field_lgms_guide_subject' => ['target_id' => $subject],
-    'field_lgms_guide_type' => ['target_id' => $type],
-    'field_lgms_guide_group' => ['target_id' => $group],
-  ]);
-
-  $node->save();
 }
 
 /**
@@ -65,7 +49,7 @@ function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation
     'entity.node.devel_render',
     'entity.node.devel_definition',
   ];
-  
+
 
   // Check if the current route is for a node edit form.
   if ($node && $node->getType() == 'guide' && in_array($current_route, $routes) && $block->id() === 'lgmsguideownerblock') {
@@ -128,91 +112,6 @@ function add_terms(array $terms, string $vid): void {
   }
 }
 
-/**
- * Gets a random term ID from a given vocabulary.
- *
- * @param string $vid The machine name of the vocabulary.
- *
- * @return int|null The random term ID or NULL if not found.
- */
-function get_random_term_id($vid) {
-  $term_ids = \Drupal::entityQuery('taxonomy_term')
-    ->condition('vid', $vid)
-    ->accessCheck(TRUE)
-    ->execute();
-  if (!empty($term_ids)) {
-    return array_rand($term_ids);
-  }
-
-  return NULL;
-}
-
-/**
- * Creates or updates field storage and instance for a guide field.
- * @throws EntityStorageException
- */
-function create_guide_field_storage($field_name, $label, $vocabulary,$cardi): void
-{
-  $field_storage = FieldStorageConfig::loadByName('node', $field_name);
-  if (!$field_storage) {
-   $field_storage = FieldStorageConfig::create([
-      'field_name' => $field_name,
-      'entity_type' => 'node',
-      'type' => 'entity_reference',
-      'settings' => [
-        'target_type' => 'taxonomy_term',
-      ],
-    ]);
-    $field_storage->save();
-  }
-
-  if ($field_storage && $cardi) {
-    // Set the cardinality to unlimited.
-    $field_storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
-    $field_storage->save();
-  }
-  $field_instance = FieldConfig::loadByName('node', 'guide', $field_name);
-  if (!$field_instance) {
-    FieldConfig::create([
-      'field_name' => $field_name,
-      'entity_type' => 'node',
-      'bundle' => 'guide',
-      'label' => $label,
-      'settings' => [
-        'handler' => 'default:taxonomy_term',
-        'handler_settings' => [
-          'target_bundles' => [
-            $vocabulary => $vocabulary,
-          ],
-        ],
-      ],
-    ])->save();
-  }
-}
-
-
-/**
- * Sets the form display configuration for a field.
- * @throws EntityStorageException
- */
-function set_form_display_config($field_name, $widget_type, $weight): void
-{
-  $form_display = EntityFormDisplay::load('node.guide.default');
-  if (!$form_display) {
-    $form_display = EntityFormDisplay::create([
-      'targetEntityType' => 'node',
-      'bundle' => 'guide',
-      'mode' => 'default',
-      'status' => TRUE,
-    ]);
-  }
-
-  $form_display->setComponent($field_name, [
-    'type' => $widget_type,
-    'weight' => $weight,
-  ])->save();
-}
-
 
 /**
  * Helper function to create content types.
@@ -234,7 +133,7 @@ function createContentType($id, $name): void
  * Helper function to create fields.
  * @throws EntityStorageException
  */
-function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $settings, $widget_type, $widget_settings): void
+function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $settings, $widget_type, $widget_settings, $status, $cardinal): void
 {
   // Create field storage.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
@@ -245,6 +144,11 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
       'type' => $field_type,
       'settings' => $settings['storage'] ?? [],
     ]);
+
+    if ($cardinal){
+      $storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    }
+
     $storage->save();
   }
 
@@ -293,123 +197,29 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
   }
 }
 
-function createWeightField($entity_type, $bundle, $field_name, $field_id) {
-  // Ensure that the field storage exists.
-  $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
-  if (!$storage) {
-    $storage = FieldStorageConfig::create([
-      'field_name' => $field_id, // Make sure this matches the field_id
-      'entity_type' => $entity_type,
-      'type' => 'integer',
-    ]);
-    $storage->save();
-  }
-
-  // Now create the field instance.
-  $field = FieldConfig::loadByName($entity_type, $bundle, $field_name);
-  if (!$field) {
-    FieldConfig::create([
-      'field_storage' => $storage, // Link to the field storage
-      'bundle' => $bundle,
-      'field_name' => $field_name,
-      'label' => 'Weight',
-      'required' => FALSE,
-    ])->save();
-  }
-
-  // Configure form display for the body field.
-  $form_display = EntityFormDisplay::load($entity_type . '.' . $bundle . '.default');
-  if (!$form_display) {
-    $form_display = EntityFormDisplay::create([
-      'targetEntityType' => $entity_type,
-      'bundle' => $bundle,
-      'mode' => 'default',
-      'status' => TRUE,
-    ]);
-  }
-  $form_display->setComponent($field_id, [
-    'type' => 'number',
-    'weight' => 10,
-    'placeholder' => 0,
-  ])->save();
-}
-
-function createBodyField($entity_type, $bundle, $field_name, $field_id, $status): void {
-  // Create field storage if it doesn't exist.
-  $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
-  if (!$storage) {
-    $storage = FieldStorageConfig::create([
-      'field_name' => $field_id,
-      'entity_type' => $entity_type,
-      'type' => 'text_long',
-    ]);
-    $storage->save();
-  }
-
-  // Create the field if it doesn't exist.
-  $field = FieldConfig::loadByName($entity_type, $bundle, $field_id);
-  if (!$field) {
-    $field = FieldConfig::create([
-      'field_storage' => $storage,
-      'bundle' => $bundle,
-      'label' => $field_name,
-      // You can set default settings for the text_long field type here.
-      'settings' => [],
-    ]);
-    $field->save();
-
-    // Configure form display for the body field.
-    $form_display = EntityFormDisplay::load($entity_type . '.' . $bundle . '.default');
-    if (!$form_display) {
-      $form_display = EntityFormDisplay::create([
-        'targetEntityType' => $entity_type,
-        'bundle' => $bundle,
-        'mode' => 'default',
-        'status' => TRUE,
-      ]);
-    }
-    $form_display->setComponent($field_id, [
-      'type' => 'text_textarea', // Widget type for text_long.
-      'settings' => [
-        'rows' => 20, // Number of rows in the textarea.
-        'placeholder' => '',
-      ],
-    ])->save();
-
-    // Configure view display for the body field.
-    $view_display = EntityViewDisplay::load($entity_type . '.' . $bundle . '.default');
-    if (!$view_display) {
-      $view_display = EntityViewDisplay::create([
-        'targetEntityType' => $entity_type,
-        'bundle' => $bundle,
-        'mode' => 'default',
-        'status' => $status,
-      ]);
-    }
-    $view_display->setComponent($field_id, [
-      'type' => 'text_default', // Formatter type for text_long.
-    ])->save();
-  }
-}
-
 /**
+ * This is executed when a node is created
  * Implements hook_node_insert().
  */
-function lgmsmodule_node_insert(NodeInterface $node) {
+function lgmsmodule_node_insert(NodeInterface $node): void
+{
   lgmsmodule_refresh_cache($node);
 }
 
 /**
+ * This is executed when a node is updated
  * Implements hook_node_update().
  */
-function lgmsmodule_node_update(NodeInterface $node) {
+function lgmsmodule_node_update(NodeInterface $node): void
+{
   lgmsmodule_refresh_cache($node);
 }
 
 /**
  * Helper function to refresh cache.
  */
-function lgmsmodule_refresh_cache(NodeInterface $node) {
+function lgmsmodule_refresh_cache(NodeInterface $node): void
+{
   if ($node->bundle() === 'guide_box') {
     // Get the 'parent_page' ID from the 'guide_box'
     $parent_page_id = $node->get('field_parent_page')->target_id;
@@ -454,6 +264,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     // Check if it's a guide page.
     if($entity->bundle() === 'guide') {
       $build['desc'] = ['#markup' => $entity->get("field_guide_description")->value,];
+
       // Get the list of guide pages
       $query = \Drupal::entityQuery('node')
         ->condition('type', 'guide_page')
@@ -477,6 +288,29 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     if($page === null){
       $page = $entity;
     }
+
+    $build['two_column_layout'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['two-column-layout']],
+    ];
+
+    $landingMethods = new landingPageHelper();
+
+    $build['two_column_layout']['left'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['left-column']],
+    ];
+
+    $build['two_column_layout']['left'][] = $landingMethods->getLGMSSearchBar('lgms_guide_owner_block');
+    $build['two_column_layout']['left'][] = [
+      '#markup' => 'Page List',
+    ];
+    $build['two_column_layout']['left'][] = $landingMethods->getLGMSSearchBar('page_view_block');
+
+    $build['two_column_layout']['right'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['right-column']],
+    ];
 
     if($page instanceof NodeInterface){
       $build['guide_pages_list'] = [
@@ -509,7 +343,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         foreach ($orderedBoxes as $guide_box_data) {
           $guide_box = $guide_box_data['data'];
 
-          $build['guide_pages_boxes'][] = [
+          $build['two_column_layout']['right'][] = [
             '#type' => 'container',
             '#attributes' => ['class' => ['guide-box-container']],
             'title' => [
@@ -526,22 +360,20 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
             ],
           ];
 
-          $build['guide_pages_boxes'][]['#contextual_links']['nodes'] = [
+          $build['two_column_layout']['right'][]['#contextual_links']['nodes'] = [
             'route_parameters' => ['node' => $guide_box->id()],
           ];
         }
       }
 
-      $build['add_guide_page_box_link'] = createBox($entity);
+      $build['two_column_layout']['right']['add_guide_page_box_link'] = createBoxButton($entity);
     }
   }
 }
 
-function createBox($node)
+function createBoxButton($node): array
 {
-  $current_node_url = $node->toUrl()->toString();
-
-  $url = Url::fromRoute('custom_guide_box.form', [], ['query' => ['current_node_url' => $current_node_url]]);
+  $url = Url::fromRoute('custom_guide_box.form', [], ['query' => ['current_node' => $node->id()]]);
   $link = Link::fromTextAndUrl(t('Create Guide Box'), $url)->toRenderable();
   $link['#attributes'] = [
     'class' => ['use-ajax'],
@@ -553,15 +385,15 @@ function createBox($node)
 }
 
 
-
-///////////////////////////////////////////////////////////////////////////////
-
 /**
  * Implements hook_install().
  * @throws EntityStorageException
  */
 function lgmsModule_install(): void
 {
+  // Create content types.
+  createContentType('guide_page', 'Guide Page');
+  createContentType('guide_box', 'Guide Box');
 
   // Create a new Guide Type taxonomy.
   create_vocab('LGMS_Guide_Type', 'Guide Type', 'Use Guide Type to group guides by their type');
@@ -574,7 +406,6 @@ function lgmsModule_install(): void
     'Course Guide',
   );
   add_terms($terms, 'LGMS_Guide_Type');
-
 
   // Create a new Guide Subject taxonomy.
   create_vocab('LGMS_Guide_Subject', 'Guide Subject', 'Use Guide Subject to group guides related to each other under the same category');
@@ -622,7 +453,6 @@ function lgmsModule_install(): void
   );
   add_terms($terms, 'LGMS_Guide_Subject');
 
-
   // Create a new Guide Group taxonomy.
   create_vocab('LGMS_Guide_Group', 'Guide Group', 'Use Guide Group to assign a guide to a specific group and.');
 
@@ -636,28 +466,88 @@ function lgmsModule_install(): void
   add_terms($terms, 'LGMS_Guide_Group');
 
   // Create field storages and instances...
-  create_guide_field_storage('field_lgms_guide_subject', 'Subject', 'LGMS_Guide_Subject',TRUE);
-  create_guide_field_storage('field_lgms_guide_type', 'Type', 'LGMS_Guide_Type',FALSE);
-  create_guide_field_storage('field_lgms_guide_group', 'Group', 'LGMS_Guide_Group',FALSE);
+  createField(
+    'field_lgms_guide_subject',
+    'node',
+    'guide',
+    'Subject',
+    'entity_reference',
+    [
+      'storage' => ['target_type' => 'taxonomy_term',],
+      'field' => [
+        'handler' => 'default:taxonomy_term',
+        'handler_settings' => [
+          'target_bundles' => [
+            'LGMS_Guide_Subject' => 'LGMS_Guide_Subject',
+          ],
+        ],
+      ]
+    ],
+    'options_buttons',
+    ['weight' => 0],
+    False,
+    False
+  );
 
-  // Set form display configurations...
-  set_form_display_config('field_lgms_guide_subject', 'options_buttons', 0);
-  set_form_display_config('field_lgms_guide_type', 'options_select', 1);
-  set_form_display_config('field_lgms_guide_group', 'options_select', 2);
+  createField(
+    'field_lgms_guide_type',
+    'node',
+    'guide',
+    'Type',
+    'entity_reference',
+    [
+      'storage' => ['target_type' => 'taxonomy_term',],
+      'field' => [
+        'handler' => 'default:taxonomy_term',
+        'handler_settings' => [
+          'target_bundles' => [
+            'LGMS_Guide_Type' => 'LGMS_Guide_Type',
+          ],
+        ],
+      ]
+    ],
+    'options_select',
+    ['weight' => 1],
+    False,
+    False
+  );
 
+  createField(
+    'field_lgms_guide_group',
+    'node',
+    'guide',
+    'Group',
+    'entity_reference',
+    [
+      'storage' => ['target_type' => 'taxonomy_term',],
+      'field' => [
+        'handler' => 'default:taxonomy_term',
+        'handler_settings' => [
+          'target_bundles' => [
+            'LGMS_Guide_Group' => 'LGMS_Guide_Group',
+          ],
+        ],
+      ]
+    ],
+    'options_select',
+    ['weight' => 2],
+    False,
+    False
+  );
 
-  createBodyField('node', 'guide', 'Description', 'field_guide_description', FALSE);
-  // Load the 'guide' content type.
-  $content_type = NodeType::load('guide');
-
-  if ($content_type) {
-    // Disable the display of author and date information. Do it manually sturucture/content-type/guide/edit/display-options
-    $content_type->set('display_submitted', FALSE);
-    $content_type->save();
-  }
-
-  // Create Guide Page content type.
-  createContentType('guide_page', 'Guide Page');
+  // Guide Description field
+  createField(
+    'field_guide_description',
+    'node',
+    'guide',
+    'Description',
+    'text_long',
+    [],
+    'text_textarea',
+    [],
+    False,
+    False
+  );
 
   // Add a reference field to Guide content type on Guide Page.
   createField(
@@ -668,17 +558,11 @@ function lgmsModule_install(): void
     'entity_reference',
     ['target_type' => 'node', 'handler' => 'default:node', 'handler_settings' => ['target_bundles' => ['guide' => 'guide']]],
     'entity_reference_autocomplete',
-    []
+    [],
+    TRUE,
+    False
   );
 
-  $content_type = NodeType::load('guide_page');
-  if ($content_type) {
-    // Disable the display of author and date information. Do it manually sturucture/content-type/guide/edit/display-options
-    $content_type->set('display_submitted', FALSE);
-    $content_type->save();
-  }
-
-  createContentType('guide_box', 'Guide Box');
 
   createField(
     'field_parent_page',
@@ -688,18 +572,9 @@ function lgmsModule_install(): void
     'entity_reference',
     ['target_type' => 'node', 'handler' => 'default:node', 'handler_settings' => ['target_bundles' => ['target_bundles' => 'target_bundles']]],
     'entity_reference_autocomplete',
-    []
-  );
-  // Add a 'Page Name' field to Guide Page content type.
-  createField(
-    'field_page_name',
-    'node',
-    'guide_page',
-    'Page Name',
-    'string',
     [],
-    'string_textfield',
-    []
+    TRUE,
+    False
   );
 
   //add page description field
@@ -711,47 +586,59 @@ function lgmsModule_install(): void
     'text_long',
     [],
     'text_textarea',
-    ['rows' => 5, 'placeholder' => 'Enter the page description here...']
+    ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
+    TRUE,
+    False
   );
 
-  createBodyField('node', 'guide_box', 'Body', 'field_body_box',TRUE);
-  createWeightField('node', 'guide_box', 'Weight', 'field_box_weight');
+  // Box Body field
+  createField(
+    'field_body_box',
+    'node',
+    'guide_box',
+    'Body',
+    'text_long',
+    [],
+    'text_textarea',
+    ['rows' => 20,],
+    TRUE,
+    False
+  );
 
+  // Box Weight field
+  createField(
+    'field_box_weight',
+    'node',
+    'guide_box',
+    'Weight',
+    'integer',
+    [],
+    'number',
+    ['placeholder' => 0],
+    TRUE,
+    False
+  );
 
-  // 10 Mock guides
-//  for ($i = 1; $i <= 10; $i++) {
-//    $guide_subject_term_id = get_random_term_id('LGMS_Guide_Subject');
-//    $guide_type_term_id = get_random_term_id('LGMS_Guide_Type');
-//    $guide_group_term_id = get_random_term_id('LGMS_Guide_Group');
-//
-//    create_guide_node(
-//      "Mock Guide $i",
-//      $guide_subject_term_id,
-//      $guide_type_term_id,
-//      $guide_group_term_id
-//    );
-//  }
-
+  // Disable the display of author and date information for guide, guide_page and guide_box.
+  disable_field('guide', 'display_submitted');
+  disable_field('guide_page', 'display_submitted');
+  disable_field('guide_box', 'display_submitted');
 }
 
-// /**
-//  * Updates field storage to allow multiple values.
-//  *
-//  * @param string $field_name The machine name of the field.
-//  * @throws EntityStorageException
-//  */
-// function update_field_storage_cardinality($field_name): void {
-//   $field_storage = FieldStorageConfig::loadByName('node', $field_name);
-//   if ($field_storage) {
-//     // Set the cardinality to unlimited.
-//     $field_storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
-//     $field_storage->save();
-//   }
-// }
+/**
+ * @throws EntityStorageException
+ */
+function disable_field($id, $field): void
+{
+  // Load the content type
+  $content_type = NodeType::load($id);
+  if ($content_type) {
+    // Disable the field
+    $content_type->set($field, FALSE);
+    $content_type->save();
+  }
+}
 
-// // Call the function to update the cardinality.
-// update_field_storage_cardinality('field_lgms_guide_subject');
-//
 
 /**
  * Implements hook_uninstall().
@@ -760,18 +647,27 @@ function lgmsModule_install(): void
 function lgmsModule_uninstall(): void
 {
   // Delete the Guide Type taxonomy vocabulary and its terms.
-  delete_vocab_and_terms('LGMS_Guide_Type');
+  delete_taxonomies('LGMS_Guide_Type');
 
   // Delete the Guide Subject taxonomy vocabulary and its terms.
-  delete_vocab_and_terms('LGMS_Guide_Subject');
+  delete_taxonomies('LGMS_Guide_Subject');
 
   // Delete the Guide Group taxonomy vocabulary and its terms.
-  delete_vocab_and_terms('LGMS_Guide_Group');
+  delete_taxonomies('LGMS_Guide_Group');
 
   // Delete field storages.
-  delete_guide_field_storage('field_lgms_guide_subject');
-  delete_guide_field_storage('field_lgms_guide_type');
-  delete_guide_field_storage('field_lgms_guide_group');
+  delete_field_storage('field_lgms_guide_subject');
+  delete_field_storage('field_lgms_guide_type');
+  delete_field_storage('field_lgms_guide_group');
+  delete_field_storage('field_lgms_guide_subject');
+  delete_field_storage('field_lgms_guide_type');
+  delete_field_storage('field_lgms_guide_group');
+  delete_field_storage('field_guide_description');
+  delete_field_storage('field_parent_guide');
+  delete_field_storage('field_parent_page');
+  delete_field_storage('field_description');
+  delete_field_storage('field_body_box');
+  delete_field_storage('field_box_weight');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
@@ -781,10 +677,10 @@ function lgmsModule_uninstall(): void
 }
 
 /**
- * Deletes a vocabulary and its terms.
+ * Deletes a Taxonomy and its terms.
  * @throws EntityStorageException
  */
-function delete_vocab_and_terms($vocab_machine_name): void
+function delete_taxonomies($vocab_machine_name): void
 {
   $vocabulary = Vocabulary::load($vocab_machine_name);
   if ($vocabulary) {
@@ -806,7 +702,7 @@ function delete_vocab_and_terms($vocab_machine_name): void
  * Deletes storage Fields
  * @throws EntityStorageException
  */
-function delete_guide_field_storage($field_storage_name): void
+function delete_field_storage($field_storage_name): void
 {
   $field_storage = FieldStorageConfig::load($field_storage_name);
   $field_storage?->delete();
