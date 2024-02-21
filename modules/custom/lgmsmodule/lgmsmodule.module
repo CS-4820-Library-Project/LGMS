@@ -1,111 +1,4 @@
 <?php
-
-use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
-
-use Drupal\lgmsmodule\Controller\landingPageHelper;
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Component\Serialization\Json;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Link;
-use Drupal\Core\Url;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\node\Entity\Node;
-use Drupal\node\Entity\NodeType;
-use Drupal\node\NodeInterface;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\taxonomy\Entity\Term;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
-
-/**
- * Implements hook_theme().
- */
-function lgmsmodule_theme($existing, $type, $theme, $path)
-{
-  return [
-    'lgmsmodule_content' => [
-      'variables' => ['table' => NULL],
-      'template' => 'lgmsmodule-content',
-    ],
-  ];
-}
-
-/**
- * Implements hook_block_access().
- */
-function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation, \Drupal\Core\Session\AccountInterface $account) {
-  // Get the current route.
-  $current_route = \Drupal::routeMatch()->getRouteName();
-  $node = \Drupal::routeMatch()->getParameter('node');
-  $routes = [
-    'entity.node.edit_form',
-    'entity.node.delete_form',
-    'entity.node.version_history',
-    'entity.node.devel_load',
-    'entity.node.devel_load_with_references',
-    'entity.node.devel_render',
-    'entity.node.devel_definition',
-  ];
-
-
-  // Check if the current route is for a node edit form.
-  if ($node && $node->getType() == 'guide' && in_array($current_route, $routes) && $block->id() === 'lgmsguideownerblock') {
-    // Block access to the block on node edit pages.
-    return \Drupal\Core\Access\AccessResult::forbidden();
-  }
-
-
-  // Allow access to the block for other routes.
-  return \Drupal\Core\Access\AccessResult::allowed();
-}
-
-/**
- * Implements hook_preprocess_page().
- */
-function lgmsmodule_preprocess_page(&$variables) {
-  // Check if the current page is a guide node
-  if ($node = \Drupal::routeMatch()->getParameter('node')) {
-
-    if ($node->getType() == 'guide') {
-      $variables['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
-    }
-  }
-}
-
-/**
- * Creates a taxonomy vocabulary if it doesn't already exist.
- *
- * @param string $vid The machine name of the vocabulary.
- * @param string $name The human-readable name of the vocabulary.
- * @param string $description The description of the vocabulary.
- * @return void
- * @throws EntityStorageException
- */
-function create_vocab(string $vid, string $name, string $description): void
-{
-  $vocabulary = Vocabulary::create([
-    'vid' => $vid,
-    'name' => $name,
-    'description' => $description,
-  ]);
-  $vocabulary->save();
-}
-
-
-/**
- * Adds terms to a taxonomy vocabulary if they don't already exist.
- *
- * @param array $terms The terms to add.
- * @param string $vid The machine name of the vocabulary.
- * @return void
- * @throws EntityStorageException
- */
-<?php
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
 use Drupal\lgmsmodule\Controller\landingPageHelper;
@@ -139,6 +32,86 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
     ],
   ];
 }
+
+/**
+ * Implements hook_block_access().
+ */
+function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation, \Drupal\Core\Session\AccountInterface $account) {
+  // Get the current route.
+  $current_route = \Drupal::routeMatch()->getRouteName();
+  $node = \Drupal::routeMatch()->getParameter('node');
+  $routes = [
+    'entity.node.edit_form',
+    'entity.node.delete_form',
+    'entity.node.version_history',
+    'entity.node.devel_load',
+    'entity.node.devel_load_with_references',
+    'entity.node.devel_render',
+    'entity.node.devel_definition',
+  ];
+
+
+  // Check if the current route is for a node edit form.
+  if ($node && $node->getType() == 'guide' && in_array($current_route, $routes) && $block->id() === 'lgmsguideownerblock') {
+    // Block access to the block on node edit pages.
+    return \Drupal\Core\Access\AccessResult::forbidden();
+  }
+
+  // Allow access to the block for other routes.
+  return \Drupal\Core\Access\AccessResult::allowed();
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function lgmsmodule_preprocess_page(&$variables) {
+  // Check if the current page is a guide node
+  if ($node = \Drupal::routeMatch()->getParameter('node')) {
+
+    if ($node->getType() == 'guide') {
+      $variables['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+    }
+  }
+}
+
+/**
+ * Creates a taxonomy vocabulary if it doesn't already exist.
+ *
+ * @param string $vid The machine name of the vocabulary.
+ * @param string $name The human-readable name of the vocabulary.
+ * @param string $description The description of the vocabulary.
+ * @return void
+ * @throws EntityStorageException
+ */
+function create_vocab(string $vid, string $name, string $description): void {
+  $vocabulary = Vocabulary::create([
+    'vid' => $vid,
+    'name' => $name,
+    'description' => $description,
+  ]);
+  $vocabulary->save();
+}
+
+
+/**
+ * Adds terms to a taxonomy vocabulary if they don't already exist.
+ *
+ * @param array $terms The terms to add.
+ * @param string $vid The machine name of the vocabulary.
+ * @return void
+ * @throws EntityStorageException
+ */
+function add_terms(array $terms, string $vid): void {
+  foreach ($terms as $term_name) {
+    $new_term = Term::create([
+      'vid' => $vid,
+      'name' => $term_name,
+    ]);
+    $new_term->enforceIsNew();
+    $new_term->save();
+  }
+}
+
 
 /**
  * Helper function to create content types.
@@ -272,7 +245,6 @@ function lgmsmodule_refresh_cache(NodeInterface $node): void
 }
 
 
-
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
@@ -316,6 +288,11 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       $page = $entity;
     }
 
+    $build['separate'] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['seperater']],
+    ];
+
     $build['two_column_layout'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['two-column-layout']],
@@ -327,7 +304,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       '#type' => 'container',
       '#attributes' => ['class' => ['left-column']],
     ];
-
     $build['two_column_layout']['left'][] = $landingMethods->getLGMSSearchBar('lgms_guide_owner_block');
     $build['two_column_layout']['left'][] = [
       '#markup' => 'Page List',
@@ -513,7 +489,7 @@ function lgmsModule_install(): void
     'options_buttons',
     ['weight' => 0],
     False,
-    False
+    True
   );
 
   createField(
