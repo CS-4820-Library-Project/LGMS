@@ -145,7 +145,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
       'settings' => $settings['storage'] ?? [],
     ]);
 
-    if ($cardinal){
+    if ($field_id == 'field_lgms_guide_subject'){
       $storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
     }
 
@@ -485,8 +485,8 @@ function lgmsModule_install(): void
     ],
     'options_buttons',
     ['weight' => 0],
-    False,
-    False
+    True,
+    True
   );
 
   createField(
