@@ -77,6 +77,30 @@ class LgmsGuideOwnerBlock extends BlockBase implements ContainerFactoryPluginInt
 
     $node = $this->routeMatch->getParameter('node');
 
+    // Initialize an array to store unique term names.
+    $term_names = [];
+
+    // Ensure we have a node and it's of the type 'guide'.
+    if ($node instanceof Node && $node->bundle() === 'guide') {
+      // Check if the 'field_lgms_guide_subject' field exists and has value.
+      if (!$node->get('field_lgms_guide_subject')->isEmpty()) {
+        // Loop through all terms in the multi-value field 'field_lgms_guide_subject'.
+        foreach ($node->get('field_lgms_guide_subject')->referencedEntities() as $term) {
+          // Add the term name to the array if not already present.
+          $term_names[$term->id()] = $term->getName();
+        }
+      }
+    }
+
+    // Add subjects to the content if any exist.
+    if (!empty($term_names)) {
+      $content["wrapper"]['subjects'] = [
+        '#theme' => 'item_list',
+        '#items' => array_values($term_names), // Use array_values to reset keys for clean display.
+      ];
+    }
+
+
     $author = $node->getOwner();
     $account = User::load($author->id());
 
