@@ -288,33 +288,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       $page = $entity;
     }
 
-    $build['separate'] = [
-      '#type' => 'container',
-      '#attributes' => ['class' => ['seperater']],
-    ];
-
-    $build['two_column_layout'] = [
-      '#type' => 'container',
-      '#attributes' => ['class' => ['two-column-layout']],
-    ];
-
-    $landingMethods = new landingPageHelper();
-
-    $build['two_column_layout']['left'] = [
-      '#type' => 'container',
-      '#attributes' => ['class' => ['left-column']],
-    ];
-    $build['two_column_layout']['left'][] = $landingMethods->getLGMSSearchBar('lgms_guide_owner_block');
-    $build['two_column_layout']['left'][] = [
-      '#markup' => 'Page List',
-    ];
-    $build['two_column_layout']['left'][] = $landingMethods->getLGMSSearchBar('page_view_block');
-
-    $build['two_column_layout']['right'] = [
-      '#type' => 'container',
-      '#attributes' => ['class' => ['right-column']],
-    ];
-
     if($page instanceof NodeInterface){
       $build['guide_pages_list'] = [
         '#type' => 'container',
@@ -346,7 +319,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         foreach ($orderedBoxes as $guide_box_data) {
           $guide_box = $guide_box_data['data'];
 
-          $build['two_column_layout']['right'][] = [
+          $build['boxes'][] = [
             '#type' => 'container',
             '#attributes' => ['class' => ['guide-box-container']],
             'title' => [
@@ -361,10 +334,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
               '#format' => $guide_box->get('field_body_box')->format,
               '#attributes' => ['class' => ['guide-box-body']],
             ],
-          ];
-
-          $build['two_column_layout']['right'][]['#contextual_links']['nodes'] = [
-            'route_parameters' => ['node' => $guide_box->id()],
           ];
         }
       }

@@ -21,18 +21,60 @@ class CustomGuideBoxForm extends FormBase {
 
     $form['#attributes']['id'] = 'form-selector';
 
+    $form['tabs'] = [
+      '#type' => 'vertical_tabs',
+    ];
+
+    $form['first_tab'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Create a new Box'),
+      '#group' => 'tabs',
+    ];
+
     // Title field
-    $form['title'] = [
+    $form['first_tab']['title'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Title'),
+      '#title' => $this->t('Box Title:'),
       '#required' => TRUE,
     ];
 
 
     // Body field
-    $form['body'] = [
+    $form['first_tab']['body'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Body'),
+    ];
+
+    $form['second_tab'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Reuse A Box'),
+      '#group' => 'tabs',
+    ];
+
+    $form['second_tab']['box'] = [
+      '#type' => 'entity_autocomplete',
+      '#title' => $this->t('Box Name'),
+      '#target_type' => 'node', // Adjust according to your needs
+      '#selection_settings' => [
+        'target_bundles' => ['guide_box'], // Adjust to your guide page bundle
+      ],
+      '#required' => TRUE,
+    ];
+
+    $form['second_tab']['reference'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('<Strong>Reference:</Strong> By selecting this, a reference of the box will be created. it will be un-editable from this guide/page'),
+    ];
+
+    $form['second_tab']['title'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Box Title:'),
+      '#required' => TRUE,
+      '#states' => [
+        'invisible' => [
+          ':input[name="reference"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $form['actions']['#type'] = 'actions';
