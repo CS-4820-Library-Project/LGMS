@@ -30,14 +30,14 @@ lgmsmodule.dashboard_new_tab:
   base_route: lgmsmodule.dashboard_overview
   weight: 1
 
-lgmsmodule.dashboard_import_tab:
-  title: 'Import'
-  route_name: lgmsmodule.dashboard_import
+lgmsmodule.guide_import_tab:
+  route_name: lgmsmodule.guide_import_form
+  title: 'Import Guide'
   base_route: lgmsmodule.dashboard_overview
   weight: 2
 
-lgmsmodule.dashboard_edit_tab:
-  title: 'Edit'
-  route_name: lgmsmodule.dashboard_edit
-  base_route: lgmsmodule.dashboard_overview
-  weight: 3
+#lgmsmodule.dashboard_edit_tab:
+#  title: 'Edit'
+#  route_name: lgmsmodule.dashboard_edit
+#  base_route: lgmsmodule.dashboard_overview
+#  weight: 3
