@@ -20,7 +20,7 @@ class CustomGuideBoxForm extends FormBase {
     ];
 
     $form['#attributes']['id'] = 'form-selector';
-
+/*
     $form['tabs'] = [
       '#type' => 'vertical_tabs',
     ];
@@ -75,6 +75,19 @@ class CustomGuideBoxForm extends FormBase {
           ':input[name="reference"]' => ['checked' => TRUE],
         ],
       ],
+    ];*/
+
+    $form['title'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Box Title:'),
+      '#required' => TRUE,
+    ];
+
+
+    // Body field
+    $form['body'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Body'),
     ];
 
     $form['actions']['#type'] = 'actions';
