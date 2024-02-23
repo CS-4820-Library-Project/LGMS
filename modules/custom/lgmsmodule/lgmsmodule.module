@@ -363,6 +363,39 @@ function createBoxButton($node): array
  */
 function lgmsModule_install(): void
 {
+
+  // Get the default theme.
+  $default_theme = \Drupal::config('system.theme')->get('default');
+  $block_id = 'lgmsguideownerblock';
+
+  if (!\Drupal\block\Entity\Block::load($block_id)) {
+    $block = \Drupal\block\Entity\Block::create([
+      'id' => $block_id,
+      'theme' => $default_theme,
+      'region' => 'sidebar_first',
+      'weight' => 0,
+      'provider' => 'lgmsmodule',
+      'plugin' => 'lgms_guide_owner_block',
+      'label' => 'LGMS Guide Owner Block',
+      'label_display' => 'visible',
+      'visibility' => [
+        'entity_bundle:node' => [
+          'id' => 'entity_bundle:node',
+          'bundles' => [
+            'guide' => 'guide',
+          ],
+          'negate' => FALSE,
+          'context_mapping' => [],
+        ],
+      ],
+    ]);
+
+    $block->save();
+    \Drupal::messenger()->addMessage('LGMS Guide Owner Block placed successfully.');
+  } else {
+    \Drupal::messenger()->addMessage('The LGMS Guide Owner Block already exists.');
+  }
+
   // Create content types.
   createContentType('guide_page', 'Guide Page');
   createContentType('guide_box', 'Guide Box');
