@@ -39,11 +39,29 @@
   background-color: #f9f9f9;
 }
 
-.guide-box-title {
+.title-edit-wrapper {
   margin-top: 0;
   background-color: #f4f6f8;
   padding: 10px;
   border-bottom: 1px solid #ccc;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.icons-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.edit-icon {
+  margin-right: 10px;
+}
+
+.re-order-icon {
+  margin-right: 10px;
 }
 
 .guide-box-body {
@@ -70,3 +88,4 @@
 .right-column {
   width: 72.5%;
 }
+

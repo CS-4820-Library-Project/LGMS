@@ -6,10 +6,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
-class CustomGuideBoxForm extends FormBase {
+class CreateGuideBoxForm extends FormBase {
 
   public function getFormId() {
-    return 'custom_guide_box_form';
+    return 'create_guide_box_form';
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
@@ -86,9 +86,11 @@ class CustomGuideBoxForm extends FormBase {
 
     // Body field
     $form['body'] = [
-      '#type' => 'textarea',
+      '#type' => 'text_format',
       '#title' => $this->t('Body'),
+      '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
     ];
+
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
@@ -98,6 +100,19 @@ class CustomGuideBoxForm extends FormBase {
     ];
 
     return $form;
+  }
+
+  public static function hideTextFormatHelpText(array $element, FormStateInterface $form_state) {
+    if (isset($element['format']['help'])) {
+      $element['format']['help']['#access'] = FALSE;
+    }
+    if (isset($element['format']['guidelines'])) {
+      $element['format']['guidelines']['#access'] = FALSE;
+    }
+    if (isset($element['format']['#attributes']['class'])) {
+      unset($element['format']['#attributes']['class']);
+    }
+    return $element;
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
@@ -133,6 +148,54 @@ class CustomGuideBoxForm extends FormBase {
 
     $new_node->save();
 
+    $page = Node::load($nid);
+    $boxList = $page->get('field_child_boxes')->getValue();
+    $boxList[] = $new_node;
+
+    $page->set('field_child_boxes', $boxList);
+    $page->save();
+
+
+    $curr_node_url = $curr_node->toUrl()->toString();
+    $curr_node_url = str_replace('LGMS/', '', $curr_node_url);
+
+    $node_path = str_replace('LGMS/', '', $curr_node_url);
+
+    $form_state->setRedirectUrl(Url::fromUri('internal:' . $node_path));
+
+    \Drupal::messenger()->addMessage('Box created successfully.');
+
+    /*$curr_node = $form_state->getValue('current_node');
+    $curr_node = Node::load($curr_node);
+    $nid = $curr_node->id();
+
+
+    if ($curr_node->bundle() === 'guide'){
+      // Get the list of guide pages
+      $query = \Drupal::entityQuery('node')
+        ->condition('type', 'guide_page')
+        ->condition('field_parent_guide', $curr_node->id())
+        ->accessCheck(TRUE);
+      $result = $query->execute();
+
+      // Get the first page
+      $first_node_id = reset($result);
+      $page = Node::load($first_node_id);
+
+      $nid = $page->id();
+    }
+
+    if(!$form->getValue(['second_tab', 'reference'])){
+    $original_box = Node::load($form->getValue(['second_tab', 'box']);
+    $new_box = $original_box.duplicate();
+    $new_box->set('field_parent_page', $nid);
+    $new_box->set('title', $form->getValue(['second_tab', 'title']);
+
+    $new_box->save();
+   } else {
+
+   }
+
 
     \Drupal::messenger()->addMessage('Box created successfully.');
 
@@ -141,6 +204,6 @@ class CustomGuideBoxForm extends FormBase {
 
     $node_path = str_replace('LGMS/', '', $curr_node_url);
 
-    $form_state->setRedirectUrl(Url::fromUri('internal:' . $node_path));
+    $form_state->setRedirectUrl(Url::fromUri('internal:' . $node_path));*/
   }
 }

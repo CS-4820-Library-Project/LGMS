@@ -54,10 +54,34 @@ lgmsmodule.guide_import_form:
   requirements:
     _permission: 'create guide content'
 
-custom_guide_box.form:
+create_guide_box.form:
   path: '/custom-guide-box-form'
   defaults:
-    _form: '\Drupal\lgmsmodule\Form\CustomGuideBoxForm'
+    _form: '\Drupal\lgmsmodule\Form\CreateGuideBoxForm'
     _title: 'Add Guide Box'
+  requirements:
+    _permission: 'access content'
+
+delete_guide_box.form:
+  path: '/delete_guide_box'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\DeleteGuideBoxForm'
+    _title: 'Delete Guide Box'
+  requirements:
+    _permission: 'access content'
+
+edit_guide_box.form:
+  path: '/edit_guide_box'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\EditGuideBoxForm'
+    _title: 'Edit Guide Box'
+  requirements:
+    _permission: 'access content'
+
+re_order_guide_box.form:
+  path: '/re_order_guide_box'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\ReOrderBoxesForm'
+    _title: 'ReOder Guide Box'
   requirements:
     _permission: 'access content'
