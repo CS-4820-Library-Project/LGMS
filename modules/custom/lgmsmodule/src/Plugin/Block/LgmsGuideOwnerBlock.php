@@ -142,10 +142,6 @@ class LgmsGuideOwnerBlock extends BlockBase implements ContainerFactoryPluginInt
       ];
     }
 
-    $content["wrapper"]['subject'] = [
-      '#markup' => '<p><strong>Subjects:</strong></p>',
-    ];
-
     // Load all nodes of type "guide" created by the current user.
     $query = \Drupal::entityQuery('node')
       ->condition('type', 'guide')
@@ -170,6 +166,10 @@ class LgmsGuideOwnerBlock extends BlockBase implements ContainerFactoryPluginInt
 
     // Output the term names within a <ul>.
     if (!empty($term_names)) {
+      $content["wrapper"]['subject'] = [
+        '#markup' => '<p><strong>Subjects:</strong></p>',
+      ];
+
       $content["wrapper"]['subjects'] = [
         '#theme' => 'item_list',
         '#items' => array_unique($term_names),
