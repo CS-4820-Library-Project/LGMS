@@ -1,4 +1,5 @@
 <?php
+
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
 use Drupal\lgmsmodule\Controller\landingPageHelper;
@@ -24,7 +25,8 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 /**
  * Implements hook_theme().
  */
-function lgmsmodule_theme($existing, $type, $theme, $path) {
+function lgmsmodule_theme($existing, $type, $theme, $path)
+{
   return [
     'lgmsmodule_content' => [
       'variables' => ['table' => NULL],
@@ -34,9 +36,36 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * This is executed when a node is created or updated.
+ *
+ * @param \Drupal\node\NodeInterface $node
+ *   The node that is being inserted or updated.
+ */
+function lgmsmodule_generate_url_alias(NodeInterface $node) {
+  // Check if the node type is 'guide' or 'page'.
+  if (in_array($node->getType(), ['guide', 'page'])) {
+    $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+    $alias = trim($alias, '-'); // Trim any leading or trailing hyphens.
+
+    // Load the existing alias for the current node, if any.
+    $path = \Drupal::service('path_alias.manager')->getPathByAlias($alias, $node->language()->getId());
+    if ($path != '/node/' . $node->id() && !preg_match('/node\/(\d+)/', $path)) {
+      // Create or update the alias if it doesn't exist or if it's not for the current node.
+      $path_alias = \Drupal\path_alias\Entity\PathAlias::create([
+        'path' => '/node/' . $node->id(),
+        'alias' => $alias,
+        'langcode' => $node->language()->getId(),
+      ]);
+      $path_alias->save();
+    }
+  }
+}
+
+/**
  * Implements hook_block_access().
  */
-function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation, \Drupal\Core\Session\AccountInterface $account) {
+function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation, \Drupal\Core\Session\AccountInterface $account)
+{
   // Get the current route.
   $current_route = \Drupal::routeMatch()->getRouteName();
   $node = \Drupal::routeMatch()->getParameter('node');
@@ -64,7 +93,8 @@ function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation
 /**
  * Implements hook_preprocess_page().
  */
-function lgmsmodule_preprocess_page(&$variables) {
+function lgmsmodule_preprocess_page(&$variables)
+{
   // Check if the current page is a guide node
   if ($node = \Drupal::routeMatch()->getParameter('node')) {
 
@@ -83,7 +113,8 @@ function lgmsmodule_preprocess_page(&$variables) {
  * @return void
  * @throws EntityStorageException
  */
-function create_vocab(string $vid, string $name, string $description): void {
+function create_vocab(string $vid, string $name, string $description): void
+{
   $vocabulary = Vocabulary::create([
     'vid' => $vid,
     'name' => $name,
@@ -101,7 +132,8 @@ function create_vocab(string $vid, string $name, string $description): void {
  * @return void
  * @throws EntityStorageException
  */
-function add_terms(array $terms, string $vid): void {
+function add_terms(array $terms, string $vid): void
+{
   foreach ($terms as $term_name) {
     $new_term = Term::create([
       'vid' => $vid,
@@ -145,7 +177,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
       'settings' => $settings['storage'] ?? [],
     ]);
 
-    if ($cardinal){
+    if ($cardinal) {
       $storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
     }
 
@@ -204,6 +236,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
 function lgmsmodule_node_insert(NodeInterface $node): void
 {
   lgmsmodule_refresh_cache($node);
+  lgmsmodule_generate_url_alias($node);
 }
 
 /**
@@ -213,6 +246,7 @@ function lgmsmodule_node_insert(NodeInterface $node): void
 function lgmsmodule_node_update(NodeInterface $node): void
 {
   lgmsmodule_refresh_cache($node);
+  lgmsmodule_generate_url_alias($node);
 }
 
 /**
@@ -248,7 +282,8 @@ function lgmsmodule_refresh_cache(NodeInterface $node): void
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
-function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
+function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void
+{
   if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
@@ -261,7 +296,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     $page = null;
 
     // Check if it's a guide page.
-    if($entity->bundle() === 'guide') {
+    if ($entity->bundle() === 'guide') {
       $build['desc'] = ['#markup' => $entity->get("field_guide_description")->value,];
 
       // Get the list of guide pages
@@ -271,8 +306,9 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         ->accessCheck(TRUE);
       $result = $query->execute();
 
-      if (empty($result)) { /**This Should change to redirecting to create a page*/
-        if(\Drupal::currentUser()->isAuthenticated()){
+      if (empty($result)) {
+        /**This Should change to redirecting to create a page*/
+        if (\Drupal::currentUser()->isAuthenticated()) {
           $url = Url::fromRoute('node.add', ['node_type' => 'guide_page'], ['query' => ['field_parent_page' => $entity->id()]]);
           $link = Link::fromTextAndUrl(t('Create Guide Page'), $url)->toRenderable();
           $link['#attributes']['class'][] = 'link';
@@ -286,11 +322,11 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       $page = Node::load($first_node_id);
     }
 
-    if($page === null){
+    if ($page === null) {
       $page = $entity;
     }
 
-    if($page instanceof NodeInterface){
+    if ($page instanceof NodeInterface) {
       $build['guide_pages_list'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['guide-pages-list']],
@@ -351,7 +387,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                     'class' => ['fa', 'fa-edit', 'edit-icon'],
                   ],
                 ],
-                '#url' => Url::fromRoute('edit_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' =>$guide_box->id()]]),
+                '#url' => Url::fromRoute('edit_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' => $guide_box->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -369,7 +405,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                     'class' => ['fa', 'fa-times', 'close-icon'],
                   ],
                 ],
-                '#url' => Url::fromRoute('delete_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' =>$guide_box->id()]]),
+                '#url' => Url::fromRoute('delete_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' => $guide_box->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -387,10 +423,9 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
             '#attributes' => ['class' => ['guide-box-body']],
           ],
         ];
-
       }
     }
-    if(\Drupal::currentUser()->isAuthenticated()) {
+    if (\Drupal::currentUser()->isAuthenticated()) {
       $build['two_column_layout']['right']['add_guide_page_box_link'] = createBoxButton($entity);
     }
   }
@@ -763,7 +798,7 @@ function delete_taxonomies($vocab_machine_name): void
       foreach ($terms as $term) {
         $term->delete();
       }
-    } catch (InvalidPluginDefinitionException|PluginNotFoundException $e) {
+    } catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
     }
     $vocabulary->delete();
   }
