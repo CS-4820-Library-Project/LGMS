@@ -947,6 +947,72 @@ function lgmsModule_install(): void
     TRUE
   );
 
+  createField(
+    'field_text_box_item',
+    'node',
+    'guide_item',
+    'Text',
+    'text_long',
+    [],
+    'text_textarea',
+    ['rows' => 20,],
+    TRUE,
+    False
+  );
+
+  createField(
+    'field_image_box_item',
+    'node',
+    'guide_item',
+    'Image',
+    'image',
+    [],
+    'image_image',
+    [],
+    TRUE,
+    False
+  );
+
+  createField(
+    'field_link_box_item',
+    'node',
+    'guide_item',
+    'Link',
+    'link',
+    [],
+    'link_default',
+    [],
+    TRUE,
+    False
+  );
+
+  //guide_item
+  createField(
+    'field_box_items',
+    'node',
+    'guide_box',
+    'Items List',
+    'entity_reference',
+    [
+      'storage' => [
+        'target_type' => 'node',
+        'handler' => 'default:node',
+        'handler_settings' => [
+          'target_bundles' => [
+            'guide_item' => 'guide_item'
+          ],
+          'sort' => [
+            'field' => '_none',
+          ],
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    True,
+  );
+
   // Disable the display of author and date information for guide, guide_page and guide_box.
   disable_field('guide', 'display_submitted');
   #disable_field('guide_page', 'display_submitted');
