@@ -1015,7 +1015,7 @@ function lgmsModule_install(): void
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
   disable_field('guide', 'display_submitted');
-  #disable_field('guide_page', 'display_submitted');
+  disable_field('guide_page', 'display_submitted');
   disable_field('guide_box', 'display_submitted');
   disable_field('sub_page', 'display_submitted');
 }
