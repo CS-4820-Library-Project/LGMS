@@ -140,7 +140,7 @@ class CreateGuideBoxForm extends FormBase {
       'type' => 'guide_box',
       'title' => $form_state->getValue('title'),
       'field_body_box' => [
-        'value' => $form_state->getValue('body'),
+        'value' => $form_state->getValue('body')['value'],
         'format' => 'full_html',
       ],
       'field_parent_page' => ['target_id' => $nid],
@@ -150,7 +150,7 @@ class CreateGuideBoxForm extends FormBase {
 
     $page = Node::load($nid);
     $boxList = $page->get('field_child_boxes')->getValue();
-    $boxList[] = $new_node;
+    $boxList[] = ['target_id' => $new_node->id()];
 
     $page->set('field_child_boxes', $boxList);
     $page->save();
