@@ -182,7 +182,7 @@ function createContentType($id, $name): void
  * Helper function to create fields.
  * @throws EntityStorageException
  */
-function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $settings, $widget_type, $widget_settings, $status, $cardinal): void
+function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $settings, $widget_type, $widget_settings, $status, $cardinal, $field_weight): void
 {
   // Create field storage.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
@@ -225,6 +225,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
     $form_display->setComponent($field_id, [
       'type' => $widget_type,
       'settings' => $widget_settings,
+      'weight'=> $field_weight,
     ])->save();
 
     // Configure view display.
@@ -744,7 +745,8 @@ function lgmsModule_install(): void
     'options_buttons',
     ['weight' => 0],
     False,
-    True
+    True,
+    3
   );
 
   createField(
@@ -767,7 +769,8 @@ function lgmsModule_install(): void
     'options_select',
     ['weight' => 1],
     False,
-    False
+    False,
+    4
   );
 
   createField(
@@ -790,7 +793,8 @@ function lgmsModule_install(): void
     'options_select',
     ['weight' => 2],
     False,
-    False
+    False,
+    5
   );
 
   // Guide Description field
@@ -804,7 +808,8 @@ function lgmsModule_install(): void
     'text_textarea',
     [],
     False,
-    False
+    False,
+    2
   );
 
   // Add a reference field to Guide content type on Guide Page.
@@ -818,7 +823,8 @@ function lgmsModule_install(): void
     'entity_reference_autocomplete',
     [],
     TRUE,
-    False
+    False,
+    1
   );
 
 
@@ -832,7 +838,8 @@ function lgmsModule_install(): void
     'entity_reference_autocomplete',
     [],
     TRUE,
-    False
+    False,
+    1,
   );
   createField(
     'field_parent_page',
@@ -844,7 +851,8 @@ function lgmsModule_install(): void
     'entity_reference_autocomplete',
     [],
     TRUE,
-    False
+    False,
+    1
   );
   //add page description field
   createField(
@@ -857,7 +865,8 @@ function lgmsModule_install(): void
     'text_textarea',
     ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
     TRUE,
-    False
+    False,
+    2
   );
 
   createField(
@@ -874,7 +883,8 @@ function lgmsModule_install(): void
       ],
     ],
     FALSE,
-    FALSE
+    FALSE,
+    10,
   );
   createField(
     'field_draft_mode',
@@ -890,7 +900,8 @@ function lgmsModule_install(): void
       ],
     ],
     FALSE,
-    FALSE
+    FALSE,
+    5
   );
 
   createField(
@@ -903,7 +914,8 @@ function lgmsModule_install(): void
     'text_textarea',
     ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
     TRUE,
-    False
+    False,
+    3
   );
 
   // Box Body field
@@ -917,7 +929,8 @@ function lgmsModule_install(): void
     'text_textarea',
     ['rows' => 20,],
     TRUE,
-    False
+    False,
+    -1
   );
 
   // page box children
@@ -944,7 +957,8 @@ function lgmsModule_install(): void
     'entity_reference_autocomplete',
     [],
     TRUE,
-    TRUE
+    TRUE,
+    5
   );
 
   createField(
@@ -957,7 +971,8 @@ function lgmsModule_install(): void
     'text_textarea',
     ['rows' => 20,],
     TRUE,
-    False
+    False,
+    1
   );
 
   createField(
@@ -970,7 +985,8 @@ function lgmsModule_install(): void
     'image_image',
     [],
     TRUE,
-    False
+    False,
+    2
   );
 
   createField(
@@ -983,7 +999,8 @@ function lgmsModule_install(): void
     'link_default',
     [],
     TRUE,
-    False
+    False,
+    3
   );
 
   //guide_item
@@ -1011,6 +1028,7 @@ function lgmsModule_install(): void
     [],
     TRUE,
     True,
+    4
   );
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
