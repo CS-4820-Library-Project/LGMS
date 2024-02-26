@@ -258,6 +258,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     $build['#cache']['tags'][] = $custom_cache_tag;
 
 
+
     $page = null;
 
     // Check if it's a guide page.
@@ -271,15 +272,20 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         ->accessCheck(TRUE);
       $result = $query->execute();
 
-      if (empty($result)) { /**This Should change to redirecting to create a page*/
+      if (empty($result)) { //This Should change to redirecting to create a page
         if(\Drupal::currentUser()->isAuthenticated()){
-          $url = Url::fromRoute('node.add', ['node_type' => 'guide_page'], ['query' => ['field_parent_page' => $entity->id()]]);
+          $url = Url::fromRoute('add_guide_page.form', [], ['query' => ['current_guide' => $entity->id()]]);
           $link = Link::fromTextAndUrl(t('Create Guide Page'), $url)->toRenderable();
-          $link['#attributes']['class'][] = 'link';
+          $link['#attributes'] = [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+          ];
           $build['add_guide_page_box_link'] = $link;
           return;
         }
       }
+
 
       // Get the first page
       $first_node_id = reset($result);
@@ -419,6 +425,7 @@ function lgmsModule_install(): void
 
   // Get the default theme.
   $default_theme = \Drupal::config('system.theme')->get('default');
+
   $block_id = 'lgmsguideownerblock';
 
   if (!\Drupal\block\Entity\Block::load($block_id)) {
@@ -436,6 +443,8 @@ function lgmsModule_install(): void
           'id' => 'entity_bundle:node',
           'bundles' => [
             'guide' => 'guide',
+            'guide_page'=>'guide_page',
+            'sub_page'=>'sub_page'
           ],
           'negate' => FALSE,
           'context_mapping' => [],
@@ -449,9 +458,41 @@ function lgmsModule_install(): void
     \Drupal::messenger()->addMessage('The LGMS Guide Owner Block already exists.');
   }
 
+  $block_id = 'pageviewblock';
+  if (!\Drupal\block\Entity\Block::load($block_id)) {
+    $block = \Drupal\block\Entity\Block::create([
+      'id' => $block_id,
+      'theme' => $default_theme,
+      'region' => 'sidebar_first',
+      'weight' => 1,
+      'provider' => 'lgmsmodule',
+      'plugin' => 'page_view_block',
+      'label' => 'LGMS page view Block',
+      'label_display' => 'visible',
+      'visibility' => [
+        'entity_bundle:node' => [
+          'id' => 'entity_bundle:node',
+          'bundles' => [
+            'guide' => 'guide',
+            'guide_page'=>'guide_page',
+            'sub_page'=>'sub_page'
+          ],
+          'negate' => FALSE,
+          'context_mapping' => [],
+        ],
+      ],
+    ]);
+
+    $block->save();
+    \Drupal::messenger()->addMessage('LGMS Page View Block placed successfully.');
+  } else {
+    \Drupal::messenger()->addMessage('The LGMS Page View Block already exists.');
+  }
+
   // Create content types.
   createContentType('guide_page', 'Guide Page');
   createContentType('guide_box', 'Guide Box');
+  createContentType('sub_page', 'Sub Page');
 
   // Create a new Guide Type taxonomy.
   create_vocab('LGMS_Guide_Type', 'Guide Type', 'Use Guide Type to group guides by their type');
@@ -634,12 +675,69 @@ function lgmsModule_install(): void
     TRUE,
     False
   );
-
+  createField(
+    'field_parent_page',
+    'node',
+    'sub_page',
+    'Parent Page',
+    'entity_reference',
+    ['target_type' => 'node', 'handler' => 'default:node', 'handler_settings' => ['target_bundles' => ['target_bundles' => 'target_bundles']]],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    False
+  );
   //add page description field
   createField(
     'field_description',
     'node',
     'guide_page',
+    'Description',
+    'text_long',
+    [],
+    'text_textarea',
+    ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
+    TRUE,
+    False
+  );
+
+  createField(
+    'field_draft_mode',
+    'node',
+    'guide_page',
+    'Draft Mode',
+    'boolean',
+    [],
+    'boolean_checkbox',
+    [ // Widget settings.
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+    ],
+    FALSE,
+    FALSE
+  );
+  createField(
+    'field_draft_mode',
+    'node',
+    'sub_page',
+    'Draft Mode',
+    'boolean',
+    [],
+    'boolean_checkbox',
+    [ // Widget settings.
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+    ],
+    FALSE,
+    FALSE
+  );
+
+  createField(
+    'field_description',
+    'node',
+    'sub_page',
     'Description',
     'text_long',
     [],
@@ -694,6 +792,7 @@ function lgmsModule_install(): void
   disable_field('guide', 'display_submitted');
   disable_field('guide_page', 'display_submitted');
   disable_field('guide_box', 'display_submitted');
+  disable_field('sub_page', 'display_submitted');
 }
 
 /**

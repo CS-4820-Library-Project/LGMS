@@ -85,3 +85,11 @@ re_order_guide_box.form:
     _title: 'ReOder Guide Box'
   requirements:
     _permission: 'access content'
+
+add_guide_page.form:
+  path: '/add_guide_page'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\CreateGuidePageForm'
+    _title: 'Add Guide Page'
+  requirements:
+    _permission: 'access content'
