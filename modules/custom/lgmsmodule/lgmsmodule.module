@@ -1,5 +1,4 @@
 <?php
-
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
 use Drupal\lgmsmodule\Controller\landingPageHelper;
@@ -25,8 +24,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 /**
  * Implements hook_theme().
  */
-function lgmsmodule_theme($existing, $type, $theme, $path)
-{
+function lgmsmodule_theme($existing, $type, $theme, $path) {
   return [
     'lgmsmodule_content' => [
       'variables' => ['table' => NULL],
@@ -37,35 +35,57 @@ function lgmsmodule_theme($existing, $type, $theme, $path)
 
 /**
  * This is executed when a node is created or updated.
- *
+ * This is used to generate URL aliases for guide and page nodes.
  * @param \Drupal\node\NodeInterface $node
  *   The node that is being inserted or updated.
  */
 function lgmsmodule_generate_url_alias(NodeInterface $node) {
-  // Check if the node type is 'guide' or 'page'.
-  if (in_array($node->getType(), ['guide', 'page'])) {
+  // Alias generation for 'guide' content type remains the same.
+  if ($node->getType() == 'guide') {
     $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
-    $alias = trim($alias, '-'); // Trim any leading or trailing hyphens.
-
-    // Load the existing alias for the current node, if any.
-    $path = \Drupal::service('path_alias.manager')->getPathByAlias($alias, $node->language()->getId());
-    if ($path != '/node/' . $node->id() && !preg_match('/node\/(\d+)/', $path)) {
-      // Create or update the alias if it doesn't exist or if it's not for the current node.
-      $path_alias = \Drupal\path_alias\Entity\PathAlias::create([
-        'path' => '/node/' . $node->id(),
-        'alias' => $alias,
-        'langcode' => $node->language()->getId(),
-      ]);
-      $path_alias->save();
+  }
+  // Alias generation for 'page' content type needs to reflect the parent-child relationship.
+  elseif ($node->getType() == 'guide_page') {
+    // Load the parent guide node.
+    $parent_guide = $node->get('field_parent_guide')->entity;
+    if ($parent_guide) {
+      // Construct the alias using the parent guide's title and the page's title.
+      $parent_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_guide->getTitle()));
+      $child_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+      $alias = '/' . $parent_alias . '/' . $child_alias;
+    } else {
+      // If there's no parent guide, fallback to just using the page title.
+      $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
     }
+  } else {
+    // If the content type is neither 'guide' nor 'page', do nothing.
+    return;
+  }
+
+  // Trim leading or trailing hyphens from the alias.
+  $alias = trim($alias, '-');
+
+  // Check if the alias already exists.
+  $path_alias_repository = \Drupal::service('path_alias.repository');
+  $existing_alias = $path_alias_repository->lookupByAlias($alias, $node->language()->getId());
+
+  // If the alias does not exist or it's not the current node's alias, create or update it.
+  if (!$existing_alias || $existing_alias['path'] !== '/node/' . $node->id()) {
+    // Create a new alias or update the existing one.
+    $path_alias_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+    $path_alias = $path_alias_storage->create([
+      'path' => '/node/' . $node->id(),
+      'alias' => $alias,
+      'langcode' => $node->language()->getId(),
+    ]);
+    $path_alias->save();
   }
 }
 
 /**
  * Implements hook_block_access().
  */
-function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation, \Drupal\Core\Session\AccountInterface $account)
-{
+function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation, \Drupal\Core\Session\AccountInterface $account) {
   // Get the current route.
   $current_route = \Drupal::routeMatch()->getRouteName();
   $node = \Drupal::routeMatch()->getParameter('node');
@@ -93,8 +113,7 @@ function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation
 /**
  * Implements hook_preprocess_page().
  */
-function lgmsmodule_preprocess_page(&$variables)
-{
+function lgmsmodule_preprocess_page(&$variables) {
   // Check if the current page is a guide node
   if ($node = \Drupal::routeMatch()->getParameter('node')) {
 
@@ -113,8 +132,7 @@ function lgmsmodule_preprocess_page(&$variables)
  * @return void
  * @throws EntityStorageException
  */
-function create_vocab(string $vid, string $name, string $description): void
-{
+function create_vocab(string $vid, string $name, string $description): void {
   $vocabulary = Vocabulary::create([
     'vid' => $vid,
     'name' => $name,
@@ -132,8 +150,7 @@ function create_vocab(string $vid, string $name, string $description): void
  * @return void
  * @throws EntityStorageException
  */
-function add_terms(array $terms, string $vid): void
-{
+function add_terms(array $terms, string $vid): void {
   foreach ($terms as $term_name) {
     $new_term = Term::create([
       'vid' => $vid,
@@ -165,7 +182,7 @@ function createContentType($id, $name): void
  * Helper function to create fields.
  * @throws EntityStorageException
  */
-function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $settings, $widget_type, $widget_settings, $status, $cardinal, $weight = null): void
+function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $settings, $widget_type, $widget_settings, $status, $cardinal): void
 {
   // Create field storage.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
@@ -177,7 +194,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
       'settings' => $settings['storage'] ?? [],
     ]);
 
-    if ($cardinal) {
+    if ($cardinal){
       $storage->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
     }
 
@@ -208,7 +225,6 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
     $form_display->setComponent($field_id, [
       'type' => $widget_type,
       'settings' => $widget_settings,
-      'weight' => $weight ?? 0
     ])->save();
 
     // Configure view display.
@@ -237,7 +253,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
 function lgmsmodule_node_insert(NodeInterface $node): void
 {
   lgmsmodule_refresh_cache($node);
-  lgmsmodule_generate_url_alias($node);
+lgmsmodule_generate_url_alias($node);
 }
 
 /**
@@ -247,7 +263,7 @@ function lgmsmodule_node_insert(NodeInterface $node): void
 function lgmsmodule_node_update(NodeInterface $node): void
 {
   lgmsmodule_refresh_cache($node);
-  lgmsmodule_generate_url_alias($node);
+lgmsmodule_generate_url_alias($node);
 }
 
 /**
@@ -283,8 +299,7 @@ function lgmsmodule_refresh_cache(NodeInterface $node): void
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
-function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void
-{
+function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
   if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
@@ -297,7 +312,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     $page = null;
 
     // Check if it's a guide page.
-    if ($entity->bundle() === 'guide') {
+    if($entity->bundle() === 'guide') {
       $build['desc'] = ['#markup' => $entity->get("field_guide_description")->value,];
 
       // Get the list of guide pages
@@ -307,9 +322,8 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         ->accessCheck(TRUE);
       $result = $query->execute();
 
-      if (empty($result)) {
-        /**This Should change to redirecting to create a page*/
-        if (\Drupal::currentUser()->isAuthenticated()) {
+      if (empty($result)) { /**This Should change to redirecting to create a page*/
+        if(\Drupal::currentUser()->isAuthenticated()){
           $url = Url::fromRoute('node.add', ['node_type' => 'guide_page'], ['query' => ['field_parent_page' => $entity->id()]]);
           $link = Link::fromTextAndUrl(t('Create Guide Page'), $url)->toRenderable();
           $link['#attributes']['class'][] = 'link';
@@ -323,11 +337,11 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       $page = Node::load($first_node_id);
     }
 
-    if ($page === null) {
+    if($page === null){
       $page = $entity;
     }
 
-    if ($page instanceof NodeInterface) {
+    if($page instanceof NodeInterface){
       $build['guide_pages_list'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['guide-pages-list']],
@@ -339,117 +353,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
       foreach ($boxes as $box) {
         $guide_box = Node::load($box['target_id']);
-
-        $items = $guide_box->get('field_box_items')->referencedEntities();
-
-        $guide_box_build['items'] = [
-          '#type' => 'container',
-          '#attributes' => ['class' => ['guide-box-items-container']],
-        ];
-
-        foreach ($items as $item) {
-          $item_container = [
-            '#type' => 'container',
-            '#attributes' => ['class' => ['guide-item']],
-          ];
-
-          // Check and render based on the type of the guide_item.
-          if ($item->hasField('field_text_box_item') && !$item->get('field_text_box_item')->isEmpty()) {
-            $item_container['content'] = [
-              '#type' => 'processed_text',
-              '#text' => $item->get('field_text_box_item')->value,
-              '#format' => $item->get('field_text_box_item')->format,
-            ];
-          } elseif ($item->hasField('field_image_box_item') && !$item->get('field_image_box_item')->isEmpty()) {
-            $item_container['content'] = [
-              '#theme' => 'image_formatter',
-              '#item' => $item->get('field_image_box_item')->first(),
-              '#image_style' => 'medium',
-            ];
-          } elseif ($item->hasField('field_link_box_item') && !$item->get('field_link_box_item')->isEmpty()) {
-            $link = $item->get('field_link_box_item')->first()->getValue();
-            $item_container['content'] = [
-              '#type' => 'link',
-              '#title' => $link['title'],
-              '#url' => Url::fromUri($link['uri']),
-            ];
-          }
-
-          // Add the item container to the guide box items.
-          $guide_box_build['items'][] = $item_container;
-        }
-        if(\Drupal::currentUser()->isAuthenticated()) {
-          $guide_box_build['items_list'] = [
-            '#type' => 'container',
-            '#attributes' => ['id' => 'add-reorder-list', 'class' => ['guide-item2']],
-            'children' => [
-              'html_item' => [
-                '#type' => 'html_tag',
-                '#tag' => 'li',
-                'content' => [
-                  '#type' => 'link',
-                  '#title' => ('HTML'),
-                  '#url' => Url::fromRoute('add_html.form', [], ['query' => ['current_box' => $guide_box->id(), 'current_node' => $entity->id()]]),
-                  '#attributes' => [
-                    'class' => ['use-ajax'],
-                    'data-dialog-type' => 'modal',
-                    'data-dialog-options' => Json::encode(['width' => 800]),
-                    'title' => 'Re-position Box',
-                    'style' => 'text-decoration: none;',
-                  ],
-                ],
-              ],
-              'link_item' => [
-                '#type' => 'html_tag',
-                '#tag' => 'li',
-                'content' => [
-                  '#type' => 'link',
-                  '#title' => t('Link'),
-                  '#url' => Url::fromRoute('add_link.form', [], ['query' => ['current_box' => $guide_box->id(), 'current_node' => $entity->id()]]),
-                  '#attributes' => [
-                    'class' => ['use-ajax'],
-                    'data-dialog-type' => 'modal',
-                    'data-dialog-options' => Json::encode(['width' => 800]),
-                    'title' => 'Re-position Box',
-                    'style' => 'text-decoration: none;',
-                  ],
-                ],
-              ],
-              'image_item' => [
-                '#type' => 'html_tag',
-                '#tag' => 'li',
-                'content' => [
-                  '#type' => 'link',
-                  '#title' => t('Image'),
-                  '#url' => Url::fromRoute('add_image.form', [], ['query' => ['current_box' => $guide_box->id(), 'current_node' => $entity->id()]]),
-                  '#attributes' => [
-                    'class' => ['use-ajax'],
-                    'data-dialog-type' => 'modal',
-                    'data-dialog-options' => Json::encode(['width' => 800]),
-                    'title' => 'Re-position Box',
-                    'style' => 'text-decoration: none;',
-                  ],
-                ],
-              ],
-              're-order' => [
-                '#type' => 'html_tag',
-                '#tag' => 'li',
-                'content' => [
-                  '#type' => 'link',
-                  '#title' => t('Re-Order'),
-                  '#url' => Url::fromRoute('re_order_box_item.form', [], ['query' => ['current_box' => $guide_box->id(), 'current_node' => $entity->id()]]),
-                  '#attributes' => [
-                    'class' => ['use-ajax'],
-                    'data-dialog-type' => 'modal',
-                    'data-dialog-options' => Json::encode(['width' => 800]),
-                    'title' => 'Re-position Box',
-                    'style' => 'text-decoration: none;',
-                  ],
-                ],
-              ],
-            ],
-          ];
-        }
 
         $build['boxes'][] = [
           '#type' => 'container',
@@ -466,7 +369,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
               '#value' => $guide_box->label(),
               '#attributes' => ['class' => ['guide-box-title']],
             ],
-            'icons' => \Drupal::currentUser()->isAuthenticated() ?[
+            'icons' => [
               '#type' => 'html_tag',
               '#tag' => 'div',
               '#attributes' => [
@@ -499,7 +402,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                     'class' => ['fa', 'fa-edit', 'edit-icon'],
                   ],
                 ],
-                '#url' => Url::fromRoute('edit_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' => $guide_box->id()]]),
+                '#url' => Url::fromRoute('edit_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' =>$guide_box->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -517,7 +420,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                     'class' => ['fa', 'fa-times', 'close-icon'],
                   ],
                 ],
-                '#url' => Url::fromRoute('delete_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' => $guide_box->id()]]),
+                '#url' => Url::fromRoute('delete_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' =>$guide_box->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -526,14 +429,20 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                   'style' => 'text-decoration: none;',
                 ],
               ],
-            ] : [],
+            ],
           ],
-          'body' => $guide_box_build,
+          'body' => [
+            '#type' => 'processed_text',
+            '#text' => $guide_box->get('field_body_box')->value,
+            '#format' => $guide_box->get('field_body_box')->format,
+            '#attributes' => ['class' => ['guide-box-body']],
+          ],
         ];
+
       }
     }
     if(\Drupal::currentUser()->isAuthenticated()) {
-      $build['add_guide_page_box_link'] = createBoxButton($entity);
+      $build['two_column_layout']['right']['add_guide_page_box_link'] = createBoxButton($entity);
     }
   }
 }
@@ -594,7 +503,6 @@ function lgmsModule_install(): void
   // Create content types.
   createContentType('guide_page', 'Guide Page');
   createContentType('guide_box', 'Guide Box');
-  createContentType('guide_item', 'Guide Box Item');
 
   // Create a new Guide Type taxonomy.
   create_vocab('LGMS_Guide_Type', 'Guide Type', 'Use Guide Type to group guides by their type');
@@ -685,10 +593,9 @@ function lgmsModule_install(): void
       ]
     ],
     'options_buttons',
-    [],
+    ['weight' => 0],
     False,
-    True,
-    2
+    True
   );
 
   createField(
@@ -709,10 +616,9 @@ function lgmsModule_install(): void
       ]
     ],
     'options_select',
-    [],
+    ['weight' => 1],
     False,
-    False,
-    3
+    False
   );
 
   createField(
@@ -733,10 +639,9 @@ function lgmsModule_install(): void
       ]
     ],
     'options_select',
-    [],
+    ['weight' => 2],
     False,
-    False,
-    4
+    False
   );
 
   // Guide Description field
@@ -750,8 +655,7 @@ function lgmsModule_install(): void
     'text_textarea',
     [],
     False,
-    False,
-    1
+    False
   );
 
   // Add a reference field to Guide content type on Guide Page.
@@ -837,73 +741,6 @@ function lgmsModule_install(): void
     TRUE
   );
 
-  createField(
-    'field_text_box_item',
-    'node',
-    'guide_item',
-    'Text',
-    'text_long',
-    [],
-    'text_textarea',
-    ['rows' => 20,],
-    TRUE,
-    False
-  );
-
-  createField(
-    'field_image_box_item',
-    'node',
-    'guide_item',
-    'Image',
-    'image',
-    [],
-    'image_image',
-    [],
-    TRUE,
-    False
-  );
-
-  createField(
-    'field_link_box_item',
-    'node',
-    'guide_item',
-    'Link',
-    'link',
-    [],
-    'link_default',
-    [],
-    TRUE,
-    False
-  );
-
-  //guide_item
-  createField(
-    'field_box_items',
-    'node',
-    'guide_box',
-    'Items List',
-    'entity_reference',
-    [
-      'storage' => [
-        'target_type' => 'node',
-        'handler' => 'default:node',
-        'handler_settings' => [
-          'target_bundles' => [
-            'guide_item' => 'guide_item'
-          ],
-          'sort' => [
-            'field' => '_none',
-          ],
-        ],
-      ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    True,
-  );
-
-
   // Disable the display of author and date information for guide, guide_page and guide_box.
   disable_field('guide', 'display_submitted');
   disable_field('guide_page', 'display_submitted');
@@ -977,7 +814,7 @@ function delete_taxonomies($vocab_machine_name): void
       foreach ($terms as $term) {
         $term->delete();
       }
-    } catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
+    } catch (InvalidPluginDefinitionException|PluginNotFoundException $e) {
     }
     $vocabulary->delete();
   }
