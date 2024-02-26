@@ -60,7 +60,7 @@ create_guide_box.form:
     _form: '\Drupal\lgmsmodule\Form\CreateGuideBoxForm'
     _title: 'Add Guide Box'
   requirements:
-    _permission: 'access content'
+    _permission: 'create guide_box content'
 
 delete_guide_box.form:
   path: '/delete_guide_box'
@@ -68,7 +68,7 @@ delete_guide_box.form:
     _form: '\Drupal\lgmsmodule\Form\DeleteGuideBoxForm'
     _title: 'Delete Guide Box'
   requirements:
-    _permission: 'access content'
+    _permission: 'delete any guide_box content'
 
 edit_guide_box.form:
   path: '/edit_guide_box'
@@ -76,12 +76,45 @@ edit_guide_box.form:
     _form: '\Drupal\lgmsmodule\Form\EditGuideBoxForm'
     _title: 'Edit Guide Box'
   requirements:
-    _permission: 'access content'
+    _permission: 'edit any guide_box content'
 
 re_order_guide_box.form:
   path: '/re_order_guide_box'
   defaults:
     _form: '\Drupal\lgmsmodule\Form\ReOrderBoxesForm'
-    _title: 'ReOder Guide Box'
+    _title: 'Re-Order Guide Box'
   requirements:
-    _permission: 'access content'
+    _permission: 'create guide_box content'
+
+re_order_box_item.form:
+  path: '/re_order_box_item'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\ReOderBoxItemsForm'
+    _title: 'Re-Order Box Items'
+  requirements:
+    _permission: 'create guide_item content'
+
+add_html.form:
+  path: '/add_html'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\AddHTMLForm'
+    _title: 'Add HTML Box Items'
+  requirements:
+    _permission: 'create guide_item content'
+
+add_link.form:
+  path: '/add_link'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\AddLinkForm'
+    _title: 'Add Link Box Items'
+  requirements:
+    _permission: 'create guide_item content'
+
+
+add_image.form:
+  path: '/add_image'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\AddImageForm'
+    _title: 'Add Image Box Items'
+  requirements:
+    _permission: 'create guide_item content'
