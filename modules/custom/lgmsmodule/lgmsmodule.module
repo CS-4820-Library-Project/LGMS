@@ -653,6 +653,7 @@ function lgmsModule_install(): void
   createContentType('guide_page', 'Guide Page');
   createContentType('guide_box', 'Guide Box');
   createContentType('sub_page', 'Sub Page');
+  createContentType('guide_item', 'Guide Box Item');
 
   // Create a new Guide Type taxonomy.
   create_vocab('LGMS_Guide_Type', 'Guide Type', 'Use Guide Type to group guides by their type');
