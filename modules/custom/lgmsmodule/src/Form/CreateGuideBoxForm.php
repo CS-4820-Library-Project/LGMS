@@ -157,9 +157,9 @@ class CreateGuideBoxForm extends FormBase {
 
 
     $curr_node_url = $curr_node->toUrl()->toString();
-    $curr_node_url = str_replace('lgms/', '', $curr_node_url);
+    $curr_node_url = str_ireplace('lgms/', '', $curr_node_url);
 
-    $node_path = str_replace('lgms/', '', $curr_node_url);
+    $node_path = str_ireplace('lgms/', '', $curr_node_url);
 
     $form_state->setRedirectUrl(Url::fromUri('internal:' . $node_path));
 
