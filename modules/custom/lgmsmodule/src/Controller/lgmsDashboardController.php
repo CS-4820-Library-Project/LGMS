@@ -18,8 +18,7 @@ class lgmsDashboardController extends ControllerBase
    * @return array
    *   A render array containing the page content.
    */
-  public function overview()
-  {
+  public function overview() {
     $build = [];
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $landingMethods = new landingPageHelper();
@@ -32,24 +31,35 @@ class lgmsDashboardController extends ControllerBase
       // Get the title from the view
       $title = $view->getTitle();
 
-      // Render the view
-      $rendered_view = $view->buildRenderable('default', []);
+      // Execute the view query to get the results
+      $view->execute();
 
-      // Add contextual links if the user has the permission to edit the view
-      if (\Drupal::currentUser()->hasPermission('administer views')) {
-        $rendered_view['#contextual_links']['views'] = [
-          'route_parameters' => ['view' => 'lgms_dashboard_table', 'display_id' => 'default'],
+      // Check if the view has any results
+      if (!$view->result) {
+        $build['no_results'] = [
+          '#markup' => $this->t('You don’t own any guides yet.'),
+        ];
+      } else {
+        // Render the view
+        $rendered_view = $view->buildRenderable('default', []);
+
+        // Add contextual links if the user has the permission to edit the view
+        if (\Drupal::currentUser()->hasPermission('administer views')) {
+          $rendered_view['#contextual_links']['views'] = [
+            'route_parameters' => ['view' => 'lgms_dashboard_table', 'display_id' => 'default'],
+          ];
+        }
+
+        // Render the searchbar block
+        $build['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_dashboard_search_block');
+
+        // Add the title and the rendered view to the build array
+        $build['table'] = [
+          'view' => $rendered_view,
         ];
       }
-
-      // Render the searchbar block
-      $build['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_dashboard_search_block');
-
-      // Add the title and the rendered view to the build array
-      $build['table'] = [
-        'view' => $rendered_view,
-      ];
     }
+
     return $build;
   }
 

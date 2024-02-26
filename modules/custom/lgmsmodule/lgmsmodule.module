@@ -165,7 +165,7 @@ function createContentType($id, $name): void
  * Helper function to create fields.
  * @throws EntityStorageException
  */
-function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $settings, $widget_type, $widget_settings, $status, $cardinal): void
+function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $settings, $widget_type, $widget_settings, $status, $cardinal, $weight = null): void
 {
   // Create field storage.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
@@ -208,6 +208,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
     $form_display->setComponent($field_id, [
       'type' => $widget_type,
       'settings' => $widget_settings,
+      'weight' => $weight ?? 0
     ])->save();
 
     // Configure view display.
@@ -684,9 +685,10 @@ function lgmsModule_install(): void
       ]
     ],
     'options_buttons',
-    ['weight' => 0],
+    [],
     False,
-    True
+    True,
+    2
   );
 
   createField(
@@ -707,9 +709,10 @@ function lgmsModule_install(): void
       ]
     ],
     'options_select',
-    ['weight' => 1],
+    [],
     False,
-    False
+    False,
+    3
   );
 
   createField(
@@ -730,9 +733,10 @@ function lgmsModule_install(): void
       ]
     ],
     'options_select',
-    ['weight' => 2],
+    [],
     False,
-    False
+    False,
+    4
   );
 
   // Guide Description field
@@ -746,7 +750,8 @@ function lgmsModule_install(): void
     'text_textarea',
     [],
     False,
-    False
+    False,
+    1
   );
 
   // Add a reference field to Guide content type on Guide Page.
