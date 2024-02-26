@@ -103,9 +103,9 @@ class AddImageForm extends FormBase {
     $current_box->save();
 
     $curr_node_url = $current_node->toUrl()->toString();
-    $curr_node_url = str_replace('LGMS/', '', $curr_node_url);
+    $curr_node_url = str_replace('lgms/', '', $curr_node_url);
 
-    $node_path = str_replace('LGMS/', '', $curr_node_url);
+    $node_path = str_replace('lgms/', '', $curr_node_url);
 
     $form_state->setRedirectUrl(Url::fromUri('internal:' . $node_path));
 

@@ -16,7 +16,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
  *
  * @Block(
  *   id = "lgms_guide_owner_block",
- *   admin_label = @Translation("Lgms Guide Owner Block"),
+ *   admin_label = @Translation("Contact information"),
  *   category = @Translation("Custom"),
  * )
  */

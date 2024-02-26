@@ -309,7 +309,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     $build['#cache']['tags'][] = $custom_cache_tag;
 
 
-
     $page = null;
 
     // Check if it's a guide page.
@@ -337,7 +336,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         }
       }
 
-
       // Get the first page
       $first_node_id = reset($result);
       $page = Node::load($first_node_id);
@@ -360,6 +358,117 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       foreach ($boxes as $box) {
         $guide_box = Node::load($box['target_id']);
 
+        $items = $guide_box->get('field_box_items')->referencedEntities();
+
+        $guide_box_build['items'] = [
+          '#type' => 'container',
+          '#attributes' => ['class' => ['guide-box-items-container']],
+        ];
+
+        foreach ($items as $item) {
+          $item_container = [
+            '#type' => 'container',
+            '#attributes' => ['class' => ['guide-item']],
+          ];
+
+          // Check and render based on the type of the guide_item.
+          if ($item->hasField('field_text_box_item') && !$item->get('field_text_box_item')->isEmpty()) {
+            $item_container['content'] = [
+              '#type' => 'processed_text',
+              '#text' => $item->get('field_text_box_item')->value,
+              '#format' => $item->get('field_text_box_item')->format,
+            ];
+          } elseif ($item->hasField('field_image_box_item') && !$item->get('field_image_box_item')->isEmpty()) {
+            $item_container['content'] = [
+              '#theme' => 'image_formatter',
+              '#item' => $item->get('field_image_box_item')->first(),
+              '#image_style' => 'medium',
+            ];
+          } elseif ($item->hasField('field_link_box_item') && !$item->get('field_link_box_item')->isEmpty()) {
+            $link = $item->get('field_link_box_item')->first()->getValue();
+            $item_container['content'] = [
+              '#type' => 'link',
+              '#title' => $link['title'],
+              '#url' => Url::fromUri($link['uri']),
+            ];
+          }
+
+          // Add the item container to the guide box items.
+          $guide_box_build['items'][] = $item_container;
+        }
+        if(\Drupal::currentUser()->isAuthenticated()) {
+          $guide_box_build['items_list'] = [
+            '#type' => 'container',
+            '#attributes' => ['id' => 'add-reorder-list', 'class' => ['guide-item2']],
+            'children' => [
+              'html_item' => [
+                '#type' => 'html_tag',
+                '#tag' => 'li',
+                'content' => [
+                  '#type' => 'link',
+                  '#title' => ('HTML'),
+                  '#url' => Url::fromRoute('add_html.form', [], ['query' => ['current_box' => $guide_box->id(), 'current_node' => $entity->id()]]),
+                  '#attributes' => [
+                    'class' => ['use-ajax'],
+                    'data-dialog-type' => 'modal',
+                    'data-dialog-options' => Json::encode(['width' => 800]),
+                    'title' => 'Re-position Box',
+                    'style' => 'text-decoration: none;',
+                  ],
+                ],
+              ],
+              'link_item' => [
+                '#type' => 'html_tag',
+                '#tag' => 'li',
+                'content' => [
+                  '#type' => 'link',
+                  '#title' => t('Link'),
+                  '#url' => Url::fromRoute('add_link.form', [], ['query' => ['current_box' => $guide_box->id(), 'current_node' => $entity->id()]]),
+                  '#attributes' => [
+                    'class' => ['use-ajax'],
+                    'data-dialog-type' => 'modal',
+                    'data-dialog-options' => Json::encode(['width' => 800]),
+                    'title' => 'Re-position Box',
+                    'style' => 'text-decoration: none;',
+                  ],
+                ],
+              ],
+              'image_item' => [
+                '#type' => 'html_tag',
+                '#tag' => 'li',
+                'content' => [
+                  '#type' => 'link',
+                  '#title' => t('Image'),
+                  '#url' => Url::fromRoute('add_image.form', [], ['query' => ['current_box' => $guide_box->id(), 'current_node' => $entity->id()]]),
+                  '#attributes' => [
+                    'class' => ['use-ajax'],
+                    'data-dialog-type' => 'modal',
+                    'data-dialog-options' => Json::encode(['width' => 800]),
+                    'title' => 'Re-position Box',
+                    'style' => 'text-decoration: none;',
+                  ],
+                ],
+              ],
+              're-order' => [
+                '#type' => 'html_tag',
+                '#tag' => 'li',
+                'content' => [
+                  '#type' => 'link',
+                  '#title' => t('Re-Order'),
+                  '#url' => Url::fromRoute('re_order_box_item.form', [], ['query' => ['current_box' => $guide_box->id(), 'current_node' => $entity->id()]]),
+                  '#attributes' => [
+                    'class' => ['use-ajax'],
+                    'data-dialog-type' => 'modal',
+                    'data-dialog-options' => Json::encode(['width' => 800]),
+                    'title' => 'Re-position Box',
+                    'style' => 'text-decoration: none;',
+                  ],
+                ],
+              ],
+            ],
+          ];
+        }
+
         $build['boxes'][] = [
           '#type' => 'container',
           '#attributes' => ['class' => ['guide-box-container']],
@@ -375,7 +484,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
               '#value' => $guide_box->label(),
               '#attributes' => ['class' => ['guide-box-title']],
             ],
-            'icons' => [
+            'icons' => \Drupal::currentUser()->isAuthenticated() ?[
               '#type' => 'html_tag',
               '#tag' => 'div',
               '#attributes' => [
@@ -435,24 +544,23 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                   'style' => 'text-decoration: none;',
                 ],
               ],
-            ],
+            ] : [],
           ],
-          'body' => [
-            '#type' => 'processed_text',
-            '#text' => $guide_box->get('field_body_box')->value,
-            '#format' => $guide_box->get('field_body_box')->format,
-            '#attributes' => ['class' => ['guide-box-body']],
-          ],
+          'body' => $guide_box_build,
         ];
 
       }
     }
     if(\Drupal::currentUser()->isAuthenticated()) {
-      $build['two_column_layout']['right']['add_guide_page_box_link'] = createBoxButton($entity);
+      $build['add_guide_page_box_link'] = createBoxButton($entity);
     }
+
+
+    $build['last_changed'] = [
+      '#markup' => '\nlast changed',
+    ];
   }
 }
-
 function createBoxButton($node): array
 {
   $url = Url::fromRoute('create_guide_box.form', [], ['query' => ['current_node' => $node->id()]]);
@@ -841,7 +949,7 @@ function lgmsModule_install(): void
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
   disable_field('guide', 'display_submitted');
-  disable_field('guide_page', 'display_submitted');
+  #disable_field('guide_page', 'display_submitted');
   disable_field('guide_box', 'display_submitted');
   disable_field('sub_page', 'display_submitted');
 }
