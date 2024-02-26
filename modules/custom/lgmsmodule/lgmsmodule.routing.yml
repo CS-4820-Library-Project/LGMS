@@ -86,6 +86,14 @@ re_order_guide_box.form:
   requirements:
     _permission: 'create guide_box content'
 
+add_guide_page.form:
+  path: '/add_guide_page'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\CreateGuidePageForm'
+    _title: 'Add Guide Page'
+  requirements:
+    _permission: 'access content'
+
 re_order_box_item.form:
   path: '/re_order_box_item'
   defaults:
@@ -118,3 +126,4 @@ add_image.form:
     _title: 'Add Image Box Items'
   requirements:
     _permission: 'create guide_item content'
+

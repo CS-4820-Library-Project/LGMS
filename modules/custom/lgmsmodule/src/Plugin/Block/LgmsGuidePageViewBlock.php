@@ -5,6 +5,9 @@ namespace Drupal\lgmsmodule\Plugin\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Database\Database;
 use Drupal\lgmsmodule\sql\sqlMethods;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
+use Drupal\Component\Serialization\Json;
 
 /**
  *
@@ -54,23 +57,106 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $page->nid]);
       $link = \Drupal\Core\Link::fromTextAndUrl($page->title, $url)->toString();
 
-
-      $build['guide_container']['content']['#items'][] = [
-        '#markup' => $link,
+      $page_item = [
+        '#markup' => '<div>' . $link . '</div>', // Wrap in div for styling purposes.
+        'sub_pages' => [
+          '#theme' => 'item_list',
+          '#items' => [],
+        ],
       ];
-    }
-    if (\Drupal::currentUser()->hasPermission('create guide page')  && $current_guide_id!= null) {
 
+      // Retrieve sub-pages for the current page.
+      $sub_pages = $sqlMethods->getSubPages($page->nid);
+
+      // Add sub-pages to the list if they exist.
+      if (!empty($sub_pages)) {
+        foreach ($sub_pages as $sub_page) {
+          $sub_url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $sub_page->nid]);
+          $sub_link = \Drupal\Core\Link::fromTextAndUrl($sub_page->title, $sub_url)->toString();
+          $page_item['sub_pages']['#items'][] = [
+            '#markup' => '<div class="sub-page-item">' . $sub_link . '</div>',
+          ];
+        }
+      }
+
+      // Check if the user has permission to create sub-pages and if no sub-page exists.
+      if (\Drupal::currentUser()->hasPermission('create sub_page content ')) {
+        // Check if a sub-page already exists for this page.
+        $sub_page_exists = $sqlMethods->subPageExists($page->nid);
+
+        // Only show the link to add a sub-page if one doesn't already exist.
+        if (!$sub_page_exists) {
+          // Create the URL for adding a new sub-page.
+          $add_sub_page_url = \Drupal\Core\Url::fromRoute('node.add', ['node_type' => 'sub_page'], [
+            'query' => ['field_parent_page' => $page->nid], // Adjust the field name if needed.
+          ]);
+          // Create the link for adding a new sub-page.
+          $add_sub_page_link = \Drupal\Core\Link::fromTextAndUrl(t('Add new sub page +'), $add_sub_page_url)->toString();
+
+          $page_item['add_sub_page'] = [
+            '#markup' => $add_sub_page_link,
+            '#prefix' => '<div class="add-sub-page-link">',
+            '#suffix' => '</div>',
+          ];
+        }
+      }
+
+
+      // Add the page item to the guide list.
+      $build['guide_container']['content']['#items'][] = $page_item;
+
+    }
+/*
+   if (\Drupal::currentUser()->hasPermission('create guide page') && $current_guide_id != null) {
+      // Generate the URL for creating a new guide page.
       $add_page_url = \Drupal\Core\Url::fromRoute('node.add', ['node_type' => 'guide_page'], [
-        'query' => ['field_guide_reference' => $current_guide_id],
+        'query' => ['field_parent_guide' => $current_guide_id], // Make sure to use the correct field name
       ]);
-      $add_page_link = \Drupal\Core\Link::fromTextAndUrl(t('Add new page +'), $add_page_url)->toString();
 
-      $build['guide_container']['content']['#items'][] = [
-        '#markup' => $add_page_link,
+      // Create the link with the correct attributes for AJAX and modal functionality.
+      $add_page_link = [
+        '#type' => 'link',
+        '#title' => t('Add new page +'),
+        '#url' => $add_page_url,
+        '#attributes' => [
+          'class' => ['use-ajax'],
+          'data-dialog-type' => 'modal',
+          'data-dialog-options' => json_encode(['width' => 700]),
+        ],
       ];
+
+      // Add the link to your build array.
+      $build['guide_container']['content']['#items'][] = $add_page_link; // Note: No need to render
     }
-    $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+
+// Attach libraries necessary for modal functionality.
+    $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
+*/
+
+    if (\Drupal::currentUser()->hasPermission('create guide page') && $current_guide_id != null) {
+      // Generate the URL for the custom form route, including the query parameter for the current guide.
+      $url = Url::fromRoute('add_guide_page.form', [], ['query' => ['current_guide' => $current_guide_id]]);
+
+      // Create the link render array with AJAX attributes.
+      $link = Link::fromTextAndUrl(t('Add Guide Page'), $url)->toRenderable();
+      $link['#attributes'] = [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode(['width' => 800]),
+      ];
+
+      // Render the link somewhere in your build array.
+      $build['add_guide_page_link'] = $link;
+
+      // Attach the library necessary for using the modal dialog
+     // $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
+    }
+
+
+// Attach libraries necessary for modal functionality.
+    $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
+
+
     return $build;
   }
 
@@ -88,4 +174,10 @@ class LgmsGuidePageViewBlock extends BlockBase {
     }
     return NULL;
   }
+  public function getCacheMaxAge() {
+    // Disable caching for this block.
+    return 0;
+  }
 }
+
+
