@@ -34,6 +34,55 @@ function lgmsmodule_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * This is executed when a node is created or updated.
+ * This is used to generate URL aliases for guide and page nodes.
+ * @param \Drupal\node\NodeInterface $node
+ *   The node that is being inserted or updated.
+ */
+function lgmsmodule_generate_url_alias(NodeInterface $node) {
+  // Alias generation for 'guide' content type remains the same.
+  if ($node->getType() == 'guide') {
+    $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+  }
+  // Alias generation for 'page' content type needs to reflect the parent-child relationship.
+  elseif ($node->getType() == 'guide_page') {
+    // Load the parent guide node.
+    $parent_guide = $node->get('field_parent_guide')->entity;
+    if ($parent_guide) {
+      // Construct the alias using the parent guide's title and the page's title.
+      $parent_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_guide->getTitle()));
+      $child_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+      $alias = '/' . $parent_alias . '/' . $child_alias;
+    } else {
+      // If there's no parent guide, fallback to just using the page title.
+      $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+    }
+  } else {
+    // If the content type is neither 'guide' nor 'page', do nothing.
+    return;
+  }
+
+  // Trim leading or trailing hyphens from the alias.
+  $alias = trim($alias, '-');
+
+  // Check if the alias already exists.
+  $path_alias_repository = \Drupal::service('path_alias.repository');
+  $existing_alias = $path_alias_repository->lookupByAlias($alias, $node->language()->getId());
+
+  // If the alias does not exist or it's not the current node's alias, create or update it.
+  if (!$existing_alias || $existing_alias['path'] !== '/node/' . $node->id()) {
+    // Create a new alias or update the existing one.
+    $path_alias_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+    $path_alias = $path_alias_storage->create([
+      'path' => '/node/' . $node->id(),
+      'alias' => $alias,
+      'langcode' => $node->language()->getId(),
+    ]);
+    $path_alias->save();
+  }
+}
+
+/**
  * Implements hook_block_access().
  */
 function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation, \Drupal\Core\Session\AccountInterface $account) {
@@ -204,6 +253,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
 function lgmsmodule_node_insert(NodeInterface $node): void
 {
   lgmsmodule_refresh_cache($node);
+lgmsmodule_generate_url_alias($node);
 }
 
 /**
@@ -213,6 +263,7 @@ function lgmsmodule_node_insert(NodeInterface $node): void
 function lgmsmodule_node_update(NodeInterface $node): void
 {
   lgmsmodule_refresh_cache($node);
+lgmsmodule_generate_url_alias($node);
 }
 
 /**
