@@ -94,6 +94,14 @@ add_guide_page.form:
   requirements:
     _permission: 'access content'
 
+import_guide_page.form:
+  path: '/import_guide_page'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\GuidePageImportForm'
+    _title: 'Import Guide Page'
+  requirements:
+    _permission: 'access content'
+
 re_order_box_item.form:
   path: '/re_order_box_item'
   defaults:
