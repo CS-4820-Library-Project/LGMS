@@ -61,12 +61,16 @@ class LgmsGuideOwnerBlock extends BlockBase {
         ];
       }
 
-      // Prepare the markup for username, name, and email.
+      // Prepare the markup for name, email and phone number.
       $first_name = $author->get('field_first_name')->value;
       $last_name = $author->get('field_last_name')->value;
+      $phone_number_raw = $author->get('field_phone_number')->value;
+      $phone_number_formatted = $this->formatPhoneNumber($phone_number_raw);
+      $phone_number_clickable = $this->makePhoneNumberClickable($phone_number_raw, $phone_number_formatted);
 
       $author_details_markup = "<p><strong>Name:</strong> {$first_name} {$last_name} ({$name})</p>";
       $author_details_markup .= "<p><strong>Email:</strong> <a href='mailto:{$email}'>{$email}</a></p>";
+      $author_details_markup .= "<p><strong>Phone:</strong> {$phone_number_clickable}</p>";
 
       // Fetch and prepare subjects.
       $subjects = [];
@@ -94,8 +98,40 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $build;
   }
 
+  /**
+   * Makes a phone number clickable for devices that support dialing.
+   *
+   * @param string $phone_number_raw The raw phone number.
+   * @param string $phone_number_formatted The formatted phone number.
+   * @return string The clickable phone number link.
+   */
+  protected function makePhoneNumberClickable($phone_number_raw, $phone_number_formatted) {
+    // Remove any non-numeric characters for the href attribute.
+    $digits = preg_replace('/\D+/', '', $phone_number_raw);
+
+    // Return a clickable link with the formatted phone number as the link text.
+    return sprintf('<a href="tel:%s">%s</a>', $digits, $phone_number_formatted);
+  }
 
 
+  /**
+   * Formats a raw phone number into the American format.
+   *
+   * @param string $phone_number_raw The raw phone number.
+   * @return string The formatted phone number.
+   */
+  protected function formatPhoneNumber($phone_number_raw) {
+    // Remove any non-numeric characters from the phone number.
+    $digits = preg_replace('/\D+/', '', $phone_number_raw);
+
+    // Format the digits into the American phone number format.
+    if (strlen($digits) === 10) {
+      return sprintf('(%s) %s-%s', substr($digits, 0, 3), substr($digits, 3, 3), substr($digits, 6));
+    }
+
+    // Return the original raw number if it doesn't have 10 digits.
+    return $phone_number_raw;
+  }
 
 
 
