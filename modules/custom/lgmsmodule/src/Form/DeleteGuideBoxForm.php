@@ -33,11 +33,36 @@ class DeleteGuideBoxForm extends FormBase {
       '#value' => $current_box,
     ];
 
+    $page = Node::load($current_node);
+
+    if ($page->bundle() === 'guide'){
+      // Get the list of guide pages
+      $query = \Drupal::entityQuery('node')
+        ->condition('type', 'guide_page')
+        ->condition('field_parent_guide', $page->id())
+        ->accessCheck(TRUE);
+      $result = $query->execute();
+
+      // Get the first page
+      $first_node_id = reset($result);
+      $page = Node::load($first_node_id);
+    }
+
+    $current_box = Node::load($current_box);
+
+    $parent_page = $current_box->get('field_parent_page')->getValue();
+    $parent_page = Node::load($parent_page[0]['target_id']);
+
+    if($page->id() == $parent_page->id()){
+      $title = $this->t('<Strong>Are you Sure you want to Delete This Box?</Strong>
+                                if you delete this box, it will be permanently Deleted and restoring it would be impossible!!');
+    } else {
+      $title = $this->t('This box will be deleted only from this page');
+    }
 
     $form['Delete'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('<Strong>Are you Sure you want to Delete This Box?</Strong>
-                                if you delete this box, it will be permanently Deleted and restoring it would be impossible!!'),
+      '#title' => $title,
       '#required' => True
     ];
 
@@ -98,7 +123,30 @@ class DeleteGuideBoxForm extends FormBase {
     $page->set('field_child_boxes', $child_boxes);
     $page->save();
 
-    $current_box?->delete();
+    $parent_page = $current_box->get('field_parent_page')->getValue();
+    $parent_page = Node::load($parent_page[0]['target_id']);
+
+    if($page->id() == $parent_page->id()){
+      $query = \Drupal::entityQuery('node')
+        ->condition('type', 'guide_page')
+        ->condition('field_child_boxes', $current_box->id())
+        ->accessCheck(TRUE);
+      $result = $query->execute();
+
+      foreach ($result as $page){
+        $page = Node::load($page);
+        $child_boxes = $page->get('field_child_boxes')->getValue();
+
+        $child_boxes = array_filter($child_boxes, function ($box) use ($current_box) {
+          return $box['target_id'] != $current_box->id();
+        });
+
+        $page->set('field_child_boxes', $child_boxes);
+        $page->save();
+      }
+
+      $current_box?->delete();
+    }
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);

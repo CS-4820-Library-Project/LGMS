@@ -400,7 +400,26 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
           // Add the item container to the guide box items.
           $guide_box_build['items'][] = $item_container;
         }
-        if(\Drupal::currentUser()->isAuthenticated()) {
+
+        $page = $entity;
+
+        if ($page->bundle() === 'guide'){
+          // Get the list of guide pages
+          $query = \Drupal::entityQuery('node')
+            ->condition('type', 'guide_page')
+            ->condition('field_parent_guide', $guide_box->id())
+            ->accessCheck(TRUE);
+          $result = $query->execute();
+
+          // Get the first page
+          $first_node_id = reset($result);
+          $page = Node::load($first_node_id);
+        }
+
+        $parent_page = $guide_box->get('field_parent_page')->getValue();
+        $parent_page = Node::load($parent_page[0]['target_id']);
+
+        if(\Drupal::currentUser()->isAuthenticated() && $parent_page->id() === $page->id()) {
           $guide_box_build['items_list'] = [
             '#type' => 'container',
             '#attributes' => ['id' => 'add-reorder-list', 'class' => ['guide-item2']],

@@ -33,11 +33,39 @@ class EditGuideBoxForm extends FormBase {
       '#value' => $current_box,
     ];
 
-    $form['title'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('New Box Title:'),
-      '#required' => TRUE,
-    ];
+    $page = Node::load($current_node);
+
+    if ($page->bundle() === 'guide'){
+      // Get the list of guide pages
+      $query = \Drupal::entityQuery('node')
+        ->condition('type', 'guide_page')
+        ->condition('field_parent_guide', $page->id())
+        ->accessCheck(TRUE);
+      $result = $query->execute();
+
+      // Get the first page
+      $first_node_id = reset($result);
+      $page = Node::load($first_node_id);
+    }
+
+    $current_box = Node::load($current_box);
+
+    $parent_page = $current_box->get('field_parent_page')->getValue();
+    $parent_page = Node::load($parent_page[0]['target_id']);
+
+
+    if($page->id() == $parent_page->id()){
+      $form['title'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('New Box Title:'),
+        '#required' => TRUE,
+      ];
+    } else {
+      $form['title'] = [
+        '#markup' => 'This Box can not be edited from this Guide',
+      ];
+      return $form;
+    }
 
 
     $form['actions']['#type'] = 'actions';
