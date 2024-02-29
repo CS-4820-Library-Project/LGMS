@@ -83,15 +83,6 @@ class CreateGuideBoxForm extends FormBase {
       '#required' => TRUE,
     ];
 
-
-    // Body field
-    $form['body'] = [
-      '#type' => 'text_format',
-      '#title' => $this->t('Body'),
-      '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
-    ];
-
-
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -139,10 +130,6 @@ class CreateGuideBoxForm extends FormBase {
     $new_node = Node::create([
       'type' => 'guide_box',
       'title' => $form_state->getValue('title'),
-      'field_body_box' => [
-        'value' => $form_state->getValue('body')['value'],
-        'format' => 'full_html',
-      ],
       'field_parent_page' => ['target_id' => $nid],
     ]);
 

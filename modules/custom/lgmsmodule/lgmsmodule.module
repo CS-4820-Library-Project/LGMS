@@ -355,7 +355,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         '#attributes' => ['class' => ['guide-pages-list']],
       ];
 
-      $boxes = $entity->get('field_child_boxes')->referencedEntities();
+      $boxes = $entity->get('field_child_boxes')->getValue();
 
       $build['boxes']['#attached']['library'][] = 'lgmsmodule/fontawesome';
 
@@ -935,21 +935,6 @@ function lgmsModule_install(): void
     3
   );
 
-  // Box Body field
-  createField(
-    'field_body_box',
-    'node',
-    'guide_box',
-    'Body',
-    'text_long',
-    [],
-    'text_textarea',
-    ['rows' => 20,],
-    TRUE,
-    False,
-    -1
-  );
-
   // page box children
   createField(
     'field_child_boxes',
@@ -1096,8 +1081,6 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_parent_guide');
   delete_field_storage('field_parent_page');
   delete_field_storage('field_description');
-  delete_field_storage('field_body_box');
-  delete_field_storage('field_box_weight');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();

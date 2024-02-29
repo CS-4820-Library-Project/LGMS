@@ -37,11 +37,17 @@ class LgmsGuideOwnerBlock extends BlockBase {
       $email = $author->getEmail();
 
       // Prepare the markup for name, email and phone number.
-      $first_name = $author->get('field_first_name')->value;
-      $last_name = $author->get('field_last_name')->value;
-      $phone_number_raw = $author->get('field_phone_number')->value;
-      $phone_number_formatted = $this->formatPhoneNumber($phone_number_raw);
-      $phone_number_clickable = $this->makePhoneNumberClickable($phone_number_raw, $phone_number_formatted);
+      $first_name = '';
+      $last_name = '';
+      $phone_number_clickable = '';
+
+      if($author->hasField('field_first_name')){
+        $first_name = $author->get('field_first_name')->value;
+        $last_name = $author->get('field_last_name')->value;
+        $phone_number_raw = $author->get('field_phone_number')->value;
+        $phone_number_formatted = $this->formatPhoneNumber($phone_number_raw);
+        $phone_number_clickable = $this->makePhoneNumberClickable($phone_number_raw, $phone_number_formatted);
+      }
 
       // Fetch and display the guide's title.
       $build['#title'] = $first_name . "'s Contact Information";
