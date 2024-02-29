@@ -132,6 +132,20 @@ class LgmsGuidePageViewBlock extends BlockBase {
 
       // Attach the library necessary for using the modal dialog
      // $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
+
+      // Generate the URL for the custom form route, including the query parameter for the current guide.
+      $url = Url::fromRoute('import_guide_page.form', [], ['query' => ['current_guide' => $current_guide_id]]);
+
+      // Create the link render array with AJAX attributes.
+      $link = Link::fromTextAndUrl(t('Import Guide Page'), $url)->toRenderable();
+      $link['#attributes'] = [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode(['width' => 800]),
+      ];
+
+      // Render the link somewhere in your build array.
+      $build['import_guide_page_link'] = $link;
     }
 
 
