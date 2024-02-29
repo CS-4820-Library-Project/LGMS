@@ -168,6 +168,9 @@ class CreateGuideBoxForm extends FormBase {
     $page->set('field_child_boxes', $boxList);
     $page->save();
 
+    $ajaxHelper = new FormHelper();
+    $ajaxHelper->updateParent($form, $form_state);
+
     /*$curr_node = $form_state->getValue('current_node');
     $curr_node = Node::load($curr_node);
     $nid = $curr_node->id();

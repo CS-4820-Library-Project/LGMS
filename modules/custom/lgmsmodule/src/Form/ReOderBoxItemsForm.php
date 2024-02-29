@@ -112,5 +112,8 @@ class ReOderBoxItemsForm extends FormBase {
 
     $current_box->set('field_box_items', array_values($reordered_items));
     $current_box->save();
+
+    $ajaxHelper = new FormHelper();
+    $ajaxHelper->updateParent($form, $form_state);
   }
 }

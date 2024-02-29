@@ -100,6 +100,10 @@ class CreateGuidePageForm extends FormBase
       // Save the new node.
       $guide_page->save();
 
+
+      $current_guide_node->set('changed', \Drupal::time()->getRequestTime());
+      $current_guide_node->save();
+
       // Message for the user.
       \Drupal::messenger()->addMessage($this->t('The guide page has been created with ID: @id', ['@id' => $guide_page->id()]));
 

@@ -71,5 +71,8 @@ class EditGuideBoxForm extends FormBase {
 
     $current_box->setTitle(rtrim($form_state->getValue('title')));
     $current_box->save();
+
+    $ajaxHelper = new FormHelper();
+    $ajaxHelper->updateParent($form, $form_state);
   }
 }

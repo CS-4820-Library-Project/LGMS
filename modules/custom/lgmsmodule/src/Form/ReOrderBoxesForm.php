@@ -132,5 +132,8 @@ class ReOrderBoxesForm extends FormBase {
 
     $page->set('field_child_boxes', array_values($reordered_child_boxes));
     $page->save();
+
+    $ajaxHelper = new FormHelper();
+    $ajaxHelper->updateParent($form, $form_state);
   }
 }

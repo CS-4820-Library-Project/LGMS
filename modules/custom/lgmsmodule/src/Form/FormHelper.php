@@ -39,4 +39,27 @@ class FormHelper {
     \Drupal::messenger()->addMessage($message);
     return $response;
   }
+
+  public function updateParent(array &$form, FormStateInterface $form_state,)
+  {
+    $current_node = $form_state->getValue('current_node');
+    $current_node = Node::load($current_node);
+
+    if($current_node->getType() === 'guide'){
+      $current_node->set('changed', \Drupal::time()->getRequestTime());
+      $current_node->save();
+    } else if ($current_node->getType() === 'guide_page'){
+      $current_node->set('changed', \Drupal::time()->getRequestTime());
+      $current_node->save();
+
+      $guide = $current_node->get('field_parent_guide')->getValue();
+      $guide = Node::load($guide[0]['target_id']);
+
+      $guide->set('changed', \Drupal::time()->getRequestTime());
+      $guide->save();
+    }
+
+    $current_node->set('changed', \Drupal::time()->getRequestTime());
+    $current_node->save();
+  }
 }

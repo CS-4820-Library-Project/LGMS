@@ -99,5 +99,8 @@ class DeleteGuideBoxForm extends FormBase {
     $page->save();
 
     $current_box?->delete();
+
+    $ajaxHelper = new FormHelper();
+    $ajaxHelper->updateParent($form, $form_state);
   }
 }

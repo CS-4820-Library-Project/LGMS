@@ -109,5 +109,8 @@ class AddHTMLForm extends FormBase {
 
     $current_box->set('field_box_items', $boxList);
     $current_box->save();
+
+    $ajaxHelper = new FormHelper();
+    $ajaxHelper->updateParent($form, $form_state);
   }
 }
