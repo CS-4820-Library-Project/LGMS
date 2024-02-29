@@ -325,8 +325,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       ];
 
 
-      //$build['desc'] = ['#markup' => $entity->get("field_guide_description")->value,];
-
       // Get the list of guide pages
       $query = \Drupal::entityQuery('node')
         ->condition('type', 'guide_page')
@@ -348,16 +346,10 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         }
       }
 
-      // Get the first page
-      $first_node_id = reset($result);
-      $page = Node::load($first_node_id);
-    }
-
-    if($page === null){
-      $page = $entity;
-    }
-
-    if($page instanceof NodeInterface){
+//      // Get the first page
+//      $first_node_id = reset($result);
+//      $page = Node::load($first_node_id);
+    } elseif ($entity->bundle() === 'guide_page'){
       $build['guide_pages_list'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['guide-pages-list']],
@@ -562,15 +554,19 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         ];
 
       }
-    }
-    if(\Drupal::currentUser()->isAuthenticated()) {
-      $build['add_guide_page_box_link'] = createBoxButton($entity);
+      if(\Drupal::currentUser()->isAuthenticated()) {
+        $build['add_guide_page_box_link'] = createBoxButton($entity);
+      }
     }
 
+    $last_changed_timestamp = $entity->getChangedTime();
+
+    $last_changed_formatted = \Drupal::service('date.formatter')->format($last_changed_timestamp, 'medium');
 
     $build['last_changed'] = [
-      '#markup' => '\nlast changed',
+      '#markup' => "<p>Last updated: {$last_changed_formatted}</p>",
     ];
+
   }
 }
 function createBoxButton($node): array
