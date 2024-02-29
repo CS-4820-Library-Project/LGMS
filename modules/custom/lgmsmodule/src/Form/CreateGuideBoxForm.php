@@ -1,6 +1,10 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\CloseModalDialogCommand;
+use Drupal\Core\Ajax\RedirectCommand;
+use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -13,6 +17,13 @@ class CreateGuideBoxForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $form['#prefix'] = '<div id="modal-form">';
+    $form['#suffix'] = '</div>';
+    $form['messages'] = [
+      '#weight' => -9999,
+      '#type' => 'status_messages',
+    ];
+
     $current_node = \Drupal::request()->query->get('current_node');
     $form['current_node'] = [
       '#type' => 'hidden',
@@ -90,8 +101,23 @@ class CreateGuideBoxForm extends FormBase {
       '#button_type' => 'primary',
     ];
 
+    $form['actions']['submit']['#ajax'] = [
+      'callback' => '::submitAjax',
+      'event' => 'click',
+    ];
+
     return $form;
   }
+
+  /**
+   * @throws EntityMalformedException
+   */
+  public function submitAjax(array &$form, FormStateInterface $form_state) {
+    $ajaxHelper = new FormHelper();
+
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.');
+  }
+
 
   public static function hideTextFormatHelpText(array $element, FormStateInterface $form_state) {
     if (isset($element['format']['help'])) {
@@ -141,16 +167,6 @@ class CreateGuideBoxForm extends FormBase {
 
     $page->set('field_child_boxes', $boxList);
     $page->save();
-
-
-    $curr_node_url = $curr_node->toUrl()->toString();
-    $curr_node_url = str_ireplace('lgms/', '', $curr_node_url);
-
-    $node_path = str_ireplace('lgms/', '', $curr_node_url);
-
-    $form_state->setRedirectUrl(Url::fromUri('internal:' . $node_path));
-
-    \Drupal::messenger()->addMessage('Box created successfully.');
 
     /*$curr_node = $form_state->getValue('current_node');
     $curr_node = Node::load($curr_node);

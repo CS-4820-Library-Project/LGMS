@@ -2,6 +2,7 @@
 
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -14,6 +15,13 @@ class ReOrderBoxesForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $form['#prefix'] = '<div id="modal-form">';
+    $form['#suffix'] = '</div>';
+    $form['messages'] = [
+      '#weight' => -9999,
+      '#type' => 'status_messages',
+    ];
+
     $current_node = \Drupal::request()->query->get('current_node');
     $form['current_node'] = [
       '#type' => 'hidden',
@@ -72,7 +80,21 @@ class ReOrderBoxesForm extends FormBase {
       '#button_type' => 'primary',
     ];
 
+    $form['actions']['submit']['#ajax'] = [
+      'callback' => '::submitAjax',
+      'event' => 'click',
+    ];
+
     return $form;
+  }
+
+  /**
+   * @throws EntityMalformedException
+   */
+  public function submitAjax(array &$form, FormStateInterface $form_state) {
+    $ajaxHelper = new FormHelper();
+
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'The Boxes have been re-ordered.');
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
@@ -109,16 +131,6 @@ class ReOrderBoxesForm extends FormBase {
     ksort($reordered_child_boxes);
 
     $page->set('field_child_boxes', array_values($reordered_child_boxes));
-
     $page->save();
-
-    $curr_node_url = $current_node->toUrl()->toString();
-    $curr_node_url = str_ireplace('lgms/', '', $curr_node_url);
-
-    $node_path = str_ireplace('lgms/', '', $curr_node_url);
-
-    $form_state->setRedirectUrl(Url::fromUri('internal:' . $node_path));
-
-    \Drupal::messenger()->addMessage($this->t('The Boxes have been re-ordered.'));
   }
 }
