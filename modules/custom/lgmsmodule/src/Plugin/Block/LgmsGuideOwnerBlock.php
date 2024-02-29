@@ -3,188 +3,120 @@
 namespace Drupal\lgmsmodule\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Database\Database;
+use Drupal\lgmsmodule\sql\sqlMethods;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
+use Drupal\Component\Serialization\Json;
 use Drupal\node\Entity\Node;
-use Drupal\taxonomy\Entity\Term;
 use Drupal\user\Entity\User;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
- * Provides a 'User Info Block' block.
+ *
  *
  * @Block(
  *   id = "lgms_guide_owner_block",
  *   admin_label = @Translation("Contact information"),
- *   category = @Translation("Custom"),
+ *   category = @Translation("LGMS"),
  * )
  */
-
-class LgmsGuideOwnerBlock extends BlockBase implements ContainerFactoryPluginInterface {
-
-  /**
-   * The current route match object.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Constructs a new LgmsGuideOwnerBlock instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match object.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->routeMatch = $route_match;
-    $this->entityTypeManager = $entity_type_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('current_route_match'),
-      $container->get('entity_type.manager')
-    );
-  }
+class LgmsGuideOwnerBlock extends BlockBase {
 
   /**
    * {@inheritdoc}
    */
   public function build() {
+    $build = [];
+    $node = \Drupal::routeMatch()->getParameter('node');
 
-    $node = $this->routeMatch->getParameter('node');
-
-    // Initialize an array to store unique term names.
-    $term_names = [];
-
-    // Ensure we have a node and it's of the type 'guide'.
     if ($node instanceof Node && $node->bundle() === 'guide') {
-      // Check if the 'field_lgms_guide_subject' field exists and has value.
+      // Fetch and display the guide's title.
+      $build['#title'] = 'Contact Information';
+
+      // Fetch the author's information.
+      $author = $node->getOwner();
+      $username = $author->getAccountName(); // Retrieve the username.
+      $name = $author->getDisplayName();
+      $email = $author->getEmail();
+
+      // Attempt to load the profile picture.
+      $user_picture = '';
+      if ($author->user_picture && !$author->user_picture->isEmpty()) {
+        $user_picture = $author->user_picture->entity->getFileUri();
+      }
+
+      // Initialize the author_info container.
+      $build['author_info'] = [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['author-info']],
+      ];
+
+      // Add the profile picture to the author_info container if available.
+      if ($user_picture) {
+        $build['author_info']['picture'] = [
+          '#theme' => 'image',
+          '#uri' => $user_picture,
+          '#attributes' => ['alt' => $this->t("@name's profile picture", ['@name' => $name])],
+          '#style' => ['width' => '100px'], // Example to control size, adjust as needed.
+        ];
+      }
+
+      // Prepare the markup for username, name, and email.
+      $first_name = $author->get('field_first_name')->value;
+      $last_name = $author->get('field_last_name')->value;
+
+      $author_details_markup = "<p><strong>Name:</strong> {$first_name} {$last_name} ({$name})</p>";
+      $author_details_markup .= "<p><strong>Email:</strong> <a href='mailto:{$email}'>{$email}</a></p>";
+
+      // Fetch and prepare subjects.
+      $subjects = [];
       if (!$node->get('field_lgms_guide_subject')->isEmpty()) {
-        // Loop through all terms in the multi-value field 'field_lgms_guide_subject'.
         foreach ($node->get('field_lgms_guide_subject')->referencedEntities() as $term) {
-          // Add the term name to the array if not already present.
-          $term_names[$term->id()] = $term->getName();
+          $subjects[] = $term->getName();
         }
       }
-    }
 
-    // Add subjects to the content if any exist.
-    if (!empty($term_names)) {
-      $content["wrapper"]['subjects'] = [
-        '#theme' => 'item_list',
-        '#items' => array_values($term_names), // Use array_values to reset keys for clean display.
-      ];
-    }
-
-
-    $author = $node->getOwner();
-    $account = User::load($author->id());
-
-    // Get user name and email.
-    $name = $account->getDisplayName();
-    $email = $account->getEmail();
-
-    // Get user profile picture.
-    $user_picture = '';
-    if ($account->hasField('user_picture') && !$account->get('user_picture')->isEmpty()) {
-      $user_picture = $account->get('user_picture')->entity->getFileUri();
-    }
-
-    $content = [];
-    // Render user information.
-    $content["wrapper"] = [
-      '#type' => 'container',
-      '#attributes' => [ 'style' => 'padding: 16px;'],
-    ];
-
-    if (!empty($user_picture)) {
-      $content["wrapper"]['user_picture'] = [
-        '#theme' => 'image',
-        '#uri' => $user_picture,
-        '#attributes' => [
-          'style' => 'width: 243px;height: 287px;object-fit:cover; margin-bottom: 16px;'
-        ],
-
-      ];
-    }
-    if (!empty($name)) {
-      $content["wrapper"]['name'] = [
-        '#markup' => '<p><strong>Name: </strong>' . $name . '</p>',
-      ];
-    }
-    if (!empty($email)) {
-      $content["wrapper"]['email'] = [
-        '#markup' => '<p><strong>Email: </strong><a>' . $email . '</a></p>',
-      ];
-    }
-
-    // Load all nodes of type "guide" created by the current user.
-    $query = \Drupal::entityQuery('node')
-      ->condition('type', 'guide')
-      ->condition('uid', $author->id())
-      ->accessCheck(TRUE); // Add access check here.
-    $nids = $query->execute();
-
-    // Load and process each guide node.
-    foreach ($nids as $nid) {
-      $node = Node::load($nid);
-
-      // Get the value of the field_lgms_guide_subject field.
-      $target_id = $node->get('field_lgms_guide_subject')->getString();
-      $term = Term::load($target_id);
-      // Get the actual value of the term.
-
-      if ($term) {
-        $term_name = $term->getName();
-        $term_names[] = $term_name;
+      // Add subjects to the markup if available.
+      if (!empty($subjects)) {
+        $author_details_markup .= "<p><strong>Subjects:</strong></p><ul>";
+        foreach ($subjects as $subject) {
+          $author_details_markup .= "<li>{$subject}</li>";
+        }
+        $author_details_markup .= "</ul>";
       }
-    }
 
-    // Output the term names within a <ul>.
-    if (!empty($term_names)) {
-      $content["wrapper"]['subject'] = [
-        '#markup' => '<p><strong>Subjects:</strong></p>',
-      ];
-
-      $content["wrapper"]['subjects'] = [
-        '#theme' => 'item_list',
-        '#items' => array_unique($term_names),
+      // Include the combined markup and subjects in the build.
+      $build['author_info']['details'] = [
+        '#markup' => $author_details_markup,
       ];
     }
 
-    // Wrapper div with padding around content elements.
-    return  $content;
+    return $build;
   }
 
-  /**
-   * {@inheritdoc}
-   */
+
+
+
+
+
+  public function getCurrentGuideId()
+  {
+    $current_node = \Drupal::routeMatch()->getParameter('node');
+    if ($current_node->getType() == 'guide') {
+      return $current_node->id();
+    }
+    elseif ($current_node->getType() == 'guide_page') {
+
+      $sqlMethods = new sqlMethods(\Drupal::database());
+      return $sqlMethods->getGuideNodeIdByPageId($current_node->id());
+
+    }
+    return NULL;
+  }
   public function getCacheMaxAge() {
     // Disable caching for this block.
     return 0;
   }
 }
+
+

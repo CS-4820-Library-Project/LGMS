@@ -106,32 +106,6 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $build['guide_container']['content']['#items'][] = $page_item;
 
     }
-/*
-   if (\Drupal::currentUser()->hasPermission('create guide page') && $current_guide_id != null) {
-      // Generate the URL for creating a new guide page.
-      $add_page_url = \Drupal\Core\Url::fromRoute('node.add', ['node_type' => 'guide_page'], [
-        'query' => ['field_parent_guide' => $current_guide_id], // Make sure to use the correct field name
-      ]);
-
-      // Create the link with the correct attributes for AJAX and modal functionality.
-      $add_page_link = [
-        '#type' => 'link',
-        '#title' => t('Add new page +'),
-        '#url' => $add_page_url,
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'modal',
-          'data-dialog-options' => json_encode(['width' => 700]),
-        ],
-      ];
-
-      // Add the link to your build array.
-      $build['guide_container']['content']['#items'][] = $add_page_link; // Note: No need to render
-    }
-
-// Attach libraries necessary for modal functionality.
-    $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
-*/
 
     if (\Drupal::currentUser()->hasPermission('create guide page') && $current_guide_id != null) {
       // Generate the URL for the custom form route, including the query parameter for the current guide.
