@@ -8,6 +8,7 @@ use Drupal\lgmsmodule\sql\sqlMethods;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Component\Serialization\Json;
+use Drupal\node\Entity\Node;
 
 /**
  *
@@ -45,7 +46,14 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $guide_title = 'Guide';
     }
 
-    $build['#title'] = $guide_title;
+    $current_guide = Node::load($current_guide_id);
+    $current_guide_url = $current_guide->toUrl()->toString();
+    $current_guide_url = str_ireplace('LGMS/', '', $current_guide_url);
+
+    $url = Url::fromUri('internal:' . $current_guide_url);
+    $link = Link::fromTextAndUrl($guide_title, $url)->toRenderable();
+
+    $build['#title'] = $link;
 
     // Add a list to your block.
     $build['guide_container']['content'] = [
