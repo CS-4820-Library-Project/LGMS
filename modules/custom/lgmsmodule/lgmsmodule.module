@@ -314,7 +314,18 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
     // Check if it's a guide page.
     if($entity->bundle() === 'guide') {
-      $build['desc'] = ['#markup' => $entity->get("field_guide_description")->value,];
+
+      $guide_title = $entity->label(); // This gets the title of the node.
+      $guide_description = $entity->get("field_guide_description")->value;
+
+      // Concatenate the title, a horizontal divider, and the description.
+      // The <hr> tag is used as the divider between the title and description.
+      $build['desc'] = [
+        '#markup' => "<h2>{$guide_title}</h2><hr><p>{$guide_description}</p>",
+      ];
+
+
+      //$build['desc'] = ['#markup' => $entity->get("field_guide_description")->value,];
 
       // Get the list of guide pages
       $query = \Drupal::entityQuery('node')
@@ -326,7 +337,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       if (empty($result)) { //This Should change to redirecting to create a page
         if(\Drupal::currentUser()->isAuthenticated()){
           $url = Url::fromRoute('add_guide_page.form', [], ['query' => ['current_guide' => $entity->id()]]);
-          $link = Link::fromTextAndUrl(t('Create Guide Page'), $url)->toRenderable();
+          //$link = Link::fromTextAndUrl(t('Create Guide Page'), $url)->toRenderable();
           $link['#attributes'] = [
             'class' => ['use-ajax'],
             'data-dialog-type' => 'modal',
