@@ -555,7 +555,11 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
       }
       if(\Drupal::currentUser()->isAuthenticated()) {
-        $build['add_guide_page_box_link'] = createBoxButton($entity);
+        $build['add_guide_page_box_link'] = [
+          '#type' => 'container',
+          'link' => createBoxButton($entity),
+        ];
+        $build['reuse_guide_page_box_link'] = reuseGuideBoxButton($entity);
       }
     }
 
@@ -569,6 +573,20 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
   }
 }
+
+function reuseGuideBoxButton($node): array
+{
+  $url = Url::fromRoute('reuse_guide_box.form', [], ['query' => ['current_node' => $node->id()]]);
+  $link = Link::fromTextAndUrl(t('Reuse Guide Box'), $url)->toRenderable();
+  $link['#attributes'] = [
+    'class' => ['use-ajax'],
+    'data-dialog-type' => 'modal',
+    'data-dialog-options' => Json::encode(['width' => 800]),
+  ];
+
+  return $link;
+}
+
 function createBoxButton($node): array
 {
   $url = Url::fromRoute('create_guide_box.form', [], ['query' => ['current_node' => $node->id()]]);

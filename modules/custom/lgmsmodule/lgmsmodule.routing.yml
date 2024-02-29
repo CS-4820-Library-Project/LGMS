@@ -127,3 +127,10 @@ add_image.form:
   requirements:
     _permission: 'create guide_item content'
 
+reuse_guide_box.form:
+  path: '/reuse-guide-box-form'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\ReuseGuideBoxForm'
+    _title: 'Reuse A Guide Box'
+  requirements:
+    _permission: 'create guide_box content'
