@@ -603,16 +603,23 @@ function lgmsModule_install(): void
           'id' => 'entity_bundle:node',
           'bundles' => [
             'guide' => 'guide',
-            'guide_page'=>'guide_page',
-            'sub_page'=>'sub_page'
+            'guide_page' => 'guide_page',
+            'sub_page' => 'sub_page'
           ],
           'negate' => FALSE,
-          'context_mapping' => [],
+          'context_mapping' => [
+            'node' => '@node.node_route_context:node',
+          ],
         ],
       ],
     ]);
 
     $block->save();
+
+    // After the block->save() call.
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(['block_list']);
+    \Drupal::service('router.builder')->rebuild();
+
     \Drupal::messenger()->addMessage('LGMS Guide Owner Block placed successfully.');
   } else {
     \Drupal::messenger()->addMessage('The LGMS Guide Owner Block already exists.');
@@ -638,7 +645,9 @@ function lgmsModule_install(): void
             'sub_page'=>'sub_page'
           ],
           'negate' => FALSE,
-          'context_mapping' => [],
+          'context_mapping' => [
+            'node' => '@node.node_route_context:node',
+          ],
         ],
       ],
     ]);
