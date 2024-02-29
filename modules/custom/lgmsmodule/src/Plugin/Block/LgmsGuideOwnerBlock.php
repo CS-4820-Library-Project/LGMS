@@ -30,14 +30,21 @@ class LgmsGuideOwnerBlock extends BlockBase {
     $node = \Drupal::routeMatch()->getParameter('node');
 
     if ($node instanceof Node && $node->bundle() === 'guide') {
-      // Fetch and display the guide's title.
-      $build['#title'] = 'Contact Information';
 
       // Fetch the author's information.
       $author = $node->getOwner();
-      $username = $author->getAccountName(); // Retrieve the username.
       $name = $author->getDisplayName();
       $email = $author->getEmail();
+
+      // Prepare the markup for name, email and phone number.
+      $first_name = $author->get('field_first_name')->value;
+      $last_name = $author->get('field_last_name')->value;
+      $phone_number_raw = $author->get('field_phone_number')->value;
+      $phone_number_formatted = $this->formatPhoneNumber($phone_number_raw);
+      $phone_number_clickable = $this->makePhoneNumberClickable($phone_number_raw, $phone_number_formatted);
+
+      // Fetch and display the guide's title.
+      $build['#title'] = $first_name . "'s Contact Information";
 
       // Attempt to load the profile picture.
       $user_picture = '';
@@ -60,13 +67,6 @@ class LgmsGuideOwnerBlock extends BlockBase {
           '#style' => ['width' => '100px'], // Example to control size, adjust as needed.
         ];
       }
-
-      // Prepare the markup for name, email and phone number.
-      $first_name = $author->get('field_first_name')->value;
-      $last_name = $author->get('field_last_name')->value;
-      $phone_number_raw = $author->get('field_phone_number')->value;
-      $phone_number_formatted = $this->formatPhoneNumber($phone_number_raw);
-      $phone_number_clickable = $this->makePhoneNumberClickable($phone_number_raw, $phone_number_formatted);
 
       $author_details_markup = "<p><strong>Name:</strong> {$first_name} {$last_name} ({$name})</p>";
       $author_details_markup .= "<p><strong>Email:</strong> <a href='mailto:{$email}'>{$email}</a></p>";
