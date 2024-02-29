@@ -355,7 +355,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         '#attributes' => ['class' => ['guide-pages-list']],
       ];
 
-      $boxes = $page->get('field_child_boxes')->getValue();
+      $boxes = $entity->get('field_child_boxes')->referencedEntities();
 
       $build['boxes']['#attached']['library'][] = 'lgmsmodule/fontawesome';
 
