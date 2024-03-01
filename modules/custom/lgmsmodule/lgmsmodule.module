@@ -301,16 +301,13 @@ function lgmsmodule_refresh_cache(NodeInterface $node): void
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
-  if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
+  if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page' || $entity->bundle() === 'guide_box') && $view_mode === 'full') {
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
 
     // Add a custom cache tag to the build array
     $custom_cache_tag = 'lgmsmodule_node_view:' . $entity->id();
     $build['#cache']['tags'][] = $custom_cache_tag;
-
-
-    $page = null;
 
     // Check if it's a guide page.
     if($entity->bundle() === 'guide') {
@@ -628,7 +625,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 function reuseGuideBoxButton($node): array
 {
   $url = Url::fromRoute('reuse_guide_box.form', [], ['query' => ['current_node' => $node->id()]]);
-  $link = Link::fromTextAndUrl(t('Reuse Guide Box'), $url)->toRenderable();
+  $link = Link::fromTextAndUrl(t('Import Guide Box'), $url)->toRenderable();
   $link['#attributes'] = [
     'class' => ['use-ajax'],
     'data-dialog-type' => 'modal',
