@@ -826,7 +826,7 @@ function lgmsModule_install(): void
       ]
     ],
     'options_buttons',
-    ['weight' => 0],
+    [],
     False,
     True,
     3
