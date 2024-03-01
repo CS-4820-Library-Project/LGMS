@@ -424,7 +424,9 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                 'style' => 'text-decoration: none;',
               ],
           ];
-          $item_container['edit_link'] = $edit_link;
+          if(\Drupal::currentUser()->isAuthenticated()) {
+            $item_container['edit_link'] = $edit_link;
+          }
 
           // Add the item container to the guide box items.
           $guide_box_build['items'][] = $item_container;
