@@ -14,6 +14,12 @@
       });
     }
   };
+  Drupal.behaviors.customLayoutRemover = {
+    attach: function (context, settings) {
+      // Remove the class "layout-container" from all elements.
+      $('.layout-container', context).removeClass('layout-container');
+    }
+  };
 })(jQuery);
 document.querySelectorAll('.js-form-item').forEach(function(item) {
   if (item.querySelector('.lgms-search')) {
@@ -41,3 +47,17 @@ document.querySelectorAll('.js-form-item').forEach(function(item) {
     }
   };
 })(jQuery, Drupal);
+/*
+(function ($, Drupal) {
+  Drupal.behaviors.myModalFormBehavior = {
+    attach: function (context, settings) {
+      // Use the 'use-ajax' class to trigger AJAX behavior.
+      // Ensure your link has this class in PHP when you render it.
+      $('a.use-ajax', context).once('myPopupBehavior').click(function (e) {
+        // Drupal's AJAX and dialog behaviors will handle the modal functionality.
+        // There's no need to prevent default or manually open a modal here.
+      });
+    }
+  };
+})(jQuery, Drupal);
+*/

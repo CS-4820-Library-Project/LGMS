@@ -67,4 +67,59 @@ class sqlMethods {
 
     return $query->execute()->fetchField();
   }
+  public function getGuidePages($guide_id) {
+
+    $query = $this->database->select('node_field_data', 'n')
+      ->fields('n', ['nid', 'title'])
+      ->condition('n.status', 1)
+      ->condition('n.type', 'guide_page');
+
+    // Join with the field table that references the guide.
+    $query->join('node__field_parent_guide', 'ref', 'n.nid = ref.entity_id');
+    $query->condition('ref.field_parent_guide_target_id', $guide_id);
+
+
+
+    return $query->execute()->fetchAll();
+  }
+
+  public function getGuideNodeIdByPageId($pageNodeId)
+  {
+    $query = $this->database->select('node__field_parent_guide', 'n')
+      ->fields('n', ['field_parent_guide_target_id'])
+      ->condition('entity_id', $pageNodeId)
+      ->condition('bundle', 'guide_page')
+      ->range(0, 1);
+
+    $result = $query->execute()->fetchField();
+
+    return $result ? (int)$result : NULL;
+  }
+  public function subPageExists($parentPageId) {
+
+
+    $query = $this->database->select('node__field_parent_page', 'pp')
+      ->fields('pp', ['entity_id'])
+      ->condition('pp.field_parent_page_target_id', $parentPageId)
+      ->condition('pp.bundle', 'sub_page', '=')
+      ->range(0, 1);
+
+    $result = $query->execute()->fetchField();
+    return !empty($result);
+  }
+  public function getSubPages($parentPageId) {
+
+
+    $query = $this->database->select('node_field_data', 'n')
+      ->fields('n', ['nid', 'title'])
+      ->condition('n.status', 1)
+      ->condition('n.type', 'sub_page');
+
+    // Join with the field table that references the parent guide page.
+    $query->join('node__field_parent_page', 'pp', 'n.nid = pp.entity_id');
+    $query->condition('pp.field_parent_page_target_id', $parentPageId);
+
+    return $query->execute()->fetchAll();
+  }
+
 }

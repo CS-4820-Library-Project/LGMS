@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\lgmsmodule\Controller;
+
 use Drupal\views\Views;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\node\Entity\Node;
@@ -8,7 +9,8 @@ use Drupal\node\Entity\Node;
 /**
  * Controller for the Dashboard page.
  */
-class lgmsDashboardController extends ControllerBase {
+class lgmsDashboardController extends ControllerBase
+{
 
   /**
    * Displays the Dashboard page.
@@ -22,13 +24,22 @@ class lgmsDashboardController extends ControllerBase {
     $landingMethods = new landingPageHelper();
     $view = Views::getView('lgms_dashboard_table');
 
-      if (is_object($view)) {
-        // Set the display id
-        $view->setDisplay('default');
+    if (is_object($view)) {
+      // Set the display id
+      $view->setDisplay('default');
 
-        // Get the title from the view
-        $title = $view->getTitle();
+      // Get the title from the view
+      $title = $view->getTitle();
 
+      // Execute the view query to get the results
+      $view->execute();
+
+      // Check if the view has any results
+      if (!$view->result) {
+        $build['no_results'] = [
+          '#markup' => $this->t('You don’t own any guides yet.'),
+        ];
+      } else {
         // Render the view
         $rendered_view = $view->buildRenderable('default', []);
 
@@ -47,35 +58,38 @@ class lgmsDashboardController extends ControllerBase {
           'view' => $rendered_view,
         ];
       }
-      return $build;
     }
 
-     public function new() {
+    return $build;
+  }
+
+  public function new()
+  {
     // Generate the content for creating new items.
-      $node = Node::create(['type' => 'guide']);
-        $form = $this->entityFormBuilder()->getForm($node);
+    // add a new guide.
+    $node = Node::create(['type' => 'guide']);
+    $form = $this->entityFormBuilder()->getForm($node);
 
-      return $form;
-        $build = [];
-
-      }
-
-  public function import() {
-    // Generate the content for importing items.
-      $node = Node::create(['type' => 'guide']);
-        $form = $this->entityFormBuilder()->getForm($node);
-
-      return $form;
-        $build = [];
+    return $form;
+    $build = [];
   }
 
-  public function edit() {
-    // Generate the content for editing items.
+  public function import()
+  {
+    // Load the custom form using the form builder service.
+    $form = \Drupal::formBuilder()->getForm('Drupal\lgmsmodule\Form\GuideImportForm');
 
-      $node = Node::create(['type' => 'guide']);
-        $form = $this->entityFormBuilder()->getForm($node);
-
-      return $form;
-        $build = [];
+    // Return the form render array.
+    return $form;
   }
+
+  //public function edit() {
+  //  // Generate the content for editing items.
+
+  //    $node = Node::create(['type' => 'guide']);
+  //      $form = $this->entityFormBuilder()->getForm($node);
+
+  //    return $form;
+  //      $build = [];
+  //}
 }

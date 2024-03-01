@@ -46,18 +46,99 @@ lgmsmodule.dashboard_new:
   requirements:
     _permission: 'create guide content'
 
-lgmsmodule.dashboard_import:
+lgmsmodule.guide_import_form:
   path: '/lgms/dashboard/import'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::import'
-    _title: 'Import Items'
+    _form: '\Drupal\lgmsmodule\Form\GuideImportForm'
+    _title: 'Import Guide'
   requirements:
     _permission: 'create guide content'
 
-lgmsmodule.dashboard_edit:
-  path: '/lgms/dashboard/edit'
+create_guide_box.form:
+  path: '/custom-guide-box-form'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\lgmsDashboardController::edit'
-    _title: 'Edit Items'
+    _form: '\Drupal\lgmsmodule\Form\CreateGuideBoxForm'
+    _title: 'Add Guide Box'
   requirements:
-    _permission: 'edit own guide content+edit any guide content'
+    _permission: 'create guide_box content'
+
+delete_guide_box.form:
+  path: '/delete_guide_box'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\DeleteGuideBoxForm'
+    _title: 'Delete Guide Box'
+  requirements:
+    _permission: 'delete any guide_box content'
+
+edit_guide_box.form:
+  path: '/edit_guide_box'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\EditGuideBoxForm'
+    _title: 'Edit Guide Box'
+  requirements:
+    _permission: 'edit any guide_box content'
+
+re_order_guide_box.form:
+  path: '/re_order_guide_box'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\ReOrderBoxesForm'
+    _title: 'Re-Order Guide Box'
+  requirements:
+    _permission: 'create guide_box content'
+
+add_guide_page.form:
+  path: '/add_guide_page'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\CreateGuidePageForm'
+    _title: 'Add Guide Page'
+  requirements:
+    _permission: 'access content'
+
+import_guide_page.form:
+  path: '/import_guide_page'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\GuidePageImportForm'
+    _title: 'Import Guide Page'
+  requirements:
+    _permission: 'access content'
+
+re_order_box_item.form:
+  path: '/re_order_box_item'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\ReOderBoxItemsForm'
+    _title: 'Re-Order Box Items'
+  requirements:
+    _permission: 'create guide_item content'
+
+add_html.form:
+  path: '/add_html'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\AddHTMLForm'
+    _title: 'Add HTML Box Items'
+  requirements:
+    _permission: 'create guide_item content'
+
+add_link.form:
+  path: '/add_link'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\AddLinkForm'
+    _title: 'Add Link Box Items'
+  requirements:
+    _permission: 'create guide_item content'
+
+
+add_image.form:
+  path: '/add_image'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\AddImageForm'
+    _title: 'Add Image Box Items'
+  requirements:
+    _permission: 'create guide_item content'
+
+reuse_guide_box.form:
+  path: '/reuse-guide-box-form'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\ReuseGuideBoxForm'
+    _title: 'Reuse A Guide Box'
+  requirements:
+    _permission: 'create guide_box content'

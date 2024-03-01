@@ -10,3 +10,8 @@ lgmsmodule:
   css:
     theme:
       css/lgmsmodule.styles.css: {}
+
+fontawesome:
+  css:
+    theme:
+      https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css: { type: external, minified: true }
