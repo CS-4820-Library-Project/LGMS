@@ -115,7 +115,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
 
     }
 
-    if (\Drupal::currentUser()->hasPermission('create guide page') && $current_guide_id != null) {
+    if (\Drupal::currentUser()->hasPermission('create guide_page content') && $current_guide_id != null) {
       // Generate the URL for the custom form route, including the query parameter for the current guide.
       $url = Url::fromRoute('add_guide_page.form', [], ['query' => ['current_guide' => $current_guide_id]]);
 
