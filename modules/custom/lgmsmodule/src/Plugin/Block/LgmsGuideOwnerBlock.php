@@ -29,7 +29,7 @@ class LgmsGuideOwnerBlock extends BlockBase {
     $build = [];
     $node = \Drupal::routeMatch()->getParameter('node');
 
-    if ($node instanceof Node && $node->bundle() === 'guide') {
+    if (true) {
 
       // Fetch the author's information.
       $author = $node->getOwner();
@@ -80,9 +80,22 @@ class LgmsGuideOwnerBlock extends BlockBase {
 
       // Fetch and prepare subjects.
       $subjects = [];
-      if (!$node->get('field_lgms_guide_subject')->isEmpty()) {
-        foreach ($node->get('field_lgms_guide_subject')->referencedEntities() as $term) {
-          $subjects[] = $term->getName();
+      if ($node instanceof Node) {
+        if ($node->bundle() === 'guide') {
+          // Directly fetch subjects from the guide.
+          if (!$node->get('field_lgms_guide_subject')->isEmpty()) {
+            foreach ($node->get('field_lgms_guide_subject')->referencedEntities() as $term) {
+              $subjects[] = $term->getName();
+            }
+          }
+        } elseif ($node->bundle() === 'guide_page') {
+          // Use the parent guide to find the subjects for a guide page.
+          $parent_guide = $node->get('field_parent_guide')->entity;
+          if ($parent_guide && !$parent_guide->get('field_lgms_guide_subject')->isEmpty()) {
+            foreach ($parent_guide->get('field_lgms_guide_subject')->referencedEntities() as $term) {
+              $subjects[] = $term->getName();
+            }
+          }
         }
       }
 
