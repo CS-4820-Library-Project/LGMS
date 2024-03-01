@@ -34,10 +34,30 @@ class AddImageForm extends FormBase {
       '#value' => $current_node,
     ];
 
+    $current_item = \Drupal::request()->query->get('current_item');
+    $edit = false;
+
+    if(!empty($current_item)){
+      $form['current_item'] = [
+        '#type' => 'hidden',
+        '#value' => $current_item,
+      ];
+
+      $edit = true;
+      $current_item = Node::load($current_item);
+    }
+
+
+    $form['edit'] = [
+      '#type' => 'hidden',
+      '#value' => $edit,
+    ];
+
     $form['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Item Title:'),
       '#required' => TRUE,
+      '#default_value' => $edit? $current_item->getTitle(): '',
     ];
 
 
@@ -51,12 +71,14 @@ class AddImageForm extends FormBase {
       '#upload_validators' => [
         'file_validate_extensions' => ['jpg jpeg png gif'],
       ],
+      '#default_value' => $edit? [$current_item->get('field_image_box_item')->target_id]: '',
     ];
 
     $form['alt'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Alternative Text:'),
       '#required' => TRUE,
+      '#default_value' => $edit? $current_item->get('field_image_box_item')->alt: '',
     ];
 
 
@@ -98,31 +120,46 @@ class AddImageForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $current_node = $form_state->getValue('current_node');
-    $current_node = Node::load($current_node);
+    $edit = $form_state->getValue('edit');
 
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
+    if($edit == '0') {
+      $current_node = $form_state->getValue('current_node');
+      $current_node = Node::load($current_node);
 
-    $image = $form_state->getValue('image');
-    $file = File::load(reset($image));
+      $current_box = $form_state->getValue('current_box');
+      $current_box = Node::load($current_box);
 
-    $new_node = Node::create([
-      'type' => 'guide_item',
-      'title' => $form_state->getValue('title'),
-      'field_image_box_item' => [
-        'target_id' => $file->id(),
-        'alt' => $form_state->getValue('alt'),
-      ],
-    ]);
+      $image = $form_state->getValue('image');
+      $file = File::load(reset($image));
 
-    $new_node->save();
+      $new_node = Node::create([
+        'type' => 'guide_item',
+        'title' => $form_state->getValue('title'),
+        'field_image_box_item' => [
+          'target_id' => $file->id(),
+          'alt' => $form_state->getValue('alt'),
+        ],
+      ]);
 
-    $boxList = $current_box->get('field_box_items')->getValue();
-    $boxList[] = ['target_id' => $new_node->id()];
+      $new_node->save();
 
-    $current_box->set('field_box_items', $boxList);
-    $current_box->save();
+      $boxList = $current_box->get('field_box_items')->getValue();
+      $boxList[] = ['target_id' => $new_node->id()];
+
+      $current_box->set('field_box_items', $boxList);
+      $current_box->save();
+    } else {
+      $current_item = $form_state->getValue('current_item');
+      $current_item = Node::load($current_item);
+
+      $image = $form_state->getValue('image');
+      $file = File::load(reset($image));
+
+      $current_item->set('field_image_box_item', ['target_id' => $file->id(), 'alt' => $form_state->getValue('alt'),]);
+      $current_item->set('title', $form_state->getValue('title'));
+
+      $current_item->save();
+    }
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);

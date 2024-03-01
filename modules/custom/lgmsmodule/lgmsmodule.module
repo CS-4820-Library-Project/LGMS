@@ -375,19 +375,23 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
             '#attributes' => ['class' => ['guide-item']],
           ];
 
-          // Check and render based on the type of the guide_item.
+          $route = '';
           if ($item->hasField('field_text_box_item') && !$item->get('field_text_box_item')->isEmpty()) {
             $item_container['content'] = [
               '#type' => 'processed_text',
               '#text' => $item->get('field_text_box_item')->value,
               '#format' => $item->get('field_text_box_item')->format,
             ];
+
+            $route = 'add_html.form';
           } elseif ($item->hasField('field_image_box_item') && !$item->get('field_image_box_item')->isEmpty()) {
             $item_container['content'] = [
               '#theme' => 'image_formatter',
               '#item' => $item->get('field_image_box_item')->first(),
               '#image_style' => 'medium',
             ];
+
+            $route = 'add_image.form';
           } elseif ($item->hasField('field_link_box_item') && !$item->get('field_link_box_item')->isEmpty()) {
             $link = $item->get('field_link_box_item')->first()->getValue();
             $item_container['content'] = [
@@ -395,7 +399,35 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
               '#title' => $link['title'],
               '#url' => Url::fromUri($link['uri']),
             ];
+
+            $route = 'add_link.form';
           }
+
+          $url = Url::fromRoute($route, [], ['query' => [
+            'current_node' => $entity->id(),
+            'current_box' => $guide_box->id(),
+            'current_item' => $item->id()]
+          ]);
+
+          $edit_link = [
+              '#type' => 'link',
+              '#title' => [
+                '#type' => 'html_tag',
+                '#tag' => 'i',
+                '#attributes' => [
+                  'class' => ['fa', 'fa-edit', 'edit-icon'],
+                ],
+              ],
+              '#url' => $url,
+              '#attributes' => [
+                'class' => ['use-ajax'],
+                'data-dialog-type' => 'modal',
+                'data-dialog-options' => Json::encode(['width' => 800]),
+                'title' => 'Edit Box',
+                'style' => 'text-decoration: none;',
+              ],
+          ];
+          $item_container['edit_link'] = $edit_link;
 
           // Add the item container to the guide box items.
           $guide_box_build['items'][] = $item_container;

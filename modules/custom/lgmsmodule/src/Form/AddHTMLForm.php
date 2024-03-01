@@ -33,10 +33,30 @@ class AddHTMLForm extends FormBase {
       '#value' => $current_node,
     ];
 
+    $current_item = \Drupal::request()->query->get('current_item');
+    $edit = false;
+
+    if(!empty($current_item)){
+      $form['current_item'] = [
+        '#type' => 'hidden',
+        '#value' => $current_item,
+      ];
+
+      $edit = true;
+      $current_item = Node::load($current_item);
+    }
+
+
+    $form['edit'] = [
+      '#type' => 'hidden',
+      '#value' => $edit,
+    ];
+
     $form['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Item Title:'),
       '#required' => TRUE,
+      '#default_value' => $edit? $current_item->getTitle(): '',
     ];
 
 
@@ -46,6 +66,7 @@ class AddHTMLForm extends FormBase {
       '#title' => $this->t('Body'),
       '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
       '#required' => TRUE,
+      '#default_value' => $edit? $current_item->get('field_text_box_item')->value: '',
     ];
 
 
@@ -87,28 +108,40 @@ class AddHTMLForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $current_node = $form_state->getValue('current_node');
-    $current_node = Node::load($current_node);
+    $edit = $form_state->getValue('edit');
 
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
+    if($edit == '0'){
+      $current_box = $form_state->getValue('current_box');
+      $current_box = Node::load($current_box);
 
-    $new_node = Node::create([
-      'type' => 'guide_item',
-      'title' => $form_state->getValue('title'),
-      'field_text_box_item' => [
+      $new_node = Node::create([
+        'type' => 'guide_item',
+        'title' => $form_state->getValue('title'),
+        'field_text_box_item' => [
+          'value' => $form_state->getValue('body')['value'],
+          'format' => $form_state->getValue('body')['format'],
+        ],
+      ]);
+
+      $new_node->save();
+
+      $boxList = $current_box->get('field_box_items')->getValue();
+      $boxList[] = ['target_id' => $new_node->id()];
+
+      $current_box->set('field_box_items', $boxList);
+      $current_box->save();
+    } else {
+      $current_item = $form_state->getValue('current_item');
+      $current_item = Node::load($current_item);
+
+      $current_item->set('field_text_box_item', [
         'value' => $form_state->getValue('body')['value'],
-        'format' => 'full_html',
-      ],
-    ]);
+        'format' => $form_state->getValue('body')['format'],
+      ]);
+      $current_item->set('title', $form_state->getValue('title'));
 
-    $new_node->save();
-
-    $boxList = $current_box->get('field_box_items')->getValue();
-    $boxList[] = ['target_id' => $new_node->id()];
-
-    $current_box->set('field_box_items', $boxList);
-    $current_box->save();
+      $current_item->save();
+    }
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);

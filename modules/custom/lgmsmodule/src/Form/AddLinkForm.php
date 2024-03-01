@@ -35,11 +35,39 @@ class AddLinkForm extends FormBase {
       '#value' => $current_node,
     ];
 
+    $current_item = \Drupal::request()->query->get('current_item');
+    $edit = false;
+
+    if(!empty($current_item)){
+      $form['current_item'] = [
+        '#type' => 'hidden',
+        '#value' => $current_item,
+      ];
+
+      $edit = true;
+      $current_item = Node::load($current_item);
+    }
+
+
+    $form['edit'] = [
+      '#type' => 'hidden',
+      '#value' => $edit,
+    ];
+
     $form['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Item Title:'),
       '#required' => TRUE,
+      '#default_value' => $edit? $current_item->getTitle(): '',
     ];
+
+    $url = '';
+
+    if($edit){
+      $url = $current_item->get('field_link_box_item')->uri;
+
+      $url = str_ireplace('internal:','', $url);
+    }
 
 
     // Body field
@@ -48,6 +76,7 @@ class AddLinkForm extends FormBase {
       '#title' => $this->t('Link URL or Path:'),
       '#description' => $this->t('Enter a full URL (e.g., "http://example.com") or an internal path (e.g., "/node/2").'),
       '#required' => TRUE,
+      '#default_value' => $url,
     ];
 
     $form['#validate'][] = '::validateLinkUrl';
@@ -98,30 +127,47 @@ class AddLinkForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
+    $edit = $form_state->getValue('edit');
 
-    $url = $form_state->getValue('link_url');
+    if($edit == '0') {
+      $current_box = $form_state->getValue('current_box');
+      $current_box = Node::load($current_box);
 
-    if($url[0] == '/')
-      $url = 'internal:' . $url;
+      $url = $form_state->getValue('link_url');
 
-    $new_node = Node::create([
-      'type' => 'guide_item',
-      'title' => $form_state->getValue('title'),
-      'field_link_box_item' => [
+      if ($url[0] == '/')
+        $url = 'internal:' . $url;
+
+      $new_node = Node::create([
+        'type' => 'guide_item',
         'title' => $form_state->getValue('title'),
-        'uri' => $url,
-      ],
-    ]);
+        'field_link_box_item' => [
+          'title' => $form_state->getValue('title'),
+          'uri' => $url,
+        ],
+      ]);
 
-    $new_node->save();
+      $new_node->save();
 
-    $boxList = $current_box->get('field_box_items')->getValue();
-    $boxList[] = ['target_id' => $new_node->id()];
+      $boxList = $current_box->get('field_box_items')->getValue();
+      $boxList[] = ['target_id' => $new_node->id()];
 
-    $current_box->set('field_box_items', $boxList);
-    $current_box->save();
+      $current_box->set('field_box_items', $boxList);
+      $current_box->save();
+    } else {
+      $current_item = $form_state->getValue('current_item');
+      $current_item = Node::load($current_item);
+
+      $url = $form_state->getValue('link_url');
+
+      if ($url[0] == '/')
+        $url = 'internal:' . $url;
+
+      $current_item->set('field_link_box_item', ['title' => $form_state->getValue('title'), 'uri' => $url,]);
+      $current_item->set('title', $form_state->getValue('title'));
+
+      $current_item->save();
+    }
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);
