@@ -33,27 +33,14 @@ class DeleteGuideBoxForm extends FormBase {
       '#value' => $current_box,
     ];
 
-    $page = Node::load($current_node);
-
-    if ($page->bundle() === 'guide'){
-      // Get the list of guide pages
-      $query = \Drupal::entityQuery('node')
-        ->condition('type', 'guide_page')
-        ->condition('field_parent_guide', $page->id())
-        ->accessCheck(TRUE);
-      $result = $query->execute();
-
-      // Get the first page
-      $first_node_id = reset($result);
-      $page = Node::load($first_node_id);
-    }
+    $current_node = Node::load($current_node);
 
     $current_box = Node::load($current_box);
 
-    $parent_page = $current_box->get('field_parent_page')->getValue();
+    $parent_page = $current_box->get('field_parent_node')->getValue();
     $parent_page = Node::load($parent_page[0]['target_id']);
 
-    if($page->id() == $parent_page->id()){
+    if($current_node->id() == $parent_page->id()){
       $title = $this->t('<Strong>Are you Sure you want to Delete This Box?</Strong>
                                 if you delete this box, it will be permanently Deleted and restoring it would be impossible!!');
     } else {
@@ -99,34 +86,19 @@ class DeleteGuideBoxForm extends FormBase {
     $current_node = $form_state->getValue('current_node');
     $current_node = Node::load($current_node);
 
-    $page = $current_node;
-
-    if ($current_node->bundle() === 'guide'){
-      // Get the list of guide pages
-      $query = \Drupal::entityQuery('node')
-        ->condition('type', 'guide_page')
-        ->condition('field_parent_guide', $current_node->id())
-        ->accessCheck(TRUE);
-      $result = $query->execute();
-
-      // Get the first page
-      $first_node_id = reset($result);
-      $page = Node::load($first_node_id);
-    }
-
-    $child_boxes = $page->get('field_child_boxes')->getValue();
+    $child_boxes = $current_node->get('field_child_boxes')->getValue();
 
     $child_boxes = array_filter($child_boxes, function ($box) use ($current_box) {
       return $box['target_id'] != $current_box->id();
     });
 
-    $page->set('field_child_boxes', $child_boxes);
-    $page->save();
+    $current_node->set('field_child_boxes', $child_boxes);
+    $current_node->save();
 
-    $parent_page = $current_box->get('field_parent_page')->getValue();
-    $parent_page = Node::load($parent_page[0]['target_id']);
+    $parent_node = $current_box->get('field_parent_node')->getValue();
+    $parent_node = Node::load($parent_node[0]['target_id']);
 
-    if($page->id() == $parent_page->id()){
+    if($current_node->id() == $parent_node->id()){
       $query = \Drupal::entityQuery('node')
         ->condition('type', 'guide_page')
         ->condition('field_child_boxes', $current_box->id())

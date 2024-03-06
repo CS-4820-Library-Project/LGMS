@@ -108,29 +108,14 @@ class ReuseGuideBoxForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $curr_node = $form_state->getValue('current_node');
     $curr_node = Node::load($curr_node);
+
     $nid = $curr_node->id();
-
-
-    if ($curr_node->bundle() === 'guide'){
-      // Get the list of guide pages
-      $query = \Drupal::entityQuery('node')
-        ->condition('type', 'guide_page')
-        ->condition('field_parent_guide', $curr_node->id())
-        ->accessCheck(TRUE);
-      $result = $query->execute();
-
-      // Get the first page
-      $first_node_id = reset($result);
-      $page = Node::load($first_node_id);
-
-      $nid = $page->id();
-    }
 
     $box = Node::load($form_state->getValue('box'));
 
     if(!$form_state->getValue('reference')){
       $new_box = $box->createDuplicate();
-      $new_box->set('field_parent_page', $nid);
+      $new_box->set('field_parent_node', $nid);
       $new_box->set('title', $form_state->getValue('title'));
 
       $new_box->save();

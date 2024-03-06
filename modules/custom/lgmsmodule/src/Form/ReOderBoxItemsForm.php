@@ -92,9 +92,6 @@ class ReOderBoxItemsForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValue('pages_table');
 
-    $current_node = $form_state->getValue('current_node');
-    $current_node = Node::load($current_node);
-
     $current_box = $form_state->getValue('current_box');
     $current_box = Node::load($current_box);
 

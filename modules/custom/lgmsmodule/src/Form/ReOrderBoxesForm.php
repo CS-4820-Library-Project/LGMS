@@ -38,22 +38,9 @@ class ReOrderBoxesForm extends FormBase {
       ]],
     ];
 
-    $page = Node::load($current_node);
+    $current_node = Node::load($current_node);
 
-    if ($page && $page->bundle() === 'guide'){
-      // Get the list of guide pages
-      $query = \Drupal::entityQuery('node')
-        ->condition('type', 'guide_page')
-        ->condition('field_parent_guide', $page->id())
-        ->accessCheck(TRUE);
-      $result = $query->execute();
-
-      // Get the first page
-      $first_node_id = reset($result);
-      $page = Node::load($first_node_id);
-    }
-
-    $child_boxes = $page->get('field_child_boxes');
+    $child_boxes = $current_node->get('field_child_boxes');
 
     foreach ($child_boxes as $weight => $box) {
       $child_page = Node::load($box->target_id);
@@ -103,22 +90,7 @@ class ReOrderBoxesForm extends FormBase {
     $current_node = $form_state->getValue('current_node');
     $current_node = Node::load($current_node);
 
-    $page = $current_node;
-
-    if ($page && $page->bundle() === 'guide'){
-      // Get the list of guide pages
-      $query = \Drupal::entityQuery('node')
-        ->condition('type', 'guide_page')
-        ->condition('field_parent_guide', $page->id())
-        ->accessCheck(TRUE);
-      $result = $query->execute();
-
-      // Get the first page
-      $first_node_id = reset($result);
-      $page = Node::load($first_node_id);
-    }
-
-    $child_boxes = $page->get('field_child_boxes')->getValue();
+    $child_boxes = $current_node->get('field_child_boxes')->getValue();
 
     $reordered_child_boxes = [];
 
@@ -130,8 +102,8 @@ class ReOrderBoxesForm extends FormBase {
 
     ksort($reordered_child_boxes);
 
-    $page->set('field_child_boxes', array_values($reordered_child_boxes));
-    $page->save();
+    $current_node->set('field_child_boxes', array_values($reordered_child_boxes));
+    $current_node->save();
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);
