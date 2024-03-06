@@ -312,14 +312,6 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     ];
 
     $route = 'add_html.form';
-  } elseif ($item->hasField('field_image_box_item') && !$item->get('field_image_box_item')->isEmpty()) {
-    $item_container['content'] = [
-      '#theme' => 'image_formatter',
-      '#item' => $item->get('field_image_box_item')->first(),
-      '#image_style' => 'medium',
-    ];
-
-    $route = 'add_image.form';
   } elseif ($item->hasField('field_link_box_item') && !$item->get('field_link_box_item')->isEmpty()) {
     $link = $item->get('field_link_box_item')->first()->getValue();
     $item_container['content'] = [
@@ -429,22 +421,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                 '#type' => 'link',
                 '#title' => t('Link'),
                 '#url' => Url::fromRoute('add_link.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
-                '#attributes' => [
-                  'class' => ['use-ajax'],
-                  'data-dialog-type' => 'modal',
-                  'data-dialog-options' => Json::encode(['width' => 800]),
-                  'title' => 'Re-position Box',
-                  'style' => 'text-decoration: none;',
-                ],
-              ],
-            ],
-            'image_item' => [
-              '#type' => 'html_tag',
-              '#tag' => 'li',
-              'content' => [
-                '#type' => 'link',
-                '#title' => t('Image'),
-                '#url' => Url::fromRoute('add_image.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -1011,21 +987,6 @@ function lgmsModule_install(): void
     TRUE,
     False,
     1
-  );
-
-  createField(
-    'field_image_box_item',
-    'node',
-    'guide_item',
-    'Image',
-    'image',
-    [],
-    [],
-    'image_image',
-    [],
-    TRUE,
-    False,
-    2
   );
 
   createField(

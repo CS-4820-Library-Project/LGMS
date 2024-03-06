@@ -126,15 +126,6 @@ add_link.form:
   requirements:
     _permission: 'create guide_item content'
 
-
-add_image.form:
-  path: '/add_image'
-  defaults:
-    _form: '\Drupal\lgmsmodule\Form\AddImageForm'
-    _title: 'Add Image Box Items'
-  requirements:
-    _permission: 'create guide_item content'
-
 reuse_guide_box.form:
   path: '/reuse-guide-box-form'
   defaults:
