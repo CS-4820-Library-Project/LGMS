@@ -380,6 +380,14 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     $boxes = $entity->get('field_child_boxes')->referencedEntities();
 
     foreach ($boxes as $box) {
+      $unpublished_class = '';
+      if(!$box->isPublished()){
+        if(!\Drupal::currentUser()->isAuthenticated()){
+          continue;
+        }
+        $unpublished_class = 'node--unpublished';
+      }
+
       $items = $box->get('field_box_items')->referencedEntities();
 
       $guide_box_build['items'] = [
@@ -452,12 +460,12 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
       $build['boxes'][] = [
         '#type' => 'container',
-        '#attributes' => ['class' => ['guide-box-container']],
+        '#attributes' => ['class' => ['guide-box-container ' . $unpublished_class]],
         'title_wrapper' => [
           '#type' => 'html_tag',
           '#tag' => 'div',
           '#attributes' => [
-            'class' => ['title-edit-wrapper'],
+            'class' => ['title-edit-wrapper ' . $unpublished_class],
           ],
           'title' => [
             '#type' => 'html_tag',

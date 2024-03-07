@@ -62,11 +62,19 @@ class LgmsGuidePageViewBlock extends BlockBase {
     ];
 
     foreach ($pages as $page) {
+      $class = '';
+      if($page->status == 0){
+        if(!\Drupal::currentUser()->isAuthenticated()){
+          continue;
+        }
+        $class = 'node--unpublished';
+      }
+
       $url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $page->nid]);
       $link = \Drupal\Core\Link::fromTextAndUrl($page->title, $url)->toString();
 
-      $page_item = [
-        '#markup' => '<div>' . $link . '</div>', // Wrap in div for styling purposes.
+      $page_item['page'] = [
+        '#markup' => '<div class="' . $class . '">' . $link . '</div>', // Wrap in div for styling purposes.
         'sub_pages' => [
           '#theme' => 'item_list',
           '#items' => [],
@@ -79,10 +87,18 @@ class LgmsGuidePageViewBlock extends BlockBase {
       // Add sub-pages to the list if they exist.
       if (!empty($sub_pages)) {
         foreach ($sub_pages as $sub_page) {
+          $sub_page_class = '';
+          if($sub_page->status == 0){
+            if(!\Drupal::currentUser()->isAuthenticated()){
+              continue;
+            }
+            $sub_page_class = 'node--unpublished';
+          }
+
           $sub_url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $sub_page->nid]);
           $sub_link = \Drupal\Core\Link::fromTextAndUrl($sub_page->title, $sub_url)->toString();
           $page_item['sub_pages']['#items'][] = [
-            '#markup' => '<div class="sub-page-item">' . $sub_link . '</div>',
+            '#markup' => '<div class="' . $sub_page_class . ' sub-page-item">' . $sub_link . '</div>',
           ];
         }
       }

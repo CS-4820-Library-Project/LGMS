@@ -54,7 +54,8 @@ class CreateGuidePageForm extends FormBase
       '#format' => 'full_html', // Set the default format or use user preferred format
       '#required' => TRUE,
     ];
-    $form['field_draft_mode'] = [
+
+    $form['published'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Draft Mode'),
       '#description' => $this->t('Check this box if the page is still in draft.'),
@@ -93,7 +94,7 @@ class CreateGuidePageForm extends FormBase
         'field_parent_guide' => [
           'target_id' => $current_guide_id,
         ],
-        'field_draft_mode' => $form_state->getValue('field_draft_mode'), // Capture the draft mode value.
+        'status' => $form_state->getValue('published') == '0',
 
       ]);
 

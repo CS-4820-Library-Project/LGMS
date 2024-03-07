@@ -70,8 +70,7 @@ class sqlMethods {
   public function getGuidePages($guide_id) {
 
     $query = $this->database->select('node_field_data', 'n')
-      ->fields('n', ['nid', 'title'])
-      ->condition('n.status', 1)
+      ->fields('n', ['nid', 'title', 'status'])
       ->condition('n.type', 'guide_page');
 
     // Join with the field table that references the guide.
@@ -111,8 +110,7 @@ class sqlMethods {
 
 
     $query = $this->database->select('node_field_data', 'n')
-      ->fields('n', ['nid', 'title'])
-      ->condition('n.status', 1)
+      ->fields('n', ['nid', 'title', 'status'])
       ->condition('n.type', 'sub_page');
 
     // Join with the field table that references the parent guide page.

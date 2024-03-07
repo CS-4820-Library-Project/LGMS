@@ -45,8 +45,16 @@ class EditGuideBoxForm extends FormBase {
       $form['title'] = [
         '#type' => 'textfield',
         '#title' => $this->t('New Box Title:'),
-        '#required' => TRUE,
+        '#default_value' => $current_box->label(),
       ];
+
+      $form['published'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Draft mode:'),
+        '#description' => $this->t('Un-check this box to publish.'),
+        '#default_value' => !$current_box->isPublished(),
+      ];
+
     } else {
       $form['title'] = [
         '#markup' => 'This Box can not be edited from this Guide',
@@ -85,6 +93,7 @@ class EditGuideBoxForm extends FormBase {
     $current_box = Node::load($current_box);
 
     $current_box->setTitle(rtrim($form_state->getValue('title')));
+    $form_state->getValue('published') == '0'? $current_box->setPublished(): $current_box->setUnpublished();
     $current_box->save();
 
     $ajaxHelper = new FormHelper();

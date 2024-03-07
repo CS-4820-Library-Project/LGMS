@@ -30,12 +30,16 @@ class CreateGuideBoxForm extends FormBase {
       '#value' => $current_node,
     ];
 
-    $form['#attributes']['id'] = 'form-selector';
-
     $form['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Box Title:'),
       '#required' => TRUE,
+    ];
+
+    $form['published'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Draft mode:'),
+      '#description' => $this->t('Un-check this box to publish.'),
     ];
 
     $form['actions']['#type'] = 'actions';
@@ -86,6 +90,7 @@ class CreateGuideBoxForm extends FormBase {
       'type' => 'guide_box',
       'title' => $form_state->getValue('title'),
       'field_parent_node' => ['target_id' => $nid],
+      'status' => $form_state->getValue('published') == '0',
     ]);
 
     $new_node->save();
