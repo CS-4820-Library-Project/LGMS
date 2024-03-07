@@ -369,6 +369,10 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     $title = $entity->label();
     $description = $entity->get("field_description")->value;
 
+    if($entity->get('field_hide_description')->value){
+      $description = '';
+    }
+
     // Concatenate the title, a horizontal divider, and the description.
     // The <hr> tag is used as the divider between the title and description.
     $build['header'] = [
@@ -1060,6 +1064,44 @@ function lgmsModule_install(): void
     TRUE,
     TRUE,
     5
+  );
+
+  createField(
+    'field_hide_description',
+    'node',
+    'guide',
+    'Hide Description',
+    'boolean',
+    [],
+    [
+      'default_value' => 0,
+      'on_label' => 'Yes',
+      'off_label' => 'No',
+    ],
+    'boolean_checkbox',
+    [],
+    TRUE,
+    1,
+    1
+  );
+
+  createField(
+    'field_hide_description',
+    'node',
+    'guide_page',
+    'Hide Description',
+    'boolean',
+    [],
+    [
+      'default_value' => 0,
+      'on_label' => 'Yes',
+      'off_label' => 'No',
+    ],
+    'boolean_checkbox',
+    [],
+    TRUE,
+    1,
+    1
   );
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
