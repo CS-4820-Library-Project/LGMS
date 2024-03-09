@@ -319,11 +319,13 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   ];
 
   $route = '';
-  if ($item->hasField('field_text_box_item') && !$item->get('field_text_box_item')->isEmpty()) {
+  if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
+    $html = $item->get('field_html_item')->entity;
+
     $item_container['content'] = [
       '#type' => 'processed_text',
-      '#text' => $item->get('field_text_box_item')->value,
-      '#format' => $item->get('field_text_box_item')->format,
+      '#text' => $html->get('field_text_box_item2')->value,
+      '#format' => $html->get('field_text_box_item2')->format,
     ];
 
     $route = 'add_html.form';
@@ -666,6 +668,7 @@ function lgmsModule_install(): void
   createContentType('guide_box', 'Guide Box');
   createContentType('sub_page', 'Sub Page');
   createContentType('guide_item', 'Guide Box Item');
+  createContentType('guide_html_item', 'HTML Box Item');
 
   // Create a new Guide Type taxonomy.
   create_vocab('LGMS_Guide_Type', 'Guide Type', 'Use Guide Type to group guides by their type');
@@ -977,9 +980,9 @@ function lgmsModule_install(): void
   );
 
   createField(
-    'field_text_box_item',
+    'field_text_box_item2',
     'node',
-    'guide_item',
+    'guide_html_item',
     'Text',
     'text_long',
     [],
@@ -989,6 +992,30 @@ function lgmsModule_install(): void
     TRUE,
     False,
     1
+  );
+
+  createField(
+    'field_html_item',
+    'node',
+    'guide_item',
+    'html item',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_html_item' => 'guide_html_item',
+        ],
+      ],
+      'sort' => [
+        'field' => '_none',
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    True,
+    4
   );
 
 
@@ -1128,6 +1155,7 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_parent_guide');
   delete_field_storage('field_parent_node');
   delete_field_storage('field_description');
+  delete_field_storage('field_text_box_item');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();

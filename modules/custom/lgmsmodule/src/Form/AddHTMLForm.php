@@ -44,6 +44,7 @@ class AddHTMLForm extends FormBase {
 
       $edit = true;
       $current_item = Node::load($current_item);
+      $current_item = $current_item->get('field_html_item')->entity;
     }
 
 
@@ -66,7 +67,8 @@ class AddHTMLForm extends FormBase {
       '#title' => $this->t('Body'),
       '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->get('field_text_box_item')->value: '',
+      '#default_value' => $edit? $current_item->get('field_text_box_item2')->value: '',
+      '#format' => $edit ? $current_item->get('field_text_box_item2')->format : 'basic_html',
     ];
 
 
@@ -114,19 +116,27 @@ class AddHTMLForm extends FormBase {
       $current_box = $form_state->getValue('current_box');
       $current_box = Node::load($current_box);
 
-      $new_node = Node::create([
-        'type' => 'guide_item',
+      $new_html = Node::create([
+        'type' => 'guide_html_item',
         'title' => $form_state->getValue('title'),
-        'field_text_box_item' => [
+        'field_text_box_item2' => [
           'value' => $form_state->getValue('body')['value'],
           'format' => $form_state->getValue('body')['format'],
         ],
       ]);
 
-      $new_node->save();
+      $new_html->save();
+
+      $new_item = Node::create([
+        'type' => 'guide_item',
+        'title' => $form_state->getValue('title'),
+        'field_html_item' => $new_html,
+      ]);
+
+      $new_item->save();
 
       $boxList = $current_box->get('field_box_items')->getValue();
-      $boxList[] = ['target_id' => $new_node->id()];
+      $boxList[] = ['target_id' => $new_item->id()];
 
       $current_box->set('field_box_items', $boxList);
       $current_box->save();
@@ -134,12 +144,17 @@ class AddHTMLForm extends FormBase {
       $current_item = $form_state->getValue('current_item');
       $current_item = Node::load($current_item);
 
-      $current_item->set('field_text_box_item', [
+      $html = $current_item->get('field_html_item')->entity;
+
+      $html->set('field_text_box_item2', [
         'value' => $form_state->getValue('body')['value'],
         'format' => $form_state->getValue('body')['format'],
       ]);
-      $current_item->set('title', $form_state->getValue('title'));
+      $html->set('title', $form_state->getValue('title'));
 
+      $html->save();
+
+      $current_item->set('changed', \Drupal::time()->getRequestTime());
       $current_item->save();
     }
 
