@@ -312,6 +312,15 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     ];
 
     $route = 'add_html.form';
+  } elseif ($item->hasField('field_link_box_item') && !$item->get('field_link_box_item')->isEmpty()) {
+    $link = $item->get('field_link_box_item')->first()->getValue();
+    $item_container['content'] = [
+      '#type' => 'link',
+      '#title' => $link['title'],
+      '#url' => Url::fromUri($link['uri']),
+    ];
+
+    $route = 'add_link.form';
   }
 
   if($item->access('update')) {
@@ -408,6 +417,22 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                 '#type' => 'link',
                 '#title' => ('HTML'),
                 '#url' => Url::fromRoute('add_html.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
+                '#attributes' => [
+                  'class' => ['use-ajax'],
+                  'data-dialog-type' => 'modal',
+                  'data-dialog-options' => Json::encode(['width' => 800]),
+                  'title' => 'Re-position Box',
+                  'style' => 'text-decoration: none;',
+                ],
+              ],
+            ],
+            'link_item' => [
+              '#type' => 'html_tag',
+              '#tag' => 'li',
+              'content' => [
+                '#type' => 'link',
+                '#title' => t('Link'),
+                '#url' => Url::fromRoute('add_link.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -974,6 +999,21 @@ function lgmsModule_install(): void
     TRUE,
     False,
     1
+  );
+
+  createField(
+    'field_link_box_item',
+    'node',
+    'guide_item',
+    'Link',
+    'link',
+    [],
+    [],
+    'link_default',
+    [],
+    TRUE,
+    False,
+    3
   );
 
   //guide_item

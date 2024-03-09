@@ -118,6 +118,14 @@ add_html.form:
   requirements:
     _permission: 'create guide_item content'
 
+add_link.form:
+  path: '/add_link'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\AddLinkForm'
+    _title: 'Add Link Box Items'
+  requirements:
+    _permission: 'create guide_item content'
+
 reuse_guide_box.form:
   path: '/reuse-guide-box-form'
   defaults:
