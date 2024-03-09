@@ -57,6 +57,22 @@ function lgmsmodule_generate_url_alias(NodeInterface $node) {
       // If there's no parent guide, fallback to just using the page title.
       $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
     }
+  } elseif ($node->getType() == 'sub_page') {
+    $parent_page = $node->get('field_parent_page')->entity;
+
+    if ($parent_page) {
+      // Construct the alias using the parent guide's title and the page's title.
+      $parent_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_page->getTitle()));
+      $parent_guide = $parent_page->get('field_parent_guide')->entity;
+      if($parent_guide){
+        $parent_guide_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_guide->getTitle()));
+        $child_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+        $alias = '/' . $parent_guide_alias . '/' . $parent_alias . '/' . $child_alias;
+      }
+    } else {
+      // If there's no parent guide, fallback to just using the page title.
+      $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+    }
   } else {
     // If the content type is neither 'guide' nor 'page', do nothing.
     return;
@@ -254,7 +270,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
 function lgmsmodule_node_insert(NodeInterface $node): void
 {
   lgmsmodule_refresh_cache($node);
-lgmsmodule_generate_url_alias($node);
+  lgmsmodule_generate_url_alias($node);
 }
 
 /**
@@ -264,7 +280,6 @@ lgmsmodule_generate_url_alias($node);
 function lgmsmodule_node_update(NodeInterface $node): void
 {
   lgmsmodule_refresh_cache($node);
-lgmsmodule_generate_url_alias($node);
 }
 
 /**
