@@ -91,21 +91,24 @@ class LgmsGuidePageViewBlock extends BlockBase {
       if (\Drupal::currentUser()->hasPermission('create sub_page content ')) {
         // Check if a sub-page already exists for this page.
         $sub_page_exists = $sqlMethods->subPageExists($page->nid);
+        $parent_page_id =$page->nid;
 
         // Only show the link to add a sub-page if one doesn't already exist.
         if (!$sub_page_exists) {
           // Create the URL for adding a new sub-page.
-          $add_sub_page_url = \Drupal\Core\Url::fromRoute('node.add', ['node_type' => 'sub_page'], [
-            'query' => ['field_parent_page' => $page->nid], // Adjust the field name if needed.
+          $add_sub_page_url = Url::fromRoute('create_sub_page.form', [], [
+            'query' => ['parent_page' => $parent_page_id]
           ]);
-          // Create the link for adding a new sub-page.
-          $add_sub_page_link = \Drupal\Core\Link::fromTextAndUrl(t('Add new sub page +'), $add_sub_page_url)->toString();
 
-          $page_item['add_sub_page'] = [
-            '#markup' => $add_sub_page_link,
-            '#prefix' => '<div class="add-sub-page-link">',
-            '#suffix' => '</div>',
+          $add_sub_page_link = Link::fromTextAndUrl(t('Add new sub page +'), $add_sub_page_url)->toRenderable();
+          $add_sub_page_link['#attributes'] = [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
           ];
+
+          // Append the 'Add new sub page' link render array to the sub-pages list.
+          $page_item['sub_pages']['#items'][] = $add_sub_page_link;
         }
       }
 
@@ -131,7 +134,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $build['add_guide_page_link'] = $link;
 
       // Attach the library necessary for using the modal dialog
-     // $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
+      // $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
 
       // Generate the URL for the custom form route, including the query parameter for the current guide.
       $url = Url::fromRoute('import_guide_page.form', [], ['query' => ['current_guide' => $current_guide_id]]);
@@ -158,15 +161,22 @@ class LgmsGuidePageViewBlock extends BlockBase {
 
   public function getCurrentGuideId()
   {
+    $sqlMethods = new sqlMethods(\Drupal::database());
     $current_node = \Drupal::routeMatch()->getParameter('node');
-    if ($current_node->getType() == 'guide') {
-      return $current_node->id();
-    }
-    elseif ($current_node->getType() == 'guide_page') {
-
-      $sqlMethods = new sqlMethods(\Drupal::database());
-      return $sqlMethods->getGuideNodeIdByPageId($current_node->id());
-
+    if ($current_node instanceof \Drupal\node\NodeInterface) {
+      // If it's a guide, return its ID.
+      if ($current_node->bundle() == 'guide') {
+        return $current_node->id();
+      }
+      // If it's a guide page, get and return the parent guide ID.
+      elseif ($current_node->bundle() == 'guide_page') {
+        return $sqlMethods->getGuideNodeIdByPageId($current_node->id());
+      }
+      // If it's a sub-page, first get the parent page ID, then get and return the parent guide ID.
+      elseif ($current_node->bundle() == 'sub_page') {
+        $parent_page_id = $sqlMethods->getPageNodeIdBySubPageId($current_node->id());
+        return $parent_page_id ? $sqlMethods->getGuideNodeIdByPageId($parent_page_id) : NULL;
+      }
     }
     return NULL;
   }

@@ -57,6 +57,22 @@ function lgmsmodule_generate_url_alias(NodeInterface $node) {
       // If there's no parent guide, fallback to just using the page title.
       $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
     }
+  } elseif ($node->getType() == 'sub_page') {
+    $parent_page = $node->get('field_parent_page')->entity;
+
+    if ($parent_page) {
+      // Construct the alias using the parent guide's title and the page's title.
+      $parent_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_page->getTitle()));
+      $parent_guide = $parent_page->get('field_parent_guide')->entity;
+      if($parent_guide){
+        $parent_guide_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_guide->getTitle()));
+        $child_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+        $alias = '/' . $parent_guide_alias . '/' . $parent_alias . '/' . $child_alias;
+      }
+    } else {
+      // If there's no parent guide, fallback to just using the page title.
+      $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+    }
   } else {
     // If the content type is neither 'guide' nor 'page', do nothing.
     return;
@@ -301,7 +317,7 @@ function lgmsmodule_refresh_cache(NodeInterface $node): void
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
-  if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page' || $entity->bundle() === 'guide_box') && $view_mode === 'full') {
+  if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page' || $entity->bundle() === 'sub_page'|| $entity->bundle() === 'guide_box') && $view_mode === 'full') {
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
 
@@ -346,7 +362,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 //      // Get the first page
 //      $first_node_id = reset($result);
 //      $page = Node::load($first_node_id);
-    } elseif ($entity->bundle() === 'guide_page'){
+    } elseif ($entity->bundle() === 'guide_page' || $entity->bundle() === 'sub_page'){
       $build['guide_pages_list'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['guide-pages-list']],
@@ -1008,6 +1024,32 @@ function lgmsModule_install(): void
     'field_child_boxes',
     'node',
     'guide_page',
+    'Children Boxes',
+    'entity_reference',
+    [
+      'storage' => [
+        'target_type' => 'node',
+        'handler' => 'default:node',
+        'handler_settings' => [
+          'target_bundles' => [
+            'guide_box' => 'guide_box'
+          ],
+          'sort' => [
+            'field' => '_none',
+          ],
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    TRUE,
+    5
+  );
+  createField(
+    'field_child_boxes',
+    'node',
+    'sub_page',
     'Children Boxes',
     'entity_reference',
     [

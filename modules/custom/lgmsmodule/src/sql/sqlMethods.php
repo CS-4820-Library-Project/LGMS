@@ -121,5 +121,17 @@ class sqlMethods {
 
     return $query->execute()->fetchAll();
   }
+  public function getPageNodeIdBySubPageId($subPageNodeId)
+  {
+    $query = $this->database->select('node__field_parent_page', 'n')
+      ->fields('n', ['field_parent_page_target_id'])
+      ->condition('entity_id', $subPageNodeId)
+      ->condition('bundle', 'sub_page') // Assuming 'sub_page' is the bundle type for your subpages; adjust if it's named differently
+      ->range(0, 1);
+
+    $result = $query->execute()->fetchField();
+
+    return $result ? (int)$result : NULL;
+  }
 
 }

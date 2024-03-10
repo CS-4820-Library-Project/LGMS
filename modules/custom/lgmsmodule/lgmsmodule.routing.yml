@@ -142,3 +142,11 @@ reuse_guide_box.form:
     _title: 'Reuse A Guide Box'
   requirements:
     _permission: 'create guide_box content'
+
+create_sub_page.form:
+  path: '/create_sub_page'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\CreateSubPageForm'
+    _title: 'Reuse A Guide Box'
+  requirements:
+    _permission: 'create sub_page content'
