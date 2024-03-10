@@ -133,3 +133,11 @@ reuse_html.form:
     _title: 'Reuse HTML Box Items'
   requirements:
     _permission: 'create guide_item content'
+
+delete_html.form:
+  path: '/delete_html'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\DeleteHTMLForm'
+    _title: 'Delete HTML Box Items'
+  requirements:
+    _permission: 'create guide_item content'

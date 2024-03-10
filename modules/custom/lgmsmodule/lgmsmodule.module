@@ -318,7 +318,9 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     '#attributes' => ['class' => ['guide-item']],
   ];
 
-  $route = '';
+  $edit_route = '';
+  $delete_route = '';
+
   if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
     $html = $item->get('field_html_item')->entity;
 
@@ -328,23 +330,52 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       '#format' => $html->get('field_text_box_item2')->format,
     ];
 
-    $route = 'add_html.form';
+    $edit_route = 'add_html.form';
+    $delete_route = 'delete_html.form';
   }
 
-  if($item->access('update') && $box->id() === $item->get('field_parent_box')->entity->id()) {
-    $url = Url::fromRoute($route, [], ['query' => [
+  if($item->access('update')) {
+    if ($box->id() === $item->get('field_parent_box')->entity->id()){
+      $url = Url::fromRoute($edit_route, [], ['query' => [
+        'current_node' => $entity->id(),
+        'current_box' => $box->id(),
+        'current_item' => $item->id()]
+      ]);
+
+      $edit_link = [
+        '#type' => 'link',
+        '#title' => [
+          '#type' => 'html_tag',
+          '#tag' => 'i',
+          '#attributes' => [
+            'class' => ['fa', 'fa-edit', 'edit-icon'],
+          ],
+        ],
+        '#url' => $url,
+        '#attributes' => [
+          'class' => ['use-ajax'],
+          'data-dialog-type' => 'modal',
+          'data-dialog-options' => Json::encode(['width' => 800]),
+          'title' => 'Edit Item',
+          'style' => 'text-decoration: none;',
+        ],
+      ];
+      $item_container['edit_link'] = $edit_link;
+    }
+
+    $url = Url::fromRoute($delete_route, [], ['query' => [
       'current_node' => $entity->id(),
       'current_box' => $box->id(),
       'current_item' => $item->id()]
     ]);
 
-    $edit_link = [
+    $delete_link = [
       '#type' => 'link',
       '#title' => [
         '#type' => 'html_tag',
         '#tag' => 'i',
         '#attributes' => [
-          'class' => ['fa', 'fa-edit', 'edit-icon'],
+          'class' => ['fa', 'fa-times', 'close-icon'],
         ],
       ],
       '#url' => $url,
@@ -356,7 +387,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
         'style' => 'text-decoration: none;',
       ],
     ];
-    $item_container['edit_link'] = $edit_link;
+    $item_container['delete_link'] = $delete_link;
   }
 
   return$item_container;
