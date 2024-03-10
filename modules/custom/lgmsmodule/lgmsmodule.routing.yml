@@ -125,3 +125,11 @@ reuse_guide_box.form:
     _title: 'Reuse A Guide Box'
   requirements:
     _permission: 'create guide_box content'
+
+reuse_html.form:
+  path: '/reuse_html'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\ReuseHTMLItemForm'
+    _title: 'Reuse HTML Box Items'
+  requirements:
+    _permission: 'create guide_item content'

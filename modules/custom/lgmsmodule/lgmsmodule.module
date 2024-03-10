@@ -331,7 +331,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $route = 'add_html.form';
   }
 
-  if($item->access('update')) {
+  if($item->access('update') && $box->id() === $item->get('field_parent_box')->entity->id()) {
     $url = Url::fromRoute($route, [], ['query' => [
       'current_node' => $entity->id(),
       'current_box' => $box->id(),
@@ -352,7 +352,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',
         'data-dialog-options' => Json::encode(['width' => 800]),
-        'title' => 'Edit Box',
+        'title' => 'Edit Item',
         'style' => 'text-decoration: none;',
       ],
     ];
@@ -425,6 +425,22 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                 '#type' => 'link',
                 '#title' => ('HTML'),
                 '#url' => Url::fromRoute('add_html.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
+                '#attributes' => [
+                  'class' => ['use-ajax'],
+                  'data-dialog-type' => 'modal',
+                  'data-dialog-options' => Json::encode(['width' => 800]),
+                  'title' => 'Re-position Box',
+                  'style' => 'text-decoration: none;',
+                ],
+              ],
+            ],
+            'reuse_html_item' => [
+              '#type' => 'html_tag',
+              '#tag' => 'li',
+              'content' => [
+                '#type' => 'link',
+                '#title' => ('Reuse HTML'),
+                '#url' => Url::fromRoute('reuse_html.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -855,6 +871,48 @@ function lgmsModule_install(): void
         'target_bundles' => [
           'guide' => 'guide',
           'guide_page' => 'guide_page',
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    False,
+    1,
+  );
+
+  createField(
+    'field_parent_box',
+    'node',
+    'guide_item',
+    'Parent node',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_box' => 'guide_box',
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    False,
+    1,
+  );
+
+  createField(
+    'field_parent_item',
+    'node',
+    'guide_html_item',
+    'Parent node',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_item' => 'guide_item',
         ],
       ],
     ],
