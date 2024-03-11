@@ -18,6 +18,11 @@ class ReuseSubPageForm extends FormBase
 
   public function buildForm(array $form, FormStateInterface $form_state)
   {
+    $form['name'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Name'),
+      '#required' => TRUE,
+    ];
     $form['sub_page_select'] = [
       '#type' => 'select',
       '#title' => $this->t('Select a Sub Page to Import'),
@@ -39,6 +44,7 @@ class ReuseSubPageForm extends FormBase
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $sub_page_id = $form_state->getValue('sub_page_select');
     $current_page_id = \Drupal::request()->query->get('parent_page'); // Adjust based on how you're passing the current page ID
+    $name = $form_state->getValue('name');
 
     $sub_page = Node::load($sub_page_id);
     $current_page = Node::load($current_page_id);
@@ -46,6 +52,7 @@ class ReuseSubPageForm extends FormBase
     if ($sub_page && $current_page) {
       // Clone the sub-page
       $cloned_sub_page = $sub_page->createDuplicate();
+      $cloned_sub_page->setTitle($name);
 
       // Here's the crucial change: Set the parent page of the cloned sub-page to the current page
       $cloned_sub_page->set('field_parent_page', $current_page_id); // Adjust 'field_parent_page' to your actual field name
