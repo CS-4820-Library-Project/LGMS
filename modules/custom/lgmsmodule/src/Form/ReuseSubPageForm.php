@@ -13,7 +13,7 @@ class ReuseSubPageForm extends FormBase
   public function getFormId()
   {
     // TODO: Implement getFormId() method.
-    return 'lgmsmodule_reuse_subpage_form';
+    return 'reuse_subpage_form';
   }
 
   public function buildForm(array $form, FormStateInterface $form_state)
@@ -36,14 +36,19 @@ class ReuseSubPageForm extends FormBase
     return $form;
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state)
-  {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $sub_page_id = $form_state->getValue('sub_page_select');
-    $sub_page = Node::load($sub_page_id);
+    $current_page_id = \Drupal::request()->query->get('parent_page'); // Adjust based on how you're passing the current page ID
 
-    if ($sub_page) {
+    $sub_page = Node::load($sub_page_id);
+    $current_page = Node::load($current_page_id);
+
+    if ($sub_page && $current_page) {
       // Clone the sub-page
       $cloned_sub_page = $sub_page->createDuplicate();
+
+      // Here's the crucial change: Set the parent page of the cloned sub-page to the current page
+      $cloned_sub_page->set('field_parent_page', $current_page_id); // Adjust 'field_parent_page' to your actual field name
       $cloned_sub_page->save();
 
       // Load child boxes related to the original sub-page
@@ -53,28 +58,44 @@ class ReuseSubPageForm extends FormBase
         // Clone each box
         $cloned_box = $box->createDuplicate();
         // Update the reference field on the cloned box to point to the cloned sub-page
-        $cloned_box->set('field_parent_sub_page', $cloned_sub_page->id());
+        $cloned_box->set('field_parent_sub_page', $cloned_sub_page->id()); // Ensure this is your actual field name
         $cloned_box->save();
       }
 
-      drupal_set_message($this->t('Sub page @title has been successfully imported with its boxes.', ['@title' => $cloned_sub_page->label()]));
+      \Drupal::messenger()->addMessage($this->t('Sub page @title has been successfully imported with its boxes.', ['@title' => $cloned_sub_page->label()]));
 
       // Redirect to the newly cloned sub-page.
       $form_state->setRedirect('entity.node.canonical', ['node' => $cloned_sub_page->id()]);
     } else {
-      drupal_set_message($this->t('Failed to load the sub page.'), 'error');
+      \Drupal::messenger()->addMessage($this->t('Failed to load the sub page or current page ID is missing.'), 'error');
     }
   }
 
-  private function getSubPageOptions()
-  {
+
+
+  private function getSubPageOptions() {
     $options = [];
-    $nodes = Node::loadMultiple();
-    foreach ($nodes as $node) {
-      if ($node->bundle() == 'sub_page') {
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', 'sub_page')
+      ->accessCheck(TRUE); // Ensure access controls are respected in this query
+    $result = $query->execute();
+    if (!empty($result)) {
+      $nodes = Node::loadMultiple($result);
+      foreach ($nodes as $node) {
         $options[$node->id()] = $node->label();
       }
     }
     return $options;
   }
+
+
+  private function getChildBoxes($pageId) {
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', 'box') // Assuming 'box' is the machine name for your box content type
+      ->condition('field_parent_page', $pageId) // Adjust field name as necessary
+      ->accessCheck(TRUE); // Explicitly setting access check
+    $result = $query->execute();
+    return Node::loadMultiple($result);
+  }
+
 }
