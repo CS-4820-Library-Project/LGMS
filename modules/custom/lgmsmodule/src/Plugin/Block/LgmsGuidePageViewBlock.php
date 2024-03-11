@@ -108,7 +108,21 @@ class LgmsGuidePageViewBlock extends BlockBase {
           ];
 
           // Append the 'Add new sub page' link render array to the sub-pages list.
-          $page_item['sub_pages']['#items'][] = $add_sub_page_link;
+          $page_item['add_sub_pages']['#items'][] = $add_sub_page_link;
+
+          $add_sub_page_url = Url::fromRoute('reuse_sub_page.form', [], [
+            'query' => ['parent_page' => $parent_page_id]
+          ]);
+
+          $add_sub_page_link = Link::fromTextAndUrl(t('Reuse sub page +'), $add_sub_page_url)->toRenderable();
+          $add_sub_page_link['#attributes'] = [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+          ];
+
+          // Append the 'Add new sub page' link render array to the sub-pages list.
+          $page_item['reuse_sub_pages']['#items'][] = $add_sub_page_link;
         }
       }
 
