@@ -1251,6 +1251,15 @@ function lgmsModule_uninstall(): void
 
   $content_type = NodeType::load('guide_box');
   $content_type?->delete();
+
+  $content_type = NodeType::load('sub_page');
+  $content_type?->delete();
+
+  $content_type = NodeType::load('guide_item');
+  $content_type?->delete();
+
+  $content_type = NodeType::load('guide_html_item');
+  $content_type?->delete();
 }
 
 /**
