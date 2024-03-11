@@ -18,7 +18,7 @@ class CreateGuidePageForm extends FormBase
     return 'create_guide_page_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state)
+  public function buildForm(array $form, FormStateInterface $form_state, $current_guide_id = NULL)
   {
     $form['#prefix'] = '<div id="modal-form">';
     $form['#suffix'] = '</div>';
@@ -26,8 +26,6 @@ class CreateGuidePageForm extends FormBase
       '#weight' => -9999,
       '#type' => 'status_messages',
     ];
-
-    $current_guide_id = \Drupal::request()->query->get('current_guide');
 
     // Load the current guide node.
     $current_guide_node = Node::load($current_guide_id);
@@ -81,8 +79,6 @@ class CreateGuidePageForm extends FormBase
 
     $form['#validate'][] = '::validateFields';
 
-  // Submit button
-    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Create Page'),

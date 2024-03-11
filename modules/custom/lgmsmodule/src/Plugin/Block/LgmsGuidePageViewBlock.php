@@ -133,10 +133,10 @@ class LgmsGuidePageViewBlock extends BlockBase {
 
     if (\Drupal::currentUser()->hasPermission('create guide_page content') && $current_guide_id != null) {
       // Generate the URL for the custom form route, including the query parameter for the current guide.
-      $url = Url::fromRoute('add_guide_page.form', [], ['query' => ['current_guide' => $current_guide_id]]);
+      $url = Url::fromRoute('lgmsmodule.guide_page_modal', [], ['query' => ['current_guide' => $current_guide_id]]);
 
       // Create the link render array with AJAX attributes.
-      $link = Link::fromTextAndUrl(t('Add Guide Page'), $url)->toRenderable();
+      $link = Link::fromTextAndUrl(t('Guide Page'), $url)->toRenderable();
       $link['#attributes'] = [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',
@@ -144,24 +144,8 @@ class LgmsGuidePageViewBlock extends BlockBase {
       ];
 
       // Render the link somewhere in your build array.
-      $build['add_guide_page_link'] = $link;
+      $build['guide_page_modal'] = $link;
 
-      // Attach the library necessary for using the modal dialog
-     // $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
-
-      // Generate the URL for the custom form route, including the query parameter for the current guide.
-      $url = Url::fromRoute('import_guide_page.form', [], ['query' => ['current_guide' => $current_guide_id]]);
-
-      // Create the link render array with AJAX attributes.
-      $link = Link::fromTextAndUrl(t('Import Guide Page'), $url)->toRenderable();
-      $link['#attributes'] = [
-        'class' => ['use-ajax'],
-        'data-dialog-type' => 'modal',
-        'data-dialog-options' => Json::encode(['width' => 800]),
-      ];
-
-      // Render the link somewhere in your build array.
-      $build['import_guide_page_link'] = $link;
     }
 
 
