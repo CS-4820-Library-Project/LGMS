@@ -96,3 +96,39 @@
 .guide-item2 {
   margin-top: 20px;
 }
+
+.nav-container {
+  background-color: #f3f4ee;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-top:10px;
+}
+
+.tabs-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.tabs-list li {
+  float: left;
+}
+
+.tabs-list li a {
+  display: block;
+  color: black;
+  text-align: center;
+  padding: 6px 12px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.tabs-list li a:hover, .tabs-list li a:focus {
+  background-color: #ddd;
+}
+
+/* Style for the active tab */
+.tabs-list li a.active {
+  background-color: #ccc;
+}

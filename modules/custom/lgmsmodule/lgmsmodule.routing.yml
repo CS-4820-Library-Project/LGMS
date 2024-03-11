@@ -141,3 +141,12 @@ delete_html.form:
     _title: 'Delete HTML Box Items'
   requirements:
     _permission: 'create guide_item content'
+
+lgmsmodule.guide_page_modal:
+  path: '/guide_page_modal'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\GuidePageModalController::build'
+    _title: 'Guide'
+  requirements:
+    _permission: 'access content'
+

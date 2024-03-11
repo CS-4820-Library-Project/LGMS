@@ -20,6 +20,30 @@
       $('.layout-container', context).removeClass('layout-container');
     }
   };
+  Drupal.behaviors.tabSwitchingBehavior = {
+    attach: function (context, settings) {
+      // Hide all tab content by default
+      $('.tab-content').hide();
+      // Show the first tab content by default
+      $('.tab-content').first().show();
+
+      // Set the first tab link as active
+      $('.tabs-list .tab-link').first().addClass('active');
+
+      $('.tab-link', context).click(function () {
+        var tabId = $(this).attr('href');
+
+        // Remove active class from all tabs and then add to the current tab
+        $('.tabs-list .tab-link').removeClass('active');
+        $(this).addClass('active');
+
+        // Hide all tab content and show the selected tab's content
+        $('.tab-content').hide();
+        $(tabId).show();
+        return false;
+      });
+    }
+  };
 })(jQuery);
 document.querySelectorAll('.js-form-item').forEach(function(item) {
   if (item.querySelector('.lgms-search')) {

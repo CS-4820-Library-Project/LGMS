@@ -17,8 +17,7 @@ class GuidePageImportForm extends FormBase {
     return 'lgmsmodule_guide_page_import_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    $current_guide = \Drupal::request()->query->get('current_guide');
+  public function buildForm(array $form, FormStateInterface $form_state, $current_guide_id = NULL) {
 
     $form['name'] = [
       '#type' => 'textfield',
@@ -36,7 +35,7 @@ class GuidePageImportForm extends FormBase {
 
     $form['current_guide'] = [
       '#type' => 'hidden',
-      '#value' => $current_guide,
+      '#value' => $current_guide_id,
     ];
 
     $form['cloned_guide_page'] = [
@@ -44,7 +43,6 @@ class GuidePageImportForm extends FormBase {
       '#value' => NULL, // Initialize with NULL value
     ];
 
-    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Import Guide Page'),
