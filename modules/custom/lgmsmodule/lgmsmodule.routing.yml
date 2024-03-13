@@ -97,7 +97,7 @@ add_guide_page.form:
 import_guide_page.form:
   path: '/import_guide_page'
   defaults:
-    _form: '\Drupal\lgmsmodule\Form\GuidePageImportForm'
+    _form: '\Drupal\lgmsmodule\Form\ImportGuidePageForm'
     _title: 'Import Guide Page'
   requirements:
     _permission: 'access content'
@@ -142,10 +142,10 @@ delete_html.form:
   requirements:
     _permission: 'create guide_item content'
 
-lgmsmodule.guide_page_modal:
-  path: '/guide_page_modal'
+lgmsmodule.popup_modal:
+  path: '/popup_modal'
   defaults:
-    _controller: '\Drupal\lgmsmodule\Controller\GuidePageModalController::build'
+    _controller: '\Drupal\lgmsmodule\Controller\PopupModalController::build'
     _title: 'Guide'
   requirements:
     _permission: 'access content'

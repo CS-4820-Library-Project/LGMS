@@ -11,10 +11,10 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
-class GuidePageImportForm extends FormBase {
+class ImportGuidePageForm extends FormBase {
 
   public function getFormId() {
-    return 'lgmsmodule_guide_page_import_form';
+    return 'lgmsmodule_import_guide_page_form';
   }
 
   public function buildForm(array $form, FormStateInterface $form_state, $current_guide_id = NULL) {
