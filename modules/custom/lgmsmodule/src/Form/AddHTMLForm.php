@@ -71,6 +71,13 @@ class AddHTMLForm extends FormBase {
       '#format' => $edit ? $current_item->get('field_text_box_item2')->format : 'basic_html',
     ];
 
+    $form['published'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Draft mode:'),
+      '#description' => $this->t('Un-check this box to publish.'),
+      '#default_value' => $current_item->isPublished() == '0',
+    ];
+
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
@@ -123,6 +130,7 @@ class AddHTMLForm extends FormBase {
           'value' => $form_state->getValue('body')['value'],
           'format' => $form_state->getValue('body')['format'],
         ],
+        'status' => $form_state->getValue('published') == '0',
       ]);
 
       $new_html->save();
@@ -132,6 +140,7 @@ class AddHTMLForm extends FormBase {
         'title' => $form_state->getValue('title'),
         'field_html_item' => $new_html,
         'field_parent_box' => $current_box,
+        'status' => $form_state->getValue('published') == '0',
       ]);
 
       $new_item->save();
@@ -155,9 +164,11 @@ class AddHTMLForm extends FormBase {
         'format' => $form_state->getValue('body')['format'],
       ]);
       $html->set('title', $form_state->getValue('title'));
-
+      $html->set('status', $form_state->getValue('published') == '0');
       $html->save();
 
+      $current_item->set('title', $form_state->getValue('title'));
+      $current_item->set('status', $form_state->getValue('published') == '0');
       $current_item->set('changed', \Drupal::time()->getRequestTime());
       $current_item->save();
     }

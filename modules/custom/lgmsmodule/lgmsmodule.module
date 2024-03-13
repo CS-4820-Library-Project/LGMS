@@ -313,9 +313,17 @@ function lgmsmodule_refresh_cache(NodeInterface $node): void
 
 function build_item(EntityInterface $entity, EntityInterface $box, EntityInterface $item): array
 {
+  $unpublished_class = '';
+  if(!$item->isPublished()){
+    if(!\Drupal::currentUser()->isAuthenticated()){
+      return [];
+    }
+    $unpublished_class = 'node--unpublished';
+  }
+
   $item_container = [
     '#type' => 'container',
-    '#attributes' => ['class' => ['guide-item']],
+    '#attributes' => ['class' => ['guide-item ' . $unpublished_class]],
   ];
 
   $edit_route = '';
@@ -324,7 +332,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
     $html = $item->get('field_html_item')->entity;
 
-    $item_container['content'] = [
+    $item_container['content'][] = [
       '#type' => 'processed_text',
       '#text' => $html->get('field_text_box_item2')->value,
       '#format' => $html->get('field_text_box_item2')->format,
@@ -763,6 +771,7 @@ function lgmsModule_install(): void
   createContentType('sub_page', 'Sub Page');
   createContentType('guide_item', 'Guide Box Item');
   createContentType('guide_html_item', 'HTML Box Item');
+  createContentType('guide_database_item', 'Database Box Item');
 
   // Create a new Guide Type taxonomy.
   create_vocab('LGMS_Guide_Type', 'Guide Type', 'Use Guide Type to group guides by their type');
@@ -1243,6 +1252,7 @@ function lgmsModule_install(): void
     1
   );
 
+//guide_database_item
   // Disable the display of author and date information for guide, guide_page and guide_box.
   disable_field('guide', 'display_submitted');
   disable_field('guide_page', 'display_submitted');
