@@ -1,0 +1,7 @@
+lgmsmodule.settings:
+  type: config_object
+  label: 'LGMS Module settings'
+  mapping:
+    proxy_prefix:
+      type: string
+      label: 'Proxy Link Prefix'

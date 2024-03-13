@@ -28,6 +28,10 @@ class CreateGuidePageForm extends FormBase
     ];
 
     // Load the current guide node.
+    $form['current_guide'] = [
+      '#type' => 'hidden',
+      '#value' => $current_guide_id,
+    ];
     $current_guide_node = Node::load($current_guide_id);
 
     // Check if the guide node exists.
@@ -109,7 +113,7 @@ class CreateGuidePageForm extends FormBase
       return $response;
     }
 
-    $current_guide_id = \Drupal::request()->query->get('current_guide');
+    $current_guide_id = $form_state->getValue('current_guide');
 
     // Load the current guide node.
     $current_guide_node = Node::load($current_guide_id);
@@ -150,7 +154,7 @@ class CreateGuidePageForm extends FormBase
       // Redirect to the new guide page.
     } else {
       // If the guide node does not exist, display an error message and redirect.
-      \Drupal::messenger()->addError($this->t('The guide page could not be associated with a guide.'));
+      \Drupal::messenger()->addError($this->t('The guide page could not be associated with a guide.'. $current_guide_id));
       $response->addCommand(new CloseModalDialogCommand());
       // Redirect to a default route such as the front page
 

@@ -131,9 +131,15 @@ class OwnerBlockForm extends FormBase {
 
     if ($user) {
       // Update fields based on the form inputs
-      $user->field_first_name->value = $form_state->getValue('first_name');
-      $user->field_last_name->value = $form_state->getValue('last_name');
-      $user->field_phone_number->value = $form_state->getValue('phone_number');
+      if ($user->hasField('field_first_name')){
+        $user->field_first_name->value = $form_state->getValue('first_name');
+      }
+      if ($user->hasField('field_last_name')){
+        $user->field_last_name->value = $form_state->getValue('last_name');
+      }
+      if ($user->hasField('field_phone_number')){
+        $user->field_phone_number->value = $form_state->getValue('phone_number');
+      }
       $new_email = $form_state->getValue('email');
       // Check if the email is already taken by another user
       if ($new_email !== $current_email) {

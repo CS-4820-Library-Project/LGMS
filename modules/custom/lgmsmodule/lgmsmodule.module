@@ -414,8 +414,52 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
     // Concatenate the title, a horizontal divider, and the description.
     // The <hr> tag is used as the divider between the title and description.
-    $build['header'] = [
-      '#markup' => "<h2><strong>$title</strong></h2><hr><p>{$description}</p>",
+    $build['guide_desc'][] = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['guide-box-2container']],
+      'title_wrapper' => [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#attributes' => [
+          'class' => ['title-edit2-wrapper'],
+        ],
+        'title' => [
+          '#type' => 'html_tag',
+          '#tag' => 'h3',
+          '#value' => '<h2><strong>'.$title . '</h2></strong>',
+          '#attributes' => ['class' => ['guide-box-title']],
+        ],
+        'icons' => $entity->getType() == 'guide'?[
+          '#type' => 'html_tag',
+          '#tag' => 'div',
+          '#attributes' => [
+            'class' => ['icons-container'],
+          ],
+          're_order_icon' => [
+            '#type' => 'link',
+            '#title' => [
+              '#type' => 'html_tag',
+              '#tag' => 'i',
+              '#attributes' => [
+                'class' => ['fa', 'fa-print',],
+              ],
+            ],
+            '#url' => Url::fromRoute('re_order_guide_box.form', [], ['query' => ['current_node' => $entity->id()]]),
+            '#attributes' => [
+              'class' => ['use-ajax'],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => Json::encode(['width' => 800]),
+              'title' => 'Print Guide',
+              'style' => 'text-decoration: none;',
+            ],
+          ],
+        ]: [],
+      ],
+      // Define the body using a recognized structure for adding content.
+      'body' => [
+        '#type' => 'markup',
+        '#markup' => '<hr>'.$description, // Ensure $description contains safe HTML if it includes user input
+      ],
     ];
 
     $build['boxes']['#attached']['library'][] = 'lgmsmodule/fontawesome';
@@ -634,6 +678,9 @@ function createBoxButton($node): array
  */
 function lgmsModule_install(): void
 {
+  \Drupal::configFactory()->getEditable('lgmsmodule.settings')
+    ->set('proxy_prefix', 'default_prefix')
+    ->save();
 
   // Get the default theme.
   $default_theme = \Drupal::config('system.theme')->get('default');

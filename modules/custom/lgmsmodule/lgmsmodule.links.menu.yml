@@ -1,0 +1,5 @@
+lgmsmodule.admin.config.system.lgmsmodule:
+  title: 'LGMS'
+  description: 'Configure LGMS specific site settings.'
+  parent: system.admin_config_system
+  route_name: lgmsmodule.admin.config.system.lgmsmodule
