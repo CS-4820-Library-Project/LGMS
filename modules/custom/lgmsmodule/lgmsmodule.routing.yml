@@ -150,3 +150,13 @@ lgmsmodule.popup_modal:
   requirements:
     _permission: 'access content'
 
+lgmsmodule.owner_block_form:
+  path: '/lgmsmodule/form'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\OwnerBlockForm'
+    _title: 'Edit Profile Information'
+  requirements:
+    _permission: 'access content'
+
+
+

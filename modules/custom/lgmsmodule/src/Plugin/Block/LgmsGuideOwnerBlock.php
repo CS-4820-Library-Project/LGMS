@@ -10,6 +10,7 @@ use Drupal\Core\Link;
 use Drupal\Component\Serialization\Json;
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  *
@@ -28,6 +29,7 @@ class LgmsGuideOwnerBlock extends BlockBase {
   public function build() {
     $build = [];
     $node = \Drupal::routeMatch()->getParameter('node');
+    $current_user = \Drupal::currentUser();
 
     if (true) {
 
@@ -64,19 +66,26 @@ class LgmsGuideOwnerBlock extends BlockBase {
         '#attributes' => ['class' => ['author-info']],
       ];
 
-      // Add the profile picture to the author_info container if available.
-      if ($user_picture) {
+      // Add the profile picture to the author_info container if available and configured to show.
+      if ($this->configuration['show_user_picture'] && $author->user_picture && !$author->user_picture->isEmpty()) {
+        $user_picture = $author->user_picture->entity->getFileUri();
         $build['author_info']['picture'] = [
           '#theme' => 'image',
           '#uri' => $user_picture,
-          '#attributes' => ['alt' => $this->t("@name's profile picture", ['@name' => $name])],
-          '#style' => ['width' => '100px'], // Example to control size, adjust as needed.
+          '#attributes' => ['alt' => $this->t("@name's profile picture", ['@name' => $author->getDisplayName()])],
+          '#style' => ['width' => '100px'], // Adjust size as needed.
         ];
       }
 
-      $author_details_markup = "<p><strong>Name:</strong> {$first_name} {$last_name} ({$name})</p>";
-      $author_details_markup .= "<p><strong>Email:</strong> <a href='mailto:{$email}'>{$email}</a></p>";
-      $author_details_markup .= "<p><strong>Phone:</strong> {$phone_number_clickable}</p>";
+      $author_details_markup = "<p><strong>Name:</strong> {$first_name} {$last_name}</p>";
+
+      if ($this->configuration['show_email']) {
+        $author_details_markup .= "<p><strong>Email:</strong> <a href='mailto:{$email}'>{$email}</a></p>";
+      }
+
+      if ($this->configuration['show_phone']) {
+        $author_details_markup .= "<p><strong>Phone:</strong> {$phone_number_clickable}</p>";
+      }
 
       // Fetch and prepare subjects.
       $subjects = [];
@@ -100,20 +109,53 @@ class LgmsGuideOwnerBlock extends BlockBase {
       }
 
       // Add subjects to the markup if available.
-      if (!empty($subjects)) {
-        $author_details_markup .= "<p><strong>Subjects:</strong></p><ul>";
+      $subjectsMarkup = '';
+      if ($this->configuration['show_subjects'] && !empty($subjects)) {
+        $subjectsMarkup .= "<p><strong>Subjects:</strong></p><ul>";
         foreach ($subjects as $subject) {
-          $author_details_markup .= "<li>{$subject}</li>";
+          $subjectsMarkup .= "<li>{$subject}</li>";
         }
-        $author_details_markup .= "</ul>";
+        $subjectsMarkup .= "</ul>";
       }
+
+      // Adjust where you include $subjectsMarkup in your final build array as needed.
+      $author_details_markup .= $subjectsMarkup;
 
       // Include the combined markup and subjects in the build.
       $build['author_info']['details'] = [
         '#markup' => $author_details_markup,
       ];
-    }
 
+      // Check if there's body content configured and add it to the block build array
+      if (!empty($this->configuration['body']['value'])) {
+        $build['body'] = [
+          '#type' => 'processed_text',
+          '#text' => $this->configuration['body']['value'],
+          '#format' => $this->configuration['body']['format'],
+        ];
+      }
+
+      if ($current_user->isAuthenticated()) {
+        // Get the current URL
+        $current_url = \Drupal\Core\Url::fromRoute('<current>');
+        $destination = $current_url->toString();
+        $modal_form_url = \Drupal\Core\Url::fromRoute('lgmsmodule.owner_block_form', [], ['query' => ['destination' => $destination]]);
+
+        $build['link_to_modal_form'] = [
+          '#type' => 'link',
+          '#title' => $this->t('Edit Profile Information'),
+          '#url' => $modal_form_url,
+          '#attributes' => [
+            'class' => ['use-ajax', 'button'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => \Drupal\Component\Serialization\Json::encode(['width' => 700]),
+          ],
+        ];
+      }
+
+      $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
+
+    }
     return $build;
   }
 
@@ -152,8 +194,6 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $phone_number_raw;
   }
 
-
-
   public function getCurrentGuideId()
   {
     $current_node = \Drupal::routeMatch()->getParameter('node');
@@ -171,6 +211,68 @@ class LgmsGuideOwnerBlock extends BlockBase {
   public function getCacheMaxAge() {
     // Disable caching for this block.
     return 0;
+  }
+
+  public function blockForm($form, FormStateInterface $form_state) {
+    $form = parent::blockForm($form, $form_state);
+
+    $form['show_user_picture'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show User Picture'),
+      '#default_value' => $this->configuration['show_user_picture'],
+    ];
+
+    // Add a checkbox to toggle the visibility of the email address
+    $form['show_email'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show Email'),
+      '#default_value' => $this->configuration['show_email'] ?? TRUE,
+    ];
+
+    // Add a checkbox to control the visibility of the phone number.
+    $form['show_phone'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show Phone Number'),
+      '#default_value' => $this->configuration['show_phone'],
+    ];
+
+    $form['show_subjects'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show Subjects'),
+      '#default_value' => $this->configuration['show_subjects'],
+    ];
+
+    $form['body'] = [
+      '#type' => 'text_format',
+      '#title' => $this->t('Body'),
+      '#default_value' => $this->configuration['body']['value'] ?? '',
+      '#format' => $this->configuration['body']['format'] ?? 'basic_html',
+      '#description' => $this->t('Add optional body content. This will be displayed in the block.'),
+    ];
+
+    return $form;
+  }
+
+  public function blockSubmit($form, FormStateInterface $form_state) {
+    parent::blockSubmit($form, $form_state);
+    $this->configuration['show_user_picture'] = $form_state->getValue('show_user_picture');
+    $this->configuration['show_email'] = $form_state->getValue('show_email');
+    $this->configuration['show_phone'] = $form_state->getValue('show_phone');
+    $this->configuration['show_subjects'] = $form_state->getValue('show_subjects');
+    $this->configuration['body'] = $form_state->getValue('body');
+  }
+
+  public function defaultConfiguration() {
+    return parent::defaultConfiguration() + [
+        'show_email' => TRUE, // Default value to show the email
+        'show_phone' => TRUE,
+        'show_subjects' => TRUE,
+        'show_user_picture' => TRUE,
+        'body' => [
+          'value' => '',
+          'format' => 'basic_html',
+        ],
+      ];
   }
 }
 
