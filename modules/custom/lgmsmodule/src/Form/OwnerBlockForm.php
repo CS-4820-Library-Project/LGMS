@@ -24,41 +24,50 @@ class OwnerBlockForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state): array
-  {
-    $user = User::load(\Drupal::currentUser()->id());
-    $destination = \Drupal::request()->get('destination');
+  public function buildForm(array $form, FormStateInterface $form_state): array {
+    $user = $this->getCurrentUser();
+    $destination = $this->getCurrentDestination();
 
-    $form['first_name'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('First Name'),
-      '#default_value' => $user->field_first_name->value ?? '',
-      '#required' => FALSE,
+    $this->addUserFields($form, $user);
+    $this->addUserPictureField($form, $user);
+    $this->addBodyField($form);
+    $this->addHiddenDestinationField($form, $destination);
+    $this->addActionButtons($form);
+
+    $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
+
+    return $form;
+  }
+
+  protected function getCurrentUser() {
+    return User::load(\Drupal::currentUser()->id());
+  }
+
+  protected function getCurrentDestination() {
+    return \Drupal::request()->get('destination');
+  }
+
+  protected function addUserFields(array &$form, $user): void {
+    $fields = [
+      'first_name' => 'First Name',
+      'last_name' => 'Last Name',
+      'email' => 'Email',
+      'phone_number' => 'Phone Number',
     ];
 
-    $form['last_name'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Last Name'),
-      '#default_value' => $user->field_last_name->value ?? '',
-      '#required' => FALSE,
-    ];
+    foreach ($fields as $fieldName => $fieldTitle) {
+      $formFieldType = $fieldName === 'email' ? 'email' : 'textfield';
+      $defaultValue = $fieldName === 'email' ? $user->getEmail() : $user->{'field_' . $fieldName}->value ?? '';
+      $form[$fieldName] = [
+        '#type' => $formFieldType,
+        '#title' => $this->t($fieldTitle),
+        '#default_value' => $defaultValue,
+        '#required' => FALSE,
+      ];
+    }
+  }
 
-    $form['email'] = [
-      '#type' => 'email',
-      '#title' => $this->t('Email'),
-      '#default_value' => $user->getEmail(),
-      '#required' => FALSE,
-    ];
-
-    // Include other fields as needed, similar to the phone number field
-    $form['phone_number'] = [
-      '#type' => 'tel',
-      '#title' => $this->t('Phone Number'),
-      '#default_value' => $user->field_phone_number->value ?? '',
-      '#required' => FALSE, // Set to FALSE if not all users have a phone number
-    ];
-
-    // For user picture, use a managed_file type field
+  protected function addUserPictureField(array &$form, $user): void {
     $form['user_picture'] = [
       '#type' => 'managed_file',
       '#title' => $this->t('User Picture'),
@@ -70,25 +79,28 @@ class OwnerBlockForm extends FormBase {
       '#required' => FALSE,
       '#description' => $this->t('Allowed extensions: png jpg jpeg'),
     ];
+  }
 
-    $form['destination'] = [
-      '#type' => 'hidden',
-      '#value' => $destination,
-    ];
-
-    // Load the block configuration
-    $block = Block::load('lgmsguideownerblock'); // Replace with your actual block ID
+  protected function addBodyField(array &$form): void {
+    $block = Block::load('lgmsguideownerblock');
     $body = $block ? $block->get('settings')['body'] : ['value' => '', 'format' => 'basic_html'];
 
-    // Pre-populate the body field with the content from the block configuration
     $form['body'] = [
       '#type' => 'text_format',
       '#title' => $this->t('Body'),
       '#default_value' => $body['value'],
       '#description' => $this->t('Add optional body content. This will be displayed in the block.'),
     ];
+  }
 
-    // Action buttons
+  protected function addHiddenDestinationField(array &$form, $destination): void {
+    $form['destination'] = [
+      '#type' => 'hidden',
+      '#value' => $destination,
+    ];
+  }
+
+  protected function addActionButtons(array &$form): void {
     $form['actions'] = [
       '#type' => 'actions',
     ];
@@ -107,88 +119,88 @@ class OwnerBlockForm extends FormBase {
       ],
       '#limit_validation_errors' => [],
     ];
-
-    $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
-
-    return $form;
   }
 
-  public function closeModalForm(array &$form, FormStateInterface $form_state): AjaxResponse
-  {
+  public function closeModalForm(array &$form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
     $response->addCommand(new CloseModalDialogCommand());
     return $response;
   }
 
+
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state): void
-  {
-    $user = User::load(\Drupal::currentUser()->id());
-    $current_email = $user->getEmail();
-    $block_id = 'lgmsguideownerblock';
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
+    $user = $this->getCurrentUser();
+    if (!$user) {
+      return;
+    }
 
-    if ($user) {
-      // Update fields based on the form inputs
-      if ($user->hasField('field_first_name')){
-        $user->field_first_name->value = $form_state->getValue('first_name');
-      }
-      if ($user->hasField('field_last_name')){
-        $user->field_last_name->value = $form_state->getValue('last_name');
-      }
-      if ($user->hasField('field_phone_number')){
-        $user->field_phone_number->value = $form_state->getValue('phone_number');
-      }
-      $new_email = $form_state->getValue('email');
-      // Check if the email is already taken by another user
-      if ($new_email !== $current_email) {
-        // If the email has changed, check if the new email is already in use.
-        $accounts_with_email = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['mail' => $new_email]);
+    $this->updateUserFields($user, $form_state);
+    $this->updateUserEmail($user, $form_state);
+    $this->handleUserPicture($user, $form_state);
+    $this->updateBlockConfiguration($form_state);
 
-        // Since the current user already has this email, ensure we're not counting them as a duplicate.
-        if ($accounts_with_email && !isset($accounts_with_email[$user->id()])) {
-          \Drupal::messenger()->addError($this->t('The email address is already in use.'));
-          return;
-        } else {
-          // If the email isn't used by another account, update the user's email.
-          $user->setEmail($new_email);
-        }
-      }
+    $user->save();
+    \Drupal::messenger()->addMessage($this->t('Information updated successfully.'));
+    $this->redirectTo($form_state);
+  }
 
-      // Handle user picture file
-      $picture_fid = $form_state->getValue(['user_picture', 0]);
-      if ($picture_fid) {
-        // Set file as permanent and save
-        $file = File::load($picture_fid);
+  protected function updateUserFields(User $user, FormStateInterface $form_state): void {
+    $fieldsToUpdate = ['field_first_name', 'field_last_name', 'field_phone_number'];
+    foreach ($fieldsToUpdate as $field) {
+      if ($user->hasField($field)) {
+        $user->$field->value = $form_state->getValue(str_replace('field_', '', $field));
+      }
+    }
+  }
+
+  protected function updateUserEmail(User $user, FormStateInterface $form_state): void {
+    $new_email = $form_state->getValue('email');
+    if ($new_email && $new_email !== $user->getEmail()) {
+      if ($this->isEmailInUse($new_email, $user->id())) {
+        \Drupal::messenger()->addError($this->t('The email address is already in use.'));
+      } else {
+        $user->setEmail($new_email);
+      }
+    }
+  }
+
+  protected function isEmailInUse(string $email, int $excludeUserId = null): bool {
+    $accounts_with_email = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['mail' => $email]);
+    if ($excludeUserId) {
+      unset($accounts_with_email[$excludeUserId]);
+    }
+    return !empty($accounts_with_email);
+  }
+
+  protected function handleUserPicture(User $user, FormStateInterface $form_state): void {
+    $picture_fid = $form_state->getValue(['user_picture', 0]);
+    if ($picture_fid) {
+      $file = File::load($picture_fid);
+      if ($file) {
         $file->setPermanent();
         $file->save();
-
         $user->user_picture->target_id = $picture_fid;
       }
+    }
+  }
 
+  protected function updateBlockConfiguration(FormStateInterface $form_state): void {
+    $block_id = 'lgmsguideownerblock';
+    $block = Block::load($block_id);
+    if ($block) {
+      $body = $form_state->getValue('body');
+      $block->set('settings', ['body' => $body] + $block->get('settings'));
+      $block->save();
+    }
+  }
 
-      // Load the block configuration.
-      $block = Block::load($block_id);
-      if ($block) {
-        // Get the submitted body value and format
-        $body = $form_state->getValue('body');
-
-        // Update the block configuration with the new body content
-        $block->set('settings', ['body' => $body] + $block->get('settings'));
-
-        // Save the block configuration
-        $block->save();
-      }
-
-      $user->save();
-      \Drupal::messenger()->addMessage($this->t('Information updated successfully.'));
-
-      // Page refresh
-      $destination = $form_state->getValue('destination');
-      if ($destination) {
-        $form_state->setRedirectUrl(Url::fromUri("internal:" . $destination));
-      }
+  protected function redirectTo(FormStateInterface $form_state): void {
+    $destination = $form_state->getValue('destination');
+    if ($destination) {
+      $form_state->setRedirectUrl(Url::fromUri("internal:" . $destination));
     }
   }
 }

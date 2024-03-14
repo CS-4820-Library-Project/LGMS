@@ -26,7 +26,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array
+  {
     $build = [];
     $node = \Drupal::routeMatch()->getParameter('node');
     $current_user = \Drupal::currentUser();
@@ -101,7 +102,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $build;
   }
 
-  private function fetchSubjectsMarkup($node) {
+  private function fetchSubjectsMarkup($node): string
+  {
     $subjects = [];
     // Fetch subjects based on node type and bundle.
     if ($node->bundle() === 'guide') {
@@ -124,7 +126,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $subjectsMarkup;
   }
 
-  private function extractSubjects($entity, $field_name) {
+  private function extractSubjects($entity, $field_name): array
+  {
     $subjects = [];
     if (!$entity->get($field_name)->isEmpty()) {
       foreach ($entity->get($field_name)->referencedEntities() as $term) {
@@ -134,7 +137,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $subjects;
   }
 
-  private function addEditProfileLink() {
+  private function addEditProfileLink(): array
+  {
     $current_url = \Drupal\Core\Url::fromRoute('<current>');
     $destination = $current_url->toString();
     $modal_form_url = \Drupal\Core\Url::fromRoute('lgmsmodule.owner_block_form', [], ['query' => ['destination' => $destination]]);
@@ -160,7 +164,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
    * @param string $phone_number_formatted The formatted phone number.
    * @return string The clickable phone number link.
    */
-  protected function makePhoneNumberClickable($phone_number_raw, $phone_number_formatted) {
+  protected function makePhoneNumberClickable($phone_number_raw, $phone_number_formatted): string
+  {
     // Remove any non-numeric characters for the href attribute.
     $digits = preg_replace('/\D+/', '', $phone_number_raw);
 
@@ -175,7 +180,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
    * @param string $phone_number_raw The raw phone number.
    * @return string The formatted phone number.
    */
-  protected function formatPhoneNumber($phone_number_raw) {
+  protected function formatPhoneNumber($phone_number_raw): string
+  {
     // Remove any non-numeric characters from the phone number.
     $digits = preg_replace('/\D+/', '', $phone_number_raw);
 
@@ -202,12 +208,14 @@ class LgmsGuideOwnerBlock extends BlockBase {
     }
     return NULL;
   }
-  public function getCacheMaxAge() {
+  public function getCacheMaxAge(): int
+  {
     // Disable caching for this block.
     return 0;
   }
 
-  public function blockForm($form, FormStateInterface $form_state) {
+  public function blockForm($form, FormStateInterface $form_state): array
+  {
     $form = parent::blockForm($form, $form_state);
 
     $form['show_user_picture'] = [
@@ -247,7 +255,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $form;
   }
 
-  public function blockSubmit($form, FormStateInterface $form_state) {
+  public function blockSubmit($form, FormStateInterface $form_state): void
+  {
     parent::blockSubmit($form, $form_state);
     $this->configuration['show_user_picture'] = $form_state->getValue('show_user_picture');
     $this->configuration['show_email'] = $form_state->getValue('show_email');
@@ -256,9 +265,10 @@ class LgmsGuideOwnerBlock extends BlockBase {
     $this->configuration['body'] = $form_state->getValue('body');
   }
 
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array
+  {
     return parent::defaultConfiguration() + [
-        'show_email' => TRUE, // Default value to show the email
+        'show_email' => TRUE,
         'show_phone' => TRUE,
         'show_subjects' => TRUE,
         'show_user_picture' => TRUE,
