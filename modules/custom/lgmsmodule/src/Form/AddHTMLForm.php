@@ -75,7 +75,7 @@ class AddHTMLForm extends FormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Draft mode:'),
       '#description' => $this->t('Un-check this box to publish.'),
-      '#default_value' => $current_item->isPublished() == '0',
+      '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
     ];
 
 
