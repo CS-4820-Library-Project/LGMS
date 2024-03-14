@@ -5,6 +5,7 @@ namespace Drupal\lgmsmodule\Form;
 use Drupal\block\Entity\Block;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -48,34 +49,59 @@ class OwnerBlockForm extends FormBase {
   }
 
   protected function addUserFields(array &$form, $user): void {
-    $fields = [
-      'first_name' => 'First Name',
-      'last_name' => 'Last Name',
-      'email' => 'Email',
-      'phone_number' => 'Phone Number',
+    // First Name
+    if ($user->hasField('field_lgms_first_name')) {
+      $form['field_lgms_first_name'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('First Name'),
+        '#default_value' => $user->get('field_lgms_first_name')->value ?? '',
+        '#required' => FALSE,
+      ];
+    }
+
+    // Last Name
+    if ($user->hasField('field_lgms_last_name')) {
+      $form['field_lgms_last_name'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Last Name'),
+        '#default_value' => $user->get('field_lgms_last_name')->value ?? '',
+        '#required' => FALSE,
+      ];
+    }
+
+    // Email
+    $form['mail'] = [
+      '#type' => 'email',
+      '#title' => $this->t('Email'),
+      '#default_value' => $user->getEmail(),
+      '#required' => FALSE,
     ];
 
-    foreach ($fields as $fieldName => $fieldTitle) {
-      $formFieldType = $fieldName === 'email' ? 'email' : 'textfield';
-      $defaultValue = $fieldName === 'email' ? $user->getEmail() : $user->{'field_' . $fieldName}->value ?? '';
-      $form[$fieldName] = [
-        '#type' => $formFieldType,
-        '#title' => $this->t($fieldTitle),
-        '#default_value' => $defaultValue,
+    // Phone Number
+    if ($user->hasField('field_lgms_phone_number')) {
+      $form['field_lgms_phone_number'] = [
+        '#type' => 'tel',
+        '#title' => $this->t('Phone Number'),
+        '#default_value' => $user->get('field_lgms_phone_number')->value ?? '',
         '#required' => FALSE,
       ];
     }
   }
 
   protected function addUserPictureField(array &$form, $user): void {
-    $form['user_picture'] = [
+    // Assuming 'field_lgms_user_picture' is your custom user image field.
+    // Debugging line; use kint() or dpm() if Devel module is installed or check Drupal logs.
+    \Drupal::logger('lgmsmodule')->notice('Current user picture target_id: @id', ['@id' => $user->field_lgms_user_picture->target_id]);
+
+
+    $form['field_lgms_user_picture'] = [
       '#type' => 'managed_file',
       '#title' => $this->t('User Picture'),
       '#upload_location' => 'public://profile_pictures/',
       '#upload_validators' => [
         'file_validate_extensions' => ['png jpg jpeg'],
       ],
-      '#default_value' => $user->user_picture->target_id ? [$user->user_picture->target_id] : NULL,
+      '#default_value' => $user->field_lgms_user_picture->target_id ? [$user->field_lgms_user_picture->target_id] : NULL,
       '#required' => FALSE,
       '#description' => $this->t('Allowed extensions: png jpg jpeg'),
     ];
@@ -130,6 +156,7 @@ class OwnerBlockForm extends FormBase {
 
   /**
    * {@inheritdoc}
+   * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     $user = $this->getCurrentUser();
@@ -137,18 +164,54 @@ class OwnerBlockForm extends FormBase {
       return;
     }
 
-    $this->updateUserFields($user, $form_state);
-    $this->updateUserEmail($user, $form_state);
+    // Handle standard fields first, including the email update, assuming validation has passed.
+    $fieldsToUpdate = [
+      'field_lgms_first_name' => $form_state->getValue('field_lgms_first_name'),
+      'field_lgms_last_name' => $form_state->getValue('field_lgms_last_name'),
+      'field_lgms_phone_number' => $form_state->getValue('field_lgms_phone_number'),
+      'mail' => $form_state->getValue('mail'), // Directly update as validation ensures uniqueness.
+    ];
+
+    foreach ($fieldsToUpdate as $fieldName => $value) {
+      if ($user->hasField($fieldName)) {
+        $user->set($fieldName, $value);
+      }
+    }
+
     $this->handleUserPicture($user, $form_state);
     $this->updateBlockConfiguration($form_state);
-
     $user->save();
-    \Drupal::messenger()->addMessage($this->t('Information updated successfully.'));
-    $this->redirectTo($form_state);
+    \Drupal::messenger()->addMessage($this->t('User information updated successfully.'));
   }
 
+
+  /**
+   * Validates the form before submission.
+   *
+   * @param array $form
+   *   The form definition array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state): void
+  {
+    parent::validateForm($form, $form_state);
+
+    // Validate the email field.
+    $newEmail = $form_state->getValue('mail');
+    $user = $this->getCurrentUser();
+
+    // Check if the email is different from the current user's email and if it's already in use.
+    if ($newEmail && $newEmail !== $user->getEmail() && $this->isEmailInUse($newEmail, $user->id())) {
+      // Set an error on the 'mail' form element if the email is already in use.
+      $form_state->setErrorByName('mail', $this->t('The email address is already in use.'));
+    }
+  }
+
+
+
   protected function updateUserFields(User $user, FormStateInterface $form_state): void {
-    $fieldsToUpdate = ['field_first_name', 'field_last_name', 'field_phone_number'];
+    $fieldsToUpdate = ['field_lgms_first_name', 'field_lgms_last_name', 'field_lgms_phone_number'];
     foreach ($fieldsToUpdate as $field) {
       if ($user->hasField($field)) {
         $user->$field->value = $form_state->getValue(str_replace('field_', '', $field));
@@ -176,16 +239,20 @@ class OwnerBlockForm extends FormBase {
   }
 
   protected function handleUserPicture(User $user, FormStateInterface $form_state): void {
-    $picture_fid = $form_state->getValue(['user_picture', 0]);
-    if ($picture_fid) {
+    $picture_fid = $form_state->getValue(['field_lgms_user_picture', 0]);
+    if (!empty($picture_fid)) {
       $file = File::load($picture_fid);
       if ($file) {
         $file->setPermanent();
         $file->save();
-        $user->user_picture->target_id = $picture_fid;
+        // Ensure file usage is recorded to prevent the file from being deleted.
+        \Drupal::service('file.usage')->add($file, 'lgmsmodule', 'user', $user->id());
+        $user->set('field_lgms_user_picture', $picture_fid);
       }
     }
   }
+
+
 
   protected function updateBlockConfiguration(FormStateInterface $form_state): void {
     $block_id = 'lgmsguideownerblock';

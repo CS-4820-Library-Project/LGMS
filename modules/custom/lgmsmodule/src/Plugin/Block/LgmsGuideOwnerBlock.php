@@ -40,13 +40,22 @@ class LgmsGuideOwnerBlock extends BlockBase {
     $email = $author->getEmail();
 
     // Check for first name, last name, and phone number fields and format accordingly.
-    if($author->hasField('field_first_name')){
-      $first_name = $author->get('field_first_name')->value;
-      $last_name = $author->get('field_last_name')->value;
-      $phone_number_raw = $author->get('field_phone_number')->value;
-      $phone_number_formatted = $this->formatPhoneNumber($phone_number_raw);
-      $phone_number_clickable = $this->makePhoneNumberClickable($phone_number_raw, $phone_number_formatted);
+    if($author->hasField('field_lgms_first_name')){
+      $first_name = $author->get('field_lgms_first_name')->value;
+      $last_name = $author->get('field_lgms_last_name')->value;
+      $phone_number_raw = $author->get('field_lgms_phone_number')->value;
+
+      // Initialize variables to avoid undefined variable errors.
+      $phone_number_formatted = '';
+      $phone_number_clickable = '';
+
+      // Only format and make the phone number clickable if it's not empty.
+      if (!empty($phone_number_raw)) {
+        $phone_number_formatted = $this->formatPhoneNumber($phone_number_raw);
+        $phone_number_clickable = $this->makePhoneNumberClickable($phone_number_raw, $phone_number_formatted);
+      }
     }
+
 
     // Set the title using the first name.
     $build['#title'] = $first_name . "'s Contact Information";
@@ -56,18 +65,20 @@ class LgmsGuideOwnerBlock extends BlockBase {
       '#type' => 'container',
       '#attributes' => ['class' => ['author-info']],
     ];
-    if ($this->configuration['show_user_picture'] && $author->user_picture && !$author->user_picture->isEmpty()) {
-      $user_picture_uri = $author->user_picture->entity->getFileUri();
-      $build['author_info']['picture'] = [
-        '#theme' => 'image',
-        '#uri' => $user_picture_uri,
-        '#attributes' => ['alt' => $this->t("@name's profile picture", ['@name' => $author->getDisplayName()])],
-        '#style' => ['width' => '100px'],
-      ];
+    if ($this->configuration['show_user_picture'] && $author->hasField('field_lgms_user_picture') && !$author->get('field_lgms_user_picture')->isEmpty()) {
+      $user_picture_file = $author->get('field_lgms_user_picture')->entity;
+      if ($user_picture_file) {
+        $user_picture_uri = $user_picture_file->getFileUri();
+        $build['author_info']['picture'] = [
+          '#theme' => 'image',
+          '#uri' => $user_picture_uri,
+          '#attributes' => ['alt' => $this->t("@name's profile picture", ['@name' => $author->getDisplayName()])],
+        ];
+      }
     }
 
     // Construct the author details markup.
-    $author_details_markup = "<p style='margin-left: 20px; !important'><strong>Name:</strong> {$first_name} {$last_name}</p>";
+    $author_details_markup = "<p><strong>Name:</strong> {$first_name} {$last_name}</p>";
     if ($this->configuration['show_email']) {
       $author_details_markup .= "<p><strong>Email:</strong> <a href='mailto:{$email}'>{$email}</a></p>";
     }
@@ -182,6 +193,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
    */
   protected function formatPhoneNumber($phone_number_raw): string
   {
+    \Drupal::logger('lgmsmodule')->notice('Phone number raw: @number', ['@number' => $phone_number_raw]);
+
     // Remove any non-numeric characters from the phone number.
     $digits = preg_replace('/\D+/', '', $phone_number_raw);
 

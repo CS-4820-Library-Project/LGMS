@@ -1437,6 +1437,75 @@ function lgmsModule_install(): void
     ''
   );
 
+  // First Name
+  createField(
+    'field_lgms_first_name',
+    'user',
+    'user',
+    'First Name',
+    'string',
+    [],
+    [],
+    'string_textfield',
+    ['size' => 20],
+    TRUE,
+    FALSE,
+    1,
+    'The user\'s first name.'
+  );
+
+  // Last Name
+  createField(
+    'field_lgms_last_name',
+    'user',
+    'user',
+    'Last Name',
+    'string',
+    [],
+    [],
+    'string_textfield',
+    ['size' => 20],
+    TRUE,
+    FALSE,
+    2,
+    'The user\'s last name.'
+  );
+
+  // Phone Number
+  createField(
+    'field_lgms_phone_number',
+    'user',
+    'user',
+    'Phone Number',
+    'string',
+    [],
+    [],
+    'string_textfield',
+    ['size' => 20],
+    TRUE,
+    FALSE,
+    3,
+    'The user\'s phone number.'
+  );
+
+  // User Picture
+  createField(
+    'field_lgms_user_picture',
+    'user',
+    'user',
+    'User Picture',
+    'image',
+    ['uri_scheme' => 'public', 'file_extensions' => 'png jpg jpeg'],
+    [],
+    'image_image',
+    ['progress_indicator' => 'throbber'],
+    TRUE,
+    FALSE,
+    4,
+    'The user\'s profile picture.'
+  );
+
+
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
   disable_field('guide', 'display_submitted');
@@ -1543,6 +1612,10 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_text_box_item');
   delete_field_storage('field_database_link');
   delete_field_storage('field_database_body');
+  delete_field_storage('field_lgms_first_name');
+  delete_field_storage('field_lgms_last_name');
+  delete_field_storage('field_lgms_phone_number');
+  delete_field_storage('field_lgms_user_picture');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
