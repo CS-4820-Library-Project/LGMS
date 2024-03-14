@@ -7,10 +7,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
-class AddHTMLForm extends FormBase {
+class AddDatabaseForm extends FormBase {
 
   public function getFormId() {
-    return 'add_html_form';
+    return 'add_database_form';
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
@@ -34,6 +34,7 @@ class AddHTMLForm extends FormBase {
     ];
 
     $current_item = \Drupal::request()->query->get('current_item');
+    $database = '';
     $edit = false;
 
     if(!empty($current_item)){
@@ -44,7 +45,7 @@ class AddHTMLForm extends FormBase {
 
       $edit = true;
       $current_item = Node::load($current_item);
-      $current_item = $current_item->get('field_html_item')->entity;
+      $database = $current_item->get('field_database_item')->entity;
     }
 
 
@@ -53,22 +54,35 @@ class AddHTMLForm extends FormBase {
       '#value' => $edit,
     ];
 
-    $form['title'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Item Title:'),
+    $form['database'] = [
+      '#type' => 'entity_autocomplete',
+      '#title' => $this->t('Database Name'),
+      '#target_type' => 'node', // Adjust according to your needs
+      '#selection_settings' => [
+        'target_bundles' => ['guide_database_item'], // Adjust to your guide page bundle
+      ],
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->getTitle(): '',
+      '#default_value' => $edit? $database: '',
+    ];
+
+    $form['body'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use database Body'),
     ];
 
 
     // Body field
-    $form['body'] = [
+    $form['description'] = [
       '#type' => 'text_format',
       '#title' => $this->t('Body'),
       '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
-      '#required' => TRUE,
-      '#default_value' => $edit? $current_item->get('field_text_box_item2')->value: '',
-      '#format' => $edit ? $current_item->get('field_text_box_item2')->format : 'basic_html',
+      '#default_value' => $edit? $current_item->get('field_description')->value: '',
+      '#format' => $edit ? $current_item->get('field_description')->format : 'basic_html',
+      '#states' => [
+        'invisible' => [
+          ':input[name="body"]' => ['checked' => True],
+        ],
+      ],
     ];
 
     $form['published'] = [
@@ -123,30 +137,19 @@ class AddHTMLForm extends FormBase {
       $current_box = $form_state->getValue('current_box');
       $current_box = Node::load($current_box);
 
-      $new_html = Node::create([
-        'type' => 'guide_html_item',
-        'title' => $form_state->getValue('title'),
-        'field_text_box_item2' => [
-          'value' => $form_state->getValue('body')['value'],
-          'format' => $form_state->getValue('body')['format'],
-        ],
-        'status' => $form_state->getValue('published') == '0',
-      ]);
-
-      $new_html->save();
+      $database = $form_state->getValue('database');
+      $database = Node::load($database);
 
       $new_item = Node::create([
         'type' => 'guide_item',
-        'title' => $form_state->getValue('title'),
-        'field_html_item' => $new_html,
+        'title' => $database->label(),
+        'field_database_item' => $database,
         'field_parent_box' => $current_box,
+        'field_description' => $form_state->getValue('body') == '0'? $form_state->getValue('description'): $database->get('field_database_body')->value,
         'status' => $form_state->getValue('published') == '0',
       ]);
 
       $new_item->save();
-
-      $new_html->set('field_parent_item',$new_item);
-      $new_html->save();
 
       $boxList = $current_box->get('field_box_items')->getValue();
       $boxList[] = ['target_id' => $new_item->id()];
@@ -157,18 +160,13 @@ class AddHTMLForm extends FormBase {
       $current_item = $form_state->getValue('current_item');
       $current_item = Node::load($current_item);
 
-      $html = $current_item->get('field_html_item')->entity;
+      $database = $form_state->getValue('database');
+      $database = Node::load($database);
 
-      $html->set('field_text_box_item2', [
-        'value' => $form_state->getValue('body')['value'],
-        'format' => $form_state->getValue('body')['format'],
-      ]);
-      $html->set('title', $form_state->getValue('title'));
-      $html->set('status', $form_state->getValue('published') == '0');
-      $html->save();
 
-      $current_item->set('title', $form_state->getValue('title'));
+      $current_item->set('title', $database->label());
       $current_item->set('status', $form_state->getValue('published') == '0');
+      $current_item->set('field_description', $form_state->getValue('body') == '0'? $form_state->getValue('description'): $database->get('field_database_body')->value);
       $current_item->set('changed', \Drupal::time()->getRequestTime());
       $current_item->save();
     }

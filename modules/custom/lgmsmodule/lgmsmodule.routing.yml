@@ -166,5 +166,26 @@ lgmsmodule.owner_block_form:
   requirements:
     _permission: 'access content'
 
+lgmsmodule.databases:
+  path: '/databases'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDatabasesController::databases'
+    _title: 'Databases'
+  requirements:
+    _permission: 'access content'
 
+add_database.form:
+  path: '/add_database'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\AddDatabaseForm'
+    _title: 'Add Database Box Items'
+  requirements:
+    _permission: 'create guide_item content'
 
+delete_database.form:
+  path: '/delete_database'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\DeleteDatabaseForm'
+    _title: 'Delete Database Box Items'
+  requirements:
+    _permission: 'create guide_item content'

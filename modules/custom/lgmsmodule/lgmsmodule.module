@@ -1,6 +1,8 @@
 <?php
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\lgmsmodule\Controller\landingPageHelper;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
@@ -14,6 +16,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\link\LinkItemInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
@@ -198,7 +201,7 @@ function createContentType($id, $name): void
  * Helper function to create fields.
  * @throws EntityStorageException
  */
-function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $storage_settings, $field_settings, $widget_type, $widget_settings, $status, $cardinal, $field_weight): void
+function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $storage_settings, $field_settings, $widget_type, $widget_settings, $status, $cardinal, $field_weight, $desc): void
 {
   // Create field storage.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
@@ -226,6 +229,9 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
       'label' => $field_name,
       'settings' => $field_settings ?? [],
     ]);
+    if (!empty($desc)){
+      $field->setDescription($desc);
+    }
     $field->save();
 
     // Configure form display.
@@ -327,7 +333,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   ];
 
   $edit_route = '';
-  $delete_route = '';
+  $delete_route = '';//add_database.form
 
   if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
     $html = $item->get('field_html_item')->entity;
@@ -340,6 +346,25 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
 
     $edit_route = 'add_html.form';
     $delete_route = 'delete_html.form';
+  } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
+    $database = $item->get('field_database_item')->entity;
+    $link = $database->get('field_database_link')->first()->getValue();
+
+    $item_container['content'][] = [
+      '#type' => 'link',
+      '#title' => $link['title'],
+      '#url' => Url::fromUri($link['uri']),
+    ];
+
+    $item_container['content'][] = [
+      '#type' => 'markup',
+      '#markup' => $item->get('field_description')->value,
+    ];
+
+
+
+    $edit_route = 'add_database.form';
+    $delete_route = 'delete_database.form';
   }
 
   if($item->access('update')) {
@@ -405,6 +430,36 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
+  if($entity->bundle() === 'guide_database_item' && $view_mode === 'full'){
+    $build['db_title'] = [
+      '#type' => 'markup',
+      '#markup' => t('<h1><strong>'.$entity->label() . '</h1></strong>'),
+    ];
+
+    if (!$entity->get('field_database_link')->isEmpty()) {
+      // Fetch the first item of the field_database_link field
+      $link_item = $entity->get('field_database_link')->first();
+      // Get the URL from the link field
+      $url = $link_item->getUrl()->toString();
+      // Get the link title (text) from the link field, fall back to the URL if the title is empty
+      $link_text = $link_item->title ?: $url;
+
+      $build['db_link'] = [
+        '#type' => 'markup',
+        '#markup' => '<h3><div class="link-icon"><i class="fa fa-link" aria-hidden="true"></i> <a href="' . $url . '">' . $link_text . '</a></div></h3>',
+      ];
+
+    }
+
+    if (!$entity->get('field_database_body')->isEmpty()) {
+      $body_value = $entity->get('field_database_body')->value;
+      $build['db_body'] = [
+        '#type' => 'markup',
+        '#markup' => '<div>' . $body_value . '</div>',
+      ];
+    }
+  }
+
   if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
@@ -508,6 +563,22 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                 '#type' => 'link',
                 '#title' => ('HTML'),
                 '#url' => Url::fromRoute('add_html.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
+                '#attributes' => [
+                  'class' => ['use-ajax'],
+                  'data-dialog-type' => 'modal',
+                  'data-dialog-options' => Json::encode(['width' => 800]),
+                  'title' => 'Re-position Box',
+                  'style' => 'text-decoration: none;',
+                ],
+              ],
+            ],
+            'database_item' => [
+              '#type' => 'html_tag',
+              '#tag' => 'li',
+              'content' => [
+                '#type' => 'link',
+                '#title' => ('Database'),
+                '#url' => Url::fromRoute('add_database.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -687,7 +758,7 @@ function createBoxButton($node): array
 function lgmsModule_install(): void
 {
   \Drupal::configFactory()->getEditable('lgmsmodule.settings')
-    ->set('proxy_prefix', 'default_prefix')
+    ->set('proxy_prefix', 'https://proxy.library.xxx.xx/login?url=')
     ->save();
 
   // Get the default theme.
@@ -862,7 +933,8 @@ function lgmsModule_install(): void
     [],
     False,
     True,
-    3
+    3,
+    ''
   );
 
   createField(
@@ -883,7 +955,8 @@ function lgmsModule_install(): void
     ['weight' => 1],
     False,
     False,
-    4
+    4,
+    ''
   );
 
   createField(
@@ -904,10 +977,11 @@ function lgmsModule_install(): void
     ['weight' => 2],
     False,
     False,
-    5
+    5,
+    ''
   );
 
-  // Guide Description field
+// Guide Description field
   createField(
     'field_description',
     'node',
@@ -920,10 +994,11 @@ function lgmsModule_install(): void
     [],
     False,
     False,
-    2
+    2,
+    ''
   );
 
-  // Add a reference field to Guide content type on Guide Page.
+// Add a reference field to Guide content type on Guide Page.
   createField(
     'field_parent_guide',
     'node',
@@ -942,9 +1017,9 @@ function lgmsModule_install(): void
     [],
     TRUE,
     False,
-    1
+    1,
+    ''
   );
-
 
   createField(
     'field_parent_node',
@@ -966,6 +1041,7 @@ function lgmsModule_install(): void
     TRUE,
     False,
     1,
+    ''
   );
 
   createField(
@@ -987,6 +1063,7 @@ function lgmsModule_install(): void
     TRUE,
     False,
     1,
+    ''
   );
 
   createField(
@@ -1008,6 +1085,7 @@ function lgmsModule_install(): void
     TRUE,
     False,
     1,
+    ''
   );
 
   createField(
@@ -1028,10 +1106,11 @@ function lgmsModule_install(): void
     [],
     TRUE,
     False,
-    1
+    1,
+    ''
   );
 
-  //add page description field
+//add page description field
   createField(
     'field_description',
     'node',
@@ -1044,7 +1123,8 @@ function lgmsModule_install(): void
     ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
     TRUE,
     False,
-    2
+    2,
+    ''
   );
 
   createField(
@@ -1064,7 +1144,9 @@ function lgmsModule_install(): void
     FALSE,
     FALSE,
     10,
+    ''
   );
+
   createField(
     'field_draft_mode',
     'node',
@@ -1081,7 +1163,8 @@ function lgmsModule_install(): void
     ],
     FALSE,
     FALSE,
-    5
+    5,
+    ''
   );
 
   createField(
@@ -1096,10 +1179,27 @@ function lgmsModule_install(): void
     ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
     TRUE,
     False,
-    3
+    3,
+    ''
   );
 
-  // page box children
+  createField(
+    'field_description',
+    'node',
+    'guide_item',
+    'Description',
+    'text_long',
+    [],
+    [],
+    'text_textarea',
+    ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
+    TRUE,
+    False,
+    3,
+    ''
+  );
+
+// page box children
   createField(
     'field_child_boxes',
     'node',
@@ -1121,7 +1221,8 @@ function lgmsModule_install(): void
     [],
     TRUE,
     TRUE,
-    5
+    5,
+    ''
   );
 
   createField(
@@ -1136,7 +1237,8 @@ function lgmsModule_install(): void
     ['rows' => 20,],
     TRUE,
     False,
-    1
+    1,
+    ''
   );
 
   createField(
@@ -1160,11 +1262,36 @@ function lgmsModule_install(): void
     [],
     TRUE,
     True,
-    4
+    4,
+    ''
   );
 
+  createField(
+    'field_database_item',
+    'node',
+    'guide_item',
+    'Database item',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_database_item' => 'guide_database_item',
+        ],
+      ],
+      'sort' => [
+        'field' => '_none',
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    True,
+    4,
+    ''
+  );
 
-  //guide_item
+//guide_item
   createField(
     'field_box_items',
     'node',
@@ -1186,10 +1313,11 @@ function lgmsModule_install(): void
     [],
     TRUE,
     True,
-    4
+    4,
+    ''
   );
 
-  // Guide box children
+// Guide box children
   createField(
     'field_child_boxes',
     'node',
@@ -1211,7 +1339,8 @@ function lgmsModule_install(): void
     [],
     TRUE,
     TRUE,
-    5
+    5,
+    ''
   );
 
   createField(
@@ -1230,7 +1359,8 @@ function lgmsModule_install(): void
     [],
     TRUE,
     1,
-    1
+    1,
+    ''
   );
 
   createField(
@@ -1249,15 +1379,124 @@ function lgmsModule_install(): void
     [],
     TRUE,
     1,
-    1
+    1,
+    ''
   );
 
-//guide_database_item
+  createField(
+    'field_database_link',
+    'node',
+    'guide_database_item',
+    'proxied Link',
+    'link',
+    [],
+    ['link_type' => LinkItemInterface::LINK_GENERIC],
+    'link_default',
+    [],
+    TRUE,
+    FALSE,
+    0,
+    'Enter the Title of the proxied content. All links in this field will have a proxy prefix attached to the url by the system (eg. https://proxy.library.xxx.xx/login?url=). so enter the URL of the content without the proxy.'
+  );
+
+  createField(
+    'field_database_body',
+    'node',
+    'guide_database_item',
+    'Body',
+    'text_long',
+    [],
+    ['text_processing' => 1],
+    'text_textarea',
+    [],
+    TRUE,
+    FALSE,
+    1,
+    ''
+  );
+
+  createField(
+    'field_db_guide_subject',
+    'node',
+    'guide_database_item',
+    'Subject',
+    'entity_reference',
+    ['target_type' => 'taxonomy_term',],
+    ['handler' => 'default:taxonomy_term',
+      'handler_settings' => [
+        'target_bundles' => [
+          'LGMS_Guide_Subject' => 'LGMS_Guide_Subject',
+        ],
+      ],
+    ],
+    'options_buttons',
+    [],
+    False,
+    True,
+    3,
+    ''
+  );
+
+
   // Disable the display of author and date information for guide, guide_page and guide_box.
   disable_field('guide', 'display_submitted');
   disable_field('guide_page', 'display_submitted');
   disable_field('guide_box', 'display_submitted');
   disable_field('sub_page', 'display_submitted');
+  disable_field('guide_database_item', 'display_submitted');
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function lgmsmodule_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
+  if ($entity instanceof NodeInterface && $entity->bundle() == 'guide_database_item') {
+    // Check if the field exists.
+    if ($entity->hasField('field_database_link')) {
+      $items = $entity->get('field_database_link');
+      foreach ($items as $item) {
+        // Get the current value of the URL.
+        $current_value = $item->uri;
+        $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
+        // Check if the current value is not null and doesn't already start with 'https://allme'.
+        if ($current_value !== NULL && strpos($current_value, $proxy_prefix) !== 0) {
+          $prefixed_url = $proxy_prefix . $current_value;
+          // Update the item with the prefixed URL.
+          $item->uri = $prefixed_url;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for node edit forms.
+ */
+function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $form_state->getFormObject()->getEntity();
+
+  // Check if the form is for a 'guide_database_item' node type.
+  if ($node instanceof NodeInterface && $node->bundle() === 'guide_database_item') {
+    // Load the proxy prefix setting.
+    $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
+
+    // Check if the field exists in the form.
+    if (isset($form['field_database_link'])) {
+      $fieldWidget = &$form['field_database_link']['widget'];
+      foreach (Element::children($fieldWidget) as $delta) {
+        if (isset($fieldWidget[$delta]['uri']['#default_value'])) {
+          $current_value = $fieldWidget[$delta]['uri']['#default_value'];
+          // Ensure $current_value is a string before calling strpos().
+          if (!is_null($current_value) && strpos((string) $current_value, $proxy_prefix) === 0) {
+            $new_value = substr($current_value, strlen($proxy_prefix));
+            // Set the default value of the field widget to the URL without the proxy prefix.
+            $fieldWidget[$delta]['uri']['#default_value'] = $new_value;
+          }
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -1302,6 +1541,8 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_parent_node');
   delete_field_storage('field_description');
   delete_field_storage('field_text_box_item');
+  delete_field_storage('field_database_link');
+  delete_field_storage('field_database_body');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
