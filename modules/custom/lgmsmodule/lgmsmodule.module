@@ -1337,6 +1337,7 @@ function lgmsModule_install(): void
   disable_field('guide_page', 'display_submitted');
   disable_field('guide_box', 'display_submitted');
   disable_field('sub_page', 'display_submitted');
+  disable_field('guide_database_item', 'display_submitted');
 }
 
 /**
