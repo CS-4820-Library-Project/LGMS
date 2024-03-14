@@ -333,7 +333,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   ];
 
   $edit_route = '';
-  $delete_route = '';
+  $delete_route = '';//add_database.form
 
   if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
     $html = $item->get('field_html_item')->entity;
@@ -346,6 +346,25 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
 
     $edit_route = 'add_html.form';
     $delete_route = 'delete_html.form';
+  } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
+    $database = $item->get('field_database_item')->entity;
+    $link = $database->get('field_database_link')->first()->getValue();
+
+    $item_container['content'][] = [
+      '#type' => 'link',
+      '#title' => $link['title'],
+      '#url' => Url::fromUri($link['uri']),
+    ];
+
+    $item_container['content'][] = [
+      '#type' => 'markup',
+      '#markup' => $item->get('field_description')->value,
+    ];
+
+
+
+    $edit_route = 'add_database.form';
+    $delete_route = 'delete_database.form';
   }
 
   if($item->access('update')) {
@@ -544,6 +563,22 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                 '#type' => 'link',
                 '#title' => ('HTML'),
                 '#url' => Url::fromRoute('add_html.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
+                '#attributes' => [
+                  'class' => ['use-ajax'],
+                  'data-dialog-type' => 'modal',
+                  'data-dialog-options' => Json::encode(['width' => 800]),
+                  'title' => 'Re-position Box',
+                  'style' => 'text-decoration: none;',
+                ],
+              ],
+            ],
+            'database_item' => [
+              '#type' => 'html_tag',
+              '#tag' => 'li',
+              'content' => [
+                '#type' => 'link',
+                '#title' => ('Database'),
+                '#url' => Url::fromRoute('add_database.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -1148,6 +1183,22 @@ function lgmsModule_install(): void
     ''
   );
 
+  createField(
+    'field_description',
+    'node',
+    'guide_item',
+    'Description',
+    'text_long',
+    [],
+    [],
+    'text_textarea',
+    ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
+    TRUE,
+    False,
+    3,
+    ''
+  );
+
 // page box children
   createField(
     'field_child_boxes',
@@ -1201,6 +1252,31 @@ function lgmsModule_install(): void
       'handler_settings' => [
         'target_bundles' => [
           'guide_html_item' => 'guide_html_item',
+        ],
+      ],
+      'sort' => [
+        'field' => '_none',
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    True,
+    4,
+    ''
+  );
+
+  createField(
+    'field_database_item',
+    'node',
+    'guide_item',
+    'Database item',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_database_item' => 'guide_database_item',
         ],
       ],
       'sort' => [
