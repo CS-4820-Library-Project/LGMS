@@ -411,6 +411,36 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
+  if($entity->bundle() === 'guide_database_item' && $view_mode === 'full'){
+    $build['db_title'] = [
+      '#type' => 'markup',
+      '#markup' => t('<h1><strong>'.$entity->label() . '</h1></strong>'),
+    ];
+
+    if (!$entity->get('field_database_link')->isEmpty()) {
+      // Fetch the first item of the field_database_link field
+      $link_item = $entity->get('field_database_link')->first();
+      // Get the URL from the link field
+      $url = $link_item->getUrl()->toString();
+      // Get the link title (text) from the link field, fall back to the URL if the title is empty
+      $link_text = $link_item->title ?: $url;
+
+      $build['db_link'] = [
+        '#type' => 'markup',
+        '#markup' => '<h3><div class="link-icon"><i class="fa fa-link" aria-hidden="true"></i> <a href="' . $url . '">' . $link_text . '</a></div></h3>',
+      ];
+
+    }
+
+    if (!$entity->get('field_database_body')->isEmpty()) {
+      $body_value = $entity->get('field_database_body')->value;
+      $build['db_body'] = [
+        '#type' => 'markup',
+        '#markup' => '<div>' . $body_value . '</div>',
+      ];
+    }
+  }
+
   if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
@@ -1310,7 +1340,7 @@ function lgmsModule_install(): void
   );
 
   createField(
-    'field_lgms_guide_subject',
+    'field_db_guide_subject',
     'node',
     'guide_database_item',
     'Subject',
@@ -1379,10 +1409,10 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
     if (isset($form['field_database_link'])) {
       $fieldWidget = &$form['field_database_link']['widget'];
       foreach (Element::children($fieldWidget) as $delta) {
-        if (isset($fieldWidget[$delta]['uri'])) {
+        if (isset($fieldWidget[$delta]['uri']['#default_value'])) {
           $current_value = $fieldWidget[$delta]['uri']['#default_value'];
-          // If the current value starts with the proxy prefix, strip it from the display.
-          if (strpos($current_value, $proxy_prefix) === 0) {
+          // Ensure $current_value is a string before calling strpos().
+          if (!is_null($current_value) && strpos((string) $current_value, $proxy_prefix) === 0) {
             $new_value = substr($current_value, strlen($proxy_prefix));
             // Set the default value of the field widget to the URL without the proxy prefix.
             $fieldWidget[$delta]['uri']['#default_value'] = $new_value;
@@ -1436,6 +1466,7 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_description');
   delete_field_storage('field_text_box_item');
   delete_field_storage('field_database_link');
+  delete_field_storage('field_database_body');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();

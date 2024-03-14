@@ -166,5 +166,11 @@ lgmsmodule.owner_block_form:
   requirements:
     _permission: 'access content'
 
-
+lgmsmodule.databases:
+  path: '/databases'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\lgmsDatabasesController::databases'
+    _title: 'Databases'
+  requirements:
+    _permission: 'access content'
 
