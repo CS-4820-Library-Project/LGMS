@@ -18,7 +18,7 @@ class CreateGuidePageForm extends FormBase
     return 'create_guide_page_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $current_guide_id = NULL)
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null)
   {
     $form['#prefix'] = '<div id="modal-form">';
     $form['#suffix'] = '</div>';
@@ -30,9 +30,9 @@ class CreateGuidePageForm extends FormBase
     // Load the current guide node.
     $form['current_guide'] = [
       '#type' => 'hidden',
-      '#value' => $current_guide_id,
+      '#value' => $ids->current_guide_id,
     ];
-    $current_guide_node = Node::load($current_guide_id);
+    $current_guide_node = Node::load($ids->current_guide_id);
 
     // Check if the guide node exists.
     if ($current_guide_node) {

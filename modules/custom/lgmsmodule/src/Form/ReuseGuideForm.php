@@ -7,12 +7,12 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class GuideImportForm extends FormBase
+class ReuseGuideForm extends FormBase
 {
 
   public function getFormId()
   {
-    return 'lgmsmodule_guide_import_form';
+    return 'lgmsmodule_reuse_guide_form';
   }
 
   public function buildForm(array $form, FormStateInterface $form_state)
@@ -32,7 +32,7 @@ class GuideImportForm extends FormBase
 
     $form['guide_select'] = [
       '#type' => 'select',
-      '#title' => $this->t('Select a Guide to Import'),
+      '#title' => $this->t('Select a Guide to Reuse'),
       '#options' => $options,
       '#empty_option' => $this->t('- Select a Guide -'),
       '#required' => TRUE,
@@ -40,7 +40,7 @@ class GuideImportForm extends FormBase
 
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Import Guide'),
+      '#value' => $this->t('Reuse Guide'),
     ];
 
     return $form;

@@ -46,11 +46,11 @@ lgmsmodule.dashboard_new:
   requirements:
     _permission: 'create guide content'
 
-lgmsmodule.guide_import_form:
-  path: '/lgms/dashboard/import'
+lgmsmodule.reuse_guide_form:
+  path: '/lgms/dashboard/reuse'
   defaults:
-    _form: '\Drupal\lgmsmodule\Form\GuideImportForm'
-    _title: 'Import Guide'
+    _form: '\Drupal\lgmsmodule\Form\ReuseGuideForm'
+    _title: 'Reuse Guide'
   requirements:
     _permission: 'create guide content'
 
@@ -94,11 +94,11 @@ add_guide_page.form:
   requirements:
     _permission: 'access content'
 
-import_guide_page.form:
-  path: '/import_guide_page'
+reuse_guide_page.form:
+  path: '/reuse_guide_page'
   defaults:
-    _form: '\Drupal\lgmsmodule\Form\ImportGuidePageForm'
-    _title: 'Import Guide Page'
+    _form: '\Drupal\lgmsmodule\Form\ReuseGuidePageForm'
+    _title: 'Reuse Guide Page'
   requirements:
     _permission: 'access content'
 

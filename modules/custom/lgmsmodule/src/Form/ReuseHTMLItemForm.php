@@ -16,7 +16,7 @@ class ReuseHTMLItemForm extends FormBase {
     return 'reuse_html_item_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
     $form['#prefix'] = '<div id="modal-form">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
@@ -24,16 +24,15 @@ class ReuseHTMLItemForm extends FormBase {
       '#type' => 'status_messages',
     ];
 
-    $current_box = \Drupal::request()->query->get('current_box');
     $form['current_box'] = [
       '#type' => 'hidden',
-      '#value' => $current_box,
+      '#value' => $ids->current_box,
     ];
 
-    $current_node = \Drupal::request()->query->get('current_node');
+
     $form['current_node'] = [
       '#type' => 'hidden',
-      '#value' => $current_node,
+      '#value' => $ids->current_node,
     ];
 
 
@@ -64,7 +63,6 @@ class ReuseHTMLItemForm extends FormBase {
 
     $form['#validate'][] = '::validateFields';
 
-    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),

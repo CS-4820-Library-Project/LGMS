@@ -361,19 +361,21 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       '#markup' => $item->get('field_description')->value,
     ];
 
-
-
-    $edit_route = 'add_database.form';
     $delete_route = 'delete_database.form';
   }
 
   if($item->access('update')) {
     if ($box->id() === $item->get('field_parent_box')->entity->id()){
-      $url = Url::fromRoute($edit_route, [], ['query' => [
-        'current_node' => $entity->id(),
-        'current_box' => $box->id(),
-        'current_item' => $item->id()]
-      ]);
+
+      $ids = [ 'current_node' => $entity->id(), 'current_box' => $box->id(), 'current_item' => $item->id()];
+      $json_data = json_encode($ids);
+      $ids = urlencode($json_data);
+
+      $array_of_objects = [(object)['name' => 'Edit HTML', 'form' => 'AddHTMLForm']];
+      $json_data = json_encode($array_of_objects);
+      $query_param = urlencode($json_data);
+
+      $url =  Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $query_param]]);
 
       $edit_link = [
         '#type' => 'link',
@@ -550,6 +552,13 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         $guide_box_build['items'][] = build_item($entity, $box, $item);
       }
 
+      $ids = ['current_box' => $box->id(), 'current_node' => $entity->id()];
+      $json_data = json_encode($ids);
+      $ids = urlencode($json_data);
+
+      $array_of_objects = [(object)['name' => 'Add HTML', 'form' => 'AddHTMLForm'],(object) ['name' => 'Reuse HTML', 'form' => 'ReuseHTMLItemForm']];
+      $json_data = json_encode($array_of_objects);
+      $query_param = urlencode($json_data);
 
       if($box->access('update')) {
         $guide_box_build['items_list'] = [
@@ -561,8 +570,8 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
               '#tag' => 'li',
               'content' => [
                 '#type' => 'link',
-                '#title' => ('HTML'),
-                '#url' => Url::fromRoute('add_html.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
+                '#title' => ('Add/Reuse HTML'),
+                '#url' => Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $query_param]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -579,22 +588,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                 '#type' => 'link',
                 '#title' => ('Database'),
                 '#url' => Url::fromRoute('add_database.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
-                '#attributes' => [
-                  'class' => ['use-ajax'],
-                  'data-dialog-type' => 'modal',
-                  'data-dialog-options' => Json::encode(['width' => 800]),
-                  'title' => 'Re-position Box',
-                  'style' => 'text-decoration: none;',
-                ],
-              ],
-            ],
-            'reuse_html_item' => [
-              '#type' => 'html_tag',
-              '#tag' => 'li',
-              'content' => [
-                '#type' => 'link',
-                '#title' => ('Reuse HTML'),
-                '#url' => Url::fromRoute('reuse_html.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -706,11 +699,27 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
     }
     if(\Drupal::currentUser()->isAuthenticated()) {
-      $build['add_guide_page_box_link'] = [
-        '#type' => 'container',
-        'link' => createBoxButton($entity),
+      // Generate the URL for the custom form route, including the query parameter for the current guide.
+      $array_of_objects = [(object)['name' => 'Create Guide Box', 'form' => 'CreateGuideBoxForm'],(object) ['name' => 'Reuse Guide Box', 'form' => 'ReuseGuideBoxForm']];
+      $json_data = json_encode($array_of_objects);
+      $query_param = urlencode($json_data);
+
+      $ids = ['current_node' => $entity->id()];
+      $json_data = json_encode($ids);
+      $ids = urlencode($json_data);
+
+      $url = Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $query_param]]);
+
+      // Create the link render array with AJAX attributes.
+      $link = Link::fromTextAndUrl(t('Create/Reuse Guide Box'), $url)->toRenderable();
+      $link['#attributes'] = [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode(['width' => 800]),
       ];
-      $build['reuse_guide_page_box_link'] = reuseGuideBoxButton($entity);
+
+      // Render the link somewhere in your build array.
+      $build['guide_box_modal'] = $link;
     }
 
     $last_changed_timestamp = $entity->getChangedTime();
@@ -723,33 +732,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
   }
 }
-
-function reuseGuideBoxButton($node): array
-{
-  $url = Url::fromRoute('reuse_guide_box.form', [], ['query' => ['current_node' => $node->id()]]);
-  $link = Link::fromTextAndUrl(t('Import Guide Box'), $url)->toRenderable();
-  $link['#attributes'] = [
-    'class' => ['use-ajax'],
-    'data-dialog-type' => 'modal',
-    'data-dialog-options' => Json::encode(['width' => 800]),
-  ];
-
-  return $link;
-}
-
-function createBoxButton($node): array
-{
-  $url = Url::fromRoute('create_guide_box.form', [], ['query' => ['current_node' => $node->id()]]);
-  $link = Link::fromTextAndUrl(t('Create Guide Box'), $url)->toRenderable();
-  $link['#attributes'] = [
-    'class' => ['use-ajax'],
-    'data-dialog-type' => 'modal',
-    'data-dialog-options' => Json::encode(['width' => 800]),
-  ];
-
-  return $link;
-}
-
 
 /**
  * Implements hook_install().
