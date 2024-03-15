@@ -361,8 +361,8 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       '#type' => 'markup',
       '#markup' => $item->get('field_description')->value,
     ];
+
     $edit_route = 'add_database.form';
-    $edit_route = 'AddDatabaseForm';
     $delete_route = 'delete_database.form';
   }
 
@@ -397,6 +397,33 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
           'style' => 'text-decoration: none;',
         ],
       ];
+
+      if($edit_route == 'add_database.form'){
+        $url = Url::fromRoute($edit_route, [], ['query' => [
+          'current_node' => $entity->id(),
+          'current_box' => $box->id(),
+          'current_item' => $item->id()]
+        ]);
+        $edit_link = [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-edit', 'edit-icon'],
+            ],
+          ],
+          '#url' => $url,
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+            'title' => 'Edit Item',
+            'style' => 'text-decoration: none;',
+          ],
+        ];
+      }
+
       $item_container['edit_link'] = $edit_link;
     }
 
@@ -481,7 +508,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
     // Concatenate the title, a horizontal divider, and the description.
     // The <hr> tag is used as the divider between the title and description.
-    $build['guide_print'][] = [
+    $build['guide_desc'][] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['guide-box-2container']],
       'title_wrapper' => [
@@ -493,38 +520,41 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
         'title' => [
           '#type' => 'html_tag',
           '#tag' => 'h3',
-          '#value' => '<h1>'.$title . '</h1>',
+          '#value' => '<h2><strong>'.$title . '</h2></strong>',
           '#attributes' => ['class' => ['guide-box-title']],
         ],
-        'icons' => $entity->getType() == 'guide' ? [
+        'icons' => $entity->getType() == 'guide'?[
           '#type' => 'html_tag',
           '#tag' => 'div',
           '#attributes' => [
             'class' => ['icons-container'],
           ],
-          'print_icon' => [
+          're_order_icon' => [
             '#type' => 'link',
             '#title' => [
               '#type' => 'html_tag',
               '#tag' => 'i',
               '#attributes' => [
-                'class' => ['fa', 'fa-print'],
+                'class' => ['fa', 'fa-print',],
               ],
             ],
-            '#url' => Url::fromRoute('lgmsmodule.download_guide', ['node' => $entity->id()]),
+            '#url' => Url::fromRoute('re_order_guide_box.form', [], ['query' => ['current_node' => $entity->id()]]),
             '#attributes' => [
+              'class' => ['use-ajax'],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => Json::encode(['width' => 800]),
               'title' => 'Print Guide',
               'style' => 'text-decoration: none;',
             ],
           ],
-        ] : [],
+        ]: [],
       ],
+      // Define the body using a recognized structure for adding content.
       'body' => [
         '#type' => 'markup',
-        '#markup' => $description, // Ensure $description is properly sanitized and safe HTML
+        '#markup' => '<hr>'.$description, // Ensure $description contains safe HTML if it includes user input
       ],
     ];
-
 
     $build['boxes']['#attached']['library'][] = 'lgmsmodule/fontawesome';
 
