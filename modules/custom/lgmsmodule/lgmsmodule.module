@@ -362,7 +362,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       '#markup' => $item->get('field_description')->value,
     ];
 
-    $edit_route = 'AddDatabaseForm';
+    $edit_route = 'add_database.form';
     $delete_route = 'delete_database.form';
   }
 
@@ -397,6 +397,33 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
           'style' => 'text-decoration: none;',
         ],
       ];
+
+      if($edit_route == 'add_database.form'){
+        $url = Url::fromRoute($edit_route, [], ['query' => [
+          'current_node' => $entity->id(),
+          'current_box' => $box->id(),
+          'current_item' => $item->id()]
+        ]);
+        $edit_link = [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-edit', 'edit-icon'],
+            ],
+          ],
+          '#url' => $url,
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+            'title' => 'Edit Item',
+            'style' => 'text-decoration: none;',
+          ],
+        ];
+      }
+
       $item_container['edit_link'] = $edit_link;
     }
 

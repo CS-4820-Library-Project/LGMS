@@ -92,6 +92,8 @@ class AddDatabaseForm extends FormBase {
       '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
     ];
 
+    $form['#validate'][] = '::validateFields';
+
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
@@ -106,6 +108,14 @@ class AddDatabaseForm extends FormBase {
     ];
 
     return $form;
+  }
+
+  public function validateFields(array &$form, FormStateInterface $form_state) {
+    $reference = $form_state->getValue('body');
+    $title = $form_state->getValue('description');
+    if (!$reference && empty($title)) {
+      $form_state->setErrorByName('description', $this->t('description: field is required.'));
+    }
   }
 
   /**
