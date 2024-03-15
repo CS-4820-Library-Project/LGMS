@@ -16,7 +16,7 @@ class CreateGuideBoxForm extends FormBase {
     return 'create_guide_box_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
     $form['#prefix'] = '<div id="modal-form">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
@@ -24,10 +24,9 @@ class CreateGuideBoxForm extends FormBase {
       '#type' => 'status_messages',
     ];
 
-    $current_node = \Drupal::request()->query->get('current_node');
     $form['current_node'] = [
       '#type' => 'hidden',
-      '#value' => $current_node,
+      '#value' => $ids->current_node,
     ];
 
     $form['title'] = [
@@ -42,7 +41,6 @@ class CreateGuideBoxForm extends FormBase {
       '#description' => $this->t('Un-check this box to publish.'),
     ];
 
-    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),

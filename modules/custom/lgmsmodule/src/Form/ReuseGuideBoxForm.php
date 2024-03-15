@@ -16,7 +16,7 @@ class ReuseGuideBoxForm extends FormBase {
     return 'reuse_guide_box_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
     $form['#prefix'] = '<div id="modal-form">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
@@ -24,10 +24,9 @@ class ReuseGuideBoxForm extends FormBase {
       '#type' => 'status_messages',
     ];
 
-    $current_node = \Drupal::request()->query->get('current_node');
     $form['current_node'] = [
       '#type' => 'hidden',
-      '#value' => $current_node,
+      '#value' => $ids->current_node,
     ];
 
     $form['#attributes']['id'] = 'form-selector';
@@ -59,7 +58,6 @@ class ReuseGuideBoxForm extends FormBase {
 
     $form['#validate'][] = '::validateFields';
 
-    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),

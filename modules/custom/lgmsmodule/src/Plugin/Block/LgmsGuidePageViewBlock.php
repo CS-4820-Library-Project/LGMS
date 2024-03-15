@@ -133,14 +133,18 @@ class LgmsGuidePageViewBlock extends BlockBase {
 
     if (\Drupal::currentUser()->hasPermission('create guide_page content') && $current_guide_id != null) {
       // Generate the URL for the custom form route, including the query parameter for the current guide.
-      $array_of_objects = [(object)['name' => 'Create Guide Page', 'form' => 'CreateGuidePageForm'],(object) ['name' => 'Import Guide Page', 'form' => 'ImportGuidePageForm']];
+      $array_of_objects = [(object)['name' => 'Create Guide Page', 'form' => 'CreateGuidePageForm'],(object) ['name' => 'Reuse Guide Page', 'form' => 'ReuseGuidePageForm']];
       $json_data = json_encode($array_of_objects);
       $query_param = urlencode($json_data);
 
-      $url = Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['current_id' => $current_guide_id, 'forms' => $query_param]]);
+      $ids = ['current_guide_id' => $current_guide_id];
+      $json_data = json_encode($ids);
+      $ids = urlencode($json_data);
+
+      $url = Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $query_param]]);
 
       // Create the link render array with AJAX attributes.
-      $link = Link::fromTextAndUrl(t('Guide Page'), $url)->toRenderable();
+      $link = Link::fromTextAndUrl(t('Create/Reuse Guide Page'), $url)->toRenderable();
       $link['#attributes'] = [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',

@@ -11,13 +11,13 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
-class ImportGuidePageForm extends FormBase {
+class ReuseGuidePageForm extends FormBase {
 
   public function getFormId() {
-    return 'lgmsmodule_import_guide_page_form';
+    return 'lgmsmodule_reuse_guide_page_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $current_guide_id = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
 
     $form['name'] = [
       '#type' => 'textfield',
@@ -27,7 +27,7 @@ class ImportGuidePageForm extends FormBase {
 
     $form['guide_page_select'] = [
       '#type' => 'select',
-      '#title' => $this->t('Select a Guide Page to Import'),
+      '#title' => $this->t('Select a Guide Page to Reuse'),
       '#options' => $this->getGuidePageOptions(),
       '#empty_option' => $this->t('- Select a Guide Page -'),
       '#required' => TRUE,
@@ -35,7 +35,7 @@ class ImportGuidePageForm extends FormBase {
 
     $form['current_guide'] = [
       '#type' => 'hidden',
-      '#value' => $current_guide_id,
+      '#value' =>  $ids->current_guide_id,
     ];
 
     $form['cloned_guide_page'] = [
@@ -45,7 +45,7 @@ class ImportGuidePageForm extends FormBase {
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Import Guide Page'),
+      '#value' => $this->t('Reuse Guide Page'),
       '#button_type' => 'primary',
     ];
 

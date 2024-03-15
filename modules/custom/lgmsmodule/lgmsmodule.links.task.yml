@@ -30,9 +30,9 @@ lgmsmodule.dashboard_new_tab:
   base_route: lgmsmodule.dashboard_overview
   weight: 1
 
-lgmsmodule.guide_import_tab:
-  route_name: lgmsmodule.guide_import_form
-  title: 'Import Guide'
+lgmsmodule.guide_reuse_tab:
+  route_name: lgmsmodule.reuse_guide_form
+  title: 'Reuse Guide'
   base_route: lgmsmodule.dashboard_overview
   weight: 2
 

@@ -74,10 +74,10 @@ class lgmsDashboardController extends ControllerBase
     $build = [];
   }
 
-  public function import()
+  public function reuse()
   {
     // Load the custom form using the form builder service.
-    $form = \Drupal::formBuilder()->getForm('Drupal\lgmsmodule\Form\GuideImportForm');
+    $form = \Drupal::formBuilder()->getForm('Drupal\lgmsmodule\Form\ReuseGuideForm');
 
     // Return the form render array.
     return $form;
