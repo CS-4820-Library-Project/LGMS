@@ -189,3 +189,12 @@ delete_database.form:
     _title: 'Delete Database Box Items'
   requirements:
     _permission: 'create guide_item content'
+
+lgmsmodule.download_guide:
+  path: '/guide/{node}/download'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\PrintGuide::downloadGuide'
+    _title: 'Download Guide'
+  requirements:
+    _permission: 'access content'
+    node: '\d+'
