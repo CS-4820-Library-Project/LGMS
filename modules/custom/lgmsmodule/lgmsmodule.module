@@ -23,6 +23,7 @@ use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\views\Entity\View;
 
 /**
  * Implements hook_theme().
@@ -344,7 +345,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       '#format' => $html->get('field_text_box_item2')->format,
     ];
 
-    $edit_route = 'add_html.form';
+    $edit_route = 'AddHTMLForm';
     $delete_route = 'delete_html.form';
   } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
     $database = $item->get('field_database_item')->entity;
@@ -361,6 +362,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       '#markup' => $item->get('field_description')->value,
     ];
 
+    $edit_route = 'AddDatabaseForm';
     $delete_route = 'delete_database.form';
   }
 
@@ -371,7 +373,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       $json_data = json_encode($ids);
       $ids = urlencode($json_data);
 
-      $array_of_objects = [(object)['name' => 'Edit HTML', 'form' => 'AddHTMLForm']];
+      $array_of_objects = [(object)['name' => 'Edit HTML', 'form' => $edit_route]];
       $json_data = json_encode($array_of_objects);
       $query_param = urlencode($json_data);
 
@@ -1487,6 +1489,27 @@ function lgmsModule_install(): void
     'The user\'s profile picture.'
   );
 
+  createField(
+    'field_media_image',
+    'node',
+    'guide_item',
+    'Media',
+    'entity_reference',
+    ['target_type' => 'media'],
+    [
+      'handler' => 'default:media',
+      'handler_settings' => [
+        'sort' => ['field' => '_none'],
+      ],
+    ],
+    'media_library_widget',
+    [],
+    TRUE,
+    false,
+    0,
+    ''
+  );
+
 
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
@@ -1598,6 +1621,7 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_lgms_last_name');
   delete_field_storage('field_lgms_phone_number');
   delete_field_storage('field_lgms_user_picture');
+  delete_field_storage('field_db_guide_subject');
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
@@ -1613,6 +1637,13 @@ function lgmsModule_uninstall(): void
 
   $content_type = NodeType::load('guide_html_item');
   $content_type?->delete();
+
+  $content_type = NodeType::load('guide_database_item');
+  $content_type?->delete();
+
+  $view_id = 'lgms_databases';
+  $view = View::load($view_id);
+  $view?->delete();
 }
 
 /**
