@@ -190,6 +190,14 @@ delete_database.form:
   requirements:
     _permission: 'create guide_item content'
 
+add_media.form:
+  path: '/add_media'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\AddMediaForm'
+    _title: 'Add Media Box Items'
+  requirements:
+    _permission: 'create guide_item content'
+
 lgmsmodule.download_guide:
   path: '/guide/{node}/download'
   defaults:
