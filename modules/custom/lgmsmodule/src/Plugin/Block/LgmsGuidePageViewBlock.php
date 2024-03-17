@@ -29,24 +29,14 @@ class LgmsGuidePageViewBlock extends BlockBase {
     $sqlMethods = new sqlMethods(\Drupal::database());
 
 
-    //$current_guide_id = 33;
     $current_guide_id = $this->getCurrentGuideId();
-
-    // Get the pages for the current guide.
-    $pages = $sqlMethods->getGuidePages($current_guide_id);
+    $current_guide = Node::load($current_guide_id);
 
     $guide_title = '';
     if ($current_guide_id) {
-      $guide_title = $sqlMethods->getTitle($current_guide_id);
+      $guide_title = $current_guide->label();
     }
 
-    // Check if the guide title was successfully retrieved.
-    if (!$guide_title) {
-
-      $guide_title = 'Guide';
-    }
-
-    $current_guide = Node::load($current_guide_id);
     $current_guide_url = $current_guide->toUrl()->toString();
     $current_guide_url = str_ireplace('LGMS/', '', $current_guide_url);
 
@@ -61,17 +51,19 @@ class LgmsGuidePageViewBlock extends BlockBase {
       '#items' => [],
     ];
 
+    $pages = $current_guide->get('field_child_pages')->referencedEntities();
+
     foreach ($pages as $page) {
       $class = '';
-      if($page->status == 0){
+      if($page->isPublished() == 0){
         if(!\Drupal::currentUser()->isAuthenticated()){
           continue;
         }
         $class = 'node--unpublished';
       }
 
-      $url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $page->nid]);
-      $link = \Drupal\Core\Link::fromTextAndUrl($page->title, $url)->toString();
+      $url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $page->id()]);
+      $link = \Drupal\Core\Link::fromTextAndUrl($page->label(), $url)->toString();
 
       $page_item['page'] = [
         '#markup' => '<div class="' . $class . '">' . $link . '</div>', // Wrap in div for styling purposes.
@@ -82,53 +74,30 @@ class LgmsGuidePageViewBlock extends BlockBase {
       ];
 
       // Retrieve sub-pages for the current page.
-      $sub_pages = $sqlMethods->getSubPages($page->nid);
+      $sub_pages = $page->get('field_child_pages')->referencedEntities();
 
       // Add sub-pages to the list if they exist.
       if (!empty($sub_pages)) {
         foreach ($sub_pages as $sub_page) {
           $sub_page_class = '';
-          if($sub_page->status == 0){
+          if($sub_page->isPublished() == 0){
             if(!\Drupal::currentUser()->isAuthenticated()){
               continue;
             }
             $sub_page_class = 'node--unpublished';
           }
 
-          $sub_url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $sub_page->nid]);
-          $sub_link = \Drupal\Core\Link::fromTextAndUrl($sub_page->title, $sub_url)->toString();
+          $sub_url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $sub_page->id()]);
+          $sub_link = \Drupal\Core\Link::fromTextAndUrl($sub_page->label(), $sub_url)->toString();
           $page_item['sub_pages']['#items'][] = [
             '#markup' => '<div class="' . $sub_page_class . ' sub-page-item">' . $sub_link . '</div>',
           ];
         }
       }
 
-      // Check if the user has permission to create sub-pages and if no sub-page exists.
-      if (\Drupal::currentUser()->hasPermission('create sub_page content ')) {
-        // Check if a sub-page already exists for this page.
-        $sub_page_exists = $sqlMethods->subPageExists($page->nid);
-
-        // Only show the link to add a sub-page if one doesn't already exist.
-        if (!$sub_page_exists) {
-          // Create the URL for adding a new sub-page.
-          $add_sub_page_url = \Drupal\Core\Url::fromRoute('node.add', ['node_type' => 'sub_page'], [
-            'query' => ['field_parent_page' => $page->nid], // Adjust the field name if needed.
-          ]);
-          // Create the link for adding a new sub-page.
-          $add_sub_page_link = \Drupal\Core\Link::fromTextAndUrl(t('Add new sub page +'), $add_sub_page_url)->toString();
-
-          $page_item['add_sub_page'] = [
-            '#markup' => $add_sub_page_link,
-            '#prefix' => '<div class="add-sub-page-link">',
-            '#suffix' => '</div>',
-          ];
-        }
-      }
-
-
       // Add the page item to the guide list.
       $build['guide_container']['content']['#items'][] = $page_item;
-
+      $page_item = [];
     }
 
     if (\Drupal::currentUser()->hasPermission('create guide_page content') && $current_guide_id != null) {
@@ -167,14 +136,17 @@ class LgmsGuidePageViewBlock extends BlockBase {
   public function getCurrentGuideId()
   {
     $current_node = \Drupal::routeMatch()->getParameter('node');
+
     if ($current_node->getType() == 'guide') {
       return $current_node->id();
     }
     elseif ($current_node->getType() == 'guide_page') {
+      $parent = $current_node->get('field_parent_guide')->entity;
 
-      $sqlMethods = new sqlMethods(\Drupal::database());
-      return $sqlMethods->getGuideNodeIdByPageId($current_node->id());
+      if($parent->getType() == 'guide_page')
+        $parent = $parent->get('field_parent_guide')->entity;
 
+      return $parent->id();
     }
     return NULL;
   }

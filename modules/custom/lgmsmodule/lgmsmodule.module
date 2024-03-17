@@ -351,6 +351,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $database = $item->get('field_database_item')->entity;
     $link = $database->get('field_database_link')->first()->getValue();
 
+    //$item_container['content'][] = \Drupal::entityTypeManager()->getViewBuilder('node')->view($database, 'full');
     $item_container['content'][] = [
       '#type' => 'link',
       '#title' => $link['title'],
@@ -1182,6 +1183,7 @@ function lgmsModule_install(): void
       'handler_settings' => [
         'target_bundles' => [
           'guide' => 'guide',
+          'guide_page' => 'guide_page',
         ],
       ],
     ],
@@ -1383,6 +1385,56 @@ function lgmsModule_install(): void
       'handler_settings' => [
         'target_bundles' => [
           'guide_box' => 'guide_box',
+        ],
+      ],
+      'sort' => [
+        'field' => '_none',
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    TRUE,
+    5,
+    ''
+  );
+
+  createField(
+    'field_child_pages',
+    'node',
+    'guide_page',
+    'Children Pages',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_page' => 'guide_page',
+        ],
+      ],
+      'sort' => [
+        'field' => '_none',
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    TRUE,
+    5,
+    ''
+  );
+
+  createField(
+    'field_child_pages',
+    'node',
+    'guide',
+    'Children Pages',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_page' => 'guide_page',
         ],
       ],
       'sort' => [
@@ -1790,11 +1842,68 @@ function lgmsmodule_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
 
 
 /**
+ * Custom validation handler for the page creation form.
+ */
+function lgmsmodule_page_form_validate($form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $parent_guide_value = $form_state->getValue('field_parent_guide');
+
+  if (!empty($parent_guide_value)) {
+    // Assuming the field is an entity reference, the target_id is the referenced entity ID.
+    $parent_entity_id = $parent_guide_value[0]['target_id'];
+    // Load the referenced entity.
+    $parent_entity = Node::load($parent_entity_id);
+
+    // Check if the parent entity is a page
+    if ($parent_entity && $parent_entity->bundle() == 'guide_page') {
+      // Set an error if the referenced entity is not a guide.
+      if ($parent_entity->get('field_parent_guide')->entity->bundle() == 'guide_page'){
+        $form_state->setErrorByName('field_parent_guide', t('The parent node Can not be a subpage.'));
+      }
+
+      $child_pages_values = $form_state->getValue('field_child_pages');
+      $has_children = FALSE;
+
+      foreach ($child_pages_values as $child_page_value) {
+        // Check if 'target_id' is not empty.
+        if (is_array($child_page_value) && !empty($child_page_value['target_id'])) {
+          $has_children = TRUE;
+          break; // No need to continue checking once a child page is found.
+        }
+      }
+
+      // Set the error if $has_children is true.
+      if ($has_children) {
+        $form_state->setErrorByName('field_child_pages', t('This page can not have subPages.'));
+      }
+
+    }
+  }
+
+  $child_pages_values = $form_state->getValue('field_child_pages');
+
+  foreach ($child_pages_values as $index => $child_page_value) {
+    \Drupal::logger('my_module')->notice('<pre>' . print_r($child_page_value, TRUE) . '</pre>');
+    if (is_array($child_page_value) && !empty($child_page_value['target_id'])) {
+      $child_page_id = $child_page_value['target_id'];
+      $child_page = Node::load($child_page_id);
+
+      if($child_page->hasField('field_child_pages') && !empty($child_page->get('field_child_pages')->getValue())){
+        $form_state->setErrorByName("field_child_pages][$index", t('A SubPage cannot have child pages.'));
+      }
+    }
+  }
+}
+
+
+/**
  * Implements hook_form_FORM_ID_alter() for node edit forms.
  */
 function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   /** @var \Drupal\node\NodeInterface $node */
   $node = $form_state->getFormObject()->getEntity();
+
+  if ($node instanceof NodeInterface && $node->bundle() === 'guide_page')
+    $form['#validate'][] = 'lgmsmodule_page_form_validate';
 
   // Check if the form is for a 'guide_database_item' node type.
   if ($node instanceof NodeInterface && $node->bundle() === 'guide_database_item') {

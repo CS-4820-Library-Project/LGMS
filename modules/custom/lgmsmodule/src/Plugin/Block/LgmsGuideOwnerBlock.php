@@ -121,6 +121,10 @@ class LgmsGuideOwnerBlock extends BlockBase {
       $subjects = $this->extractSubjects($node, 'field_lgms_guide_subject');
     } elseif ($node->bundle() === 'guide_page') {
       $parent_guide = $node->get('field_parent_guide')->entity;
+
+      if($parent_guide->bundle() == 'guide_page')
+        $parent_guide = $parent_guide->get('field_parent_guide')->entity;
+
       if ($parent_guide) {
         $subjects = $this->extractSubjects($parent_guide, 'field_lgms_guide_subject');
       }

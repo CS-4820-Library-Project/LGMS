@@ -32,15 +32,15 @@ class CreateGuidePageForm extends FormBase
       '#type' => 'hidden',
       '#value' => $ids->current_guide_id,
     ];
-    $current_guide_node = Node::load($ids->current_guide_id);
+    $current_guide = Node::load($ids->current_guide_id);
 
     // Check if the guide node exists.
-    if ($current_guide_node) {
+    if ($current_guide) {
       // Add the current guide's name and ID to the form as markup elements.
       $form['guide_info'] = [
         '#type' => 'item',
         '#markup' => $this->t('You are adding a page to the guide: @name ', [
-          '@name' => $current_guide_node->label(),
+          '@name' => $current_guide->label(),
 
         ]),
       ];
@@ -73,6 +73,14 @@ class CreateGuidePageForm extends FormBase
           ':input[name="hide_description"]' => ['checked' => TRUE],
         ],
       ],
+    ];
+
+    $form['position'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Position'),
+      '#options' => $this->getPageList($ids->current_guide_id),
+      '#required' => TRUE,
+      '#default_value' => 'top_level',
     ];
 
     $form['published'] = [
@@ -123,6 +131,13 @@ class CreateGuidePageForm extends FormBase
       $title = $form_state->getValue('title');
       $body_values = $form_state->getValue('field_description');
 
+      $parent = $form_state->getValue('position');
+      if($parent == 'top_level')
+        $parent = $current_guide_id;
+
+      $parent = Node::load($parent);
+
+
       // Create the guide page node.
       $guide_page = Node::create([
         'type' => 'guide_page',
@@ -131,16 +146,19 @@ class CreateGuidePageForm extends FormBase
           'value' => $body_values['value'],
           'format' => $body_values['format'],
         ],
-        'field_parent_guide' => [
-          'target_id' => $current_guide_id,
-        ],
+        'field_parent_guide' => $parent,
         'status' => $form_state->getValue('published') == '0',
-
       ]);
 
       // Save the new node.
       $guide_page->save();
 
+      $page_list = $parent->get('field_child_pages')->getValue();
+      $page_list[] = ['target_id' => $guide_page->id()];
+
+      $parent->set('field_child_pages', $page_list);
+      $parent->set('changed', \Drupal::time()->getRequestTime());
+      $parent->save();
 
       $current_guide_node->set('changed', \Drupal::time()->getRequestTime());
       $current_guide_node->save();
@@ -167,5 +185,38 @@ class CreateGuidePageForm extends FormBase
   public function submitForm(array &$form, FormStateInterface $form_state)
   {
 
+  }
+
+  public function getPageList($guide_id) {
+    $options = [];
+
+    $options['Top Level']['top_level'] = t('Top Level');
+
+    // Load the guide entity.
+    $guide = Node::load($guide_id);
+
+    // Check if the guide has been loaded and has the field_child_pages field.
+    if ($guide && $guide->hasField('field_child_pages')) {
+      // Get the array of child page IDs from the guide.
+      $child_pages = $guide->get('field_child_pages')->referencedEntities();
+
+      if (!empty($child_pages)) {
+        // Group label for child pages.
+        $group_label = 'Sub page of';
+
+        // Initialize the group if it's not set.
+        if (!isset($options[$group_label])) {
+          $options[$group_label] = [];
+        }
+
+        // Create options array from the child pages.
+        foreach ($child_pages as $child_page) {
+          $options[$group_label][$child_page->id()] = $child_page->label(); // Use the title or label of the page.
+        }
+      }
+    }
+
+    // Return the options array with the 'Top Level' and the grouped child pages.
+    return $options;
   }
 }
