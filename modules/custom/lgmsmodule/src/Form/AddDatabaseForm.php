@@ -65,22 +65,23 @@ class AddDatabaseForm extends FormBase {
       '#default_value' => $edit? $database: '',
     ];
 
-    $form['body'] = [
+    $form['include_desc'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Use database Body'),
+      '#title' => $this->t('Include Description'),
+      '#default_value' => True,
     ];
 
 
     // Body field
     $form['description'] = [
-      '#type' => 'text_format',
+      '#type' => 'textfield',
       '#title' => $this->t('Body'),
       '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
       '#default_value' => $edit? $current_item->get('field_description')->value: '',
       '#format' => $edit ? $current_item->get('field_description')->format : 'basic_html',
       '#states' => [
         'invisible' => [
-          ':input[name="body"]' => ['checked' => True],
+          ':input[name="include_desc"]' => ['checked' => False],
         ],
       ],
     ];
@@ -111,7 +112,7 @@ class AddDatabaseForm extends FormBase {
   }
 
   public function validateFields(array &$form, FormStateInterface $form_state) {
-    $reference = $form_state->getValue('body');
+    $reference = $form_state->getValue('include_desc');
     $title = $form_state->getValue('description');
     if (!$reference && empty($title)) {
       $form_state->setErrorByName('description', $this->t('description: field is required.'));
@@ -155,7 +156,7 @@ class AddDatabaseForm extends FormBase {
         'title' => $database->label(),
         'field_database_item' => $database,
         'field_parent_box' => $current_box,
-        'field_description' => $form_state->getValue('body') == '0'? $form_state->getValue('description'): $database->get('field_database_body')->value,
+        'field_description' => $form_state->getValue('include_desc') == '0'? '': $form_state->getValue('description'),
         'status' => $form_state->getValue('published') == '0',
       ]);
 
@@ -176,7 +177,7 @@ class AddDatabaseForm extends FormBase {
 
       $current_item->set('title', $database->label());
       $current_item->set('status', $form_state->getValue('published') == '0');
-      $current_item->set('field_description', $form_state->getValue('body') == '0'? $form_state->getValue('description'): $database->get('field_database_body')->value);
+      $current_item->set('field_description', $form_state->getValue('include_desc') == '0'? '': $form_state->getValue('description'));
       $current_item->set('changed', \Drupal::time()->getRequestTime());
       $current_item->save();
     }

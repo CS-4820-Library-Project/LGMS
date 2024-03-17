@@ -1698,6 +1698,26 @@ function lgmsModule_install(): void
     ''
   );
 
+  createField(
+    'field_make_proxy',
+    'node',
+    'guide_database_item',
+    'Include Proxy',
+    'boolean',
+    [],
+    [],
+    'boolean_checkbox',
+    [ // Widget settings.
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+    ],
+    FALSE,
+    FALSE,
+    1,
+    ''
+  );
+
 
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
@@ -1713,23 +1733,35 @@ function lgmsModule_install(): void
  */
 function lgmsmodule_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
   if ($entity instanceof NodeInterface && $entity->bundle() == 'guide_database_item') {
-    // Check if the field exists.
-    if ($entity->hasField('field_database_link')) {
+    // Load the proxy prefix setting.
+    $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
+
+    // Check if the 'field_make_proxy' is checked and the field exists.
+    if ($entity->hasField('field_make_proxy') && $entity->get('field_make_proxy')->value && $entity->hasField('field_database_link')) {
       $items = $entity->get('field_database_link');
       foreach ($items as $item) {
         // Get the current value of the URL.
         $current_value = $item->uri;
-        $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
-        // Check if the current value is not null and doesn't already start with 'https://allme'.
+        // If the proxy prefix is not already there, prepend it.
         if ($current_value !== NULL && strpos($current_value, $proxy_prefix) !== 0) {
-          $prefixed_url = $proxy_prefix . $current_value;
-          // Update the item with the prefixed URL.
-          $item->uri = $prefixed_url;
+          $item->uri = $proxy_prefix . $current_value;
+        }
+      }
+    } elseif ($entity->hasField('field_database_link')) {
+      // If the 'field_make_proxy' is not checked, ensure the proxy prefix is not there.
+      $items = $entity->get('field_database_link');
+      foreach ($items as $item) {
+        // Get the current value of the URL.
+        $current_value = $item->uri;
+        // If the proxy prefix is there, remove it.
+        if ($current_value !== NULL && strpos($current_value, $proxy_prefix) === 0) {
+          $item->uri = substr($current_value, strlen($proxy_prefix));
         }
       }
     }
   }
 }
+
 
 /**
  * Implements hook_form_FORM_ID_alter() for node edit forms.
@@ -1743,16 +1775,29 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
     // Load the proxy prefix setting.
     $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
 
-    // Check if the field exists in the form.
-    if (isset($form['field_database_link'])) {
+    $make_proxy = $node->get('field_make_proxy')->value;
+
+    // Check if the field exists in the form and if the checkbox is checked.
+    if (isset($form['field_database_link']) && $make_proxy) {
       $fieldWidget = &$form['field_database_link']['widget'];
       foreach (Element::children($fieldWidget) as $delta) {
         if (isset($fieldWidget[$delta]['uri']['#default_value'])) {
           $current_value = $fieldWidget[$delta]['uri']['#default_value'];
           // Ensure $current_value is a string before calling strpos().
+          if (!is_null($current_value) && strpos((string) $current_value, $proxy_prefix) !== 0) {
+            // Prepend the proxy prefix to the URL if not already there.
+            $fieldWidget[$delta]['uri']['#default_value'] = $proxy_prefix . $current_value;
+          }
+        }
+      }
+    } else if (isset($form['field_database_link']) && !$make_proxy) {
+      $fieldWidget = &$form['field_database_link']['widget'];
+      foreach (Element::children($fieldWidget) as $delta) {
+        if (isset($fieldWidget[$delta]['uri']['#default_value'])) {
+          $current_value = $fieldWidget[$delta]['uri']['#default_value'];
+          // If the proxy prefix is present, remove it.
           if (!is_null($current_value) && strpos((string) $current_value, $proxy_prefix) === 0) {
             $new_value = substr($current_value, strlen($proxy_prefix));
-            // Set the default value of the field widget to the URL without the proxy prefix.
             $fieldWidget[$delta]['uri']['#default_value'] = $new_value;
           }
         }
