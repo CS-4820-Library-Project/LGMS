@@ -1489,7 +1489,7 @@ function lgmsModule_install(): void
     ''
   );
 
-// Guide box children
+  // Guide box children
   createField(
     'field_child_boxes',
     'node',
@@ -1512,6 +1512,32 @@ function lgmsModule_install(): void
     TRUE,
     TRUE,
     5,
+    ''
+  );
+
+  // Guide page children
+  createField(
+    'field_child_pages',
+    'node',
+    'guide',
+    'Children Pages',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_page' => 'guide_page',
+        ],
+      ],
+      'sort' => [
+        'field' => '_none',
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    TRUE,
+    6,
     ''
   );
 
