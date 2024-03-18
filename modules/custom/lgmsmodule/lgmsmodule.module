@@ -286,6 +286,16 @@ function lgmsmodule_node_insert(NodeInterface $node): void
  */
 function lgmsmodule_node_update(NodeInterface $node): void
 {
+  if($node->bundle() === 'guide_page'){
+    // Check if the entity is a 'guide_page' and has the field 'field_reference_node'.
+    \Drupal::logger('my_module')->notice('<pre>' . print_r($node->id(), TRUE) . '</pre>');
+    if ($node->getEntityTypeId() === 'node' && $node->bundle() === 'guide_page' && $node->hasField('field_reference_node')) {
+      \Drupal::logger('my_module')->notice('<pre>' . print_r($node->id(), TRUE) . '</pre>');
+      // Proceed to update referencing guide pages.
+      update_referencing_guide_pages($node);
+    }
+  }
+
   lgmsmodule_refresh_cache($node);
 }
 
@@ -515,7 +525,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     return [];
   }
 
-  if($item->access('update')) {
+  if($item->access('update') && !$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()) {
     if ($box->id() === $item->get('field_parent_box')->entity->id()){
 
       $ids = [ 'current_node' => $entity->id(), 'current_box' => $box->id(), 'current_item' => $item->id()];
@@ -644,6 +654,12 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
 
+    $reference_page = true;
+
+    if(!$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()){
+      $reference_page = false;
+    }
+
     // Add a custom cache tag to the build array
     $custom_cache_tag = 'lgmsmodule_node_view:' . $entity->id();
     $build['#cache']['tags'][] = $custom_cache_tag;
@@ -735,7 +751,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       $json_data = json_encode($array_of_objects);
       $query_param = urlencode($json_data);
 
-      if($box->access('update')) {
+      if($box->access('update') && !$reference_page) {
         $guide_box_build['items_list'] = [
           '#type' => 'container',
           '#attributes' => ['id' => 'add-reorder-list', 'class' => ['guide-item2']],
@@ -823,7 +839,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
             '#value' => $box->label(),
             '#attributes' => ['class' => ['guide-box-title']],
           ],
-          'icons' => $box->access('update') ?[
+          'icons' => $box->access('update') && !$reference_page ?[
             '#type' => 'html_tag',
             '#tag' => 'div',
             '#attributes' => [
@@ -889,7 +905,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       ];
 
     }
-    if(\Drupal::currentUser()->isAuthenticated()) {
+    if(\Drupal::currentUser()->isAuthenticated() && !$reference_page) {
       // Generate the URL for the custom form route, including the query parameter for the current guide.
       $array_of_objects = [(object)['name' => 'Create Guide Box', 'form' => 'CreateGuideBoxForm'],(object) ['name' => 'Reuse Guide Box', 'form' => 'ReuseGuideBoxForm']];
       $json_data = json_encode($array_of_objects);
@@ -1425,6 +1441,31 @@ function lgmsModule_install(): void
   );
 
   createField(
+    'field_reference_node',
+    'node',
+    'guide_page',
+    'Reference To',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_page' => 'guide_page',
+        ],
+      ],
+      'sort' => [
+        'field' => '_none',
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    False,
+    5,
+    ''
+  );
+
+  createField(
     'field_child_pages',
     'node',
     'guide',
@@ -1845,6 +1886,69 @@ function lgmsmodule_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
  * Custom validation handler for the page creation form.
  */
 function lgmsmodule_page_form_validate($form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $reference = $form_state->getValue('field_reference_node')[0]['target_id'];
+
+  if(!empty($reference)){
+    $node = $form_state->getFormObject()->getEntity();
+
+    $hasChangesOtherThanChildPages = FALSE;
+
+    if ($node->label() != $form_state->getValue('title')[0]['value']) {
+      $hasChangesOtherThanChildPages = TRUE;
+    }
+
+    if ($node->get('field_description')->value != $form_state->getValue('field_description')[0]['value']) {
+      $hasChangesOtherThanChildPages = TRUE;
+    }
+
+    if ($node->get('field_parent_guide')->target_id != $form_state->getValue('field_parent_guide')[0]['target_id']) {
+      $hasChangesOtherThanChildPages = TRUE;
+    }
+
+    if ($node->isPublished() != $form_state->getValue('status')) {
+      $form_state->setErrorByName('', t('1'));
+      $hasChangesOtherThanChildPages = TRUE;
+    }
+
+    if ($node->get('field_reference_node')->target_id != $form_state->getValue('field_reference_node')[0]['target_id']) {
+      $form_state->setErrorByName('', t('2'));
+      $hasChangesOtherThanChildPages = TRUE;
+    }
+
+    if ($node->get('field_hide_description')->value != ($form_state->getValue('field_hide_description')['value'])) {
+      $hasChangesOtherThanChildPages = TRUE;
+    }
+
+    /**To Do**/
+
+    $original_child_boxes = $node->get('field_child_boxes')->referencedEntities();
+    \Drupal::logger('my_module')->notice('<pre>' . print_r(count($original_child_boxes), TRUE) . '</pre>');
+    \Drupal::logger('my_module')->notice('<pre>' . print_r(count($form_state->getValue('field_child_boxes')), TRUE) . '</pre>');
+    for ($i = 0; $i < count($form_state->getValue('field_child_boxes')); $i++){
+      if(empty($original_child_boxes[$i])){
+        break;
+      }
+
+      $new_box = $form_state->getValue('field_child_boxes')[$i]['target_id'];
+      \Drupal::logger('my_module')->notice('<pre>' . print_r($new_box, TRUE) . '</pre>');
+      \Drupal::logger('my_module')->notice('<pre>' . print_r($original_child_boxes[$i]->id(), TRUE) . '</pre>');
+
+      if($original_child_boxes[$i]->id() != $new_box){
+        $hasChangesOtherThanChildPages = TRUE;
+        break;
+      }
+    }
+
+    if (count($original_child_boxes) != count($form_state->getValue('field_child_boxes'))) {
+      $hasChangesOtherThanChildPages = TRUE;
+    }
+
+    if ($hasChangesOtherThanChildPages) {
+      $form_state->setErrorByName('', t('You can only change the child pages of this node.'));
+    }
+
+  }
+
   $parent_guide_value = $form_state->getValue('field_parent_guide');
 
   if (!empty($parent_guide_value)) {
@@ -1882,13 +1986,13 @@ function lgmsmodule_page_form_validate($form, \Drupal\Core\Form\FormStateInterfa
   $child_pages_values = $form_state->getValue('field_child_pages');
 
   foreach ($child_pages_values as $index => $child_page_value) {
-    \Drupal::logger('my_module')->notice('<pre>' . print_r($child_page_value, TRUE) . '</pre>');
+    //\Drupal::logger('my_module')->notice('<pre>' . print_r($child_page_value, TRUE) . '</pre>');
     if (is_array($child_page_value) && !empty($child_page_value['target_id'])) {
       $child_page_id = $child_page_value['target_id'];
       $child_page = Node::load($child_page_id);
 
       if($child_page->hasField('field_child_pages') && !empty($child_page->get('field_child_pages')->getValue())){
-        $form_state->setErrorByName("field_child_pages][$index", t('A SubPage cannot have child pages.'));
+        $form_state->setErrorByName("field_child_pages][$index", t('A subPage cannot have child pages.'));
       }
     }
   }
@@ -1937,6 +2041,33 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
           }
         }
       }
+    }
+  }
+}
+
+function update_referencing_guide_pages($updated_guide_page) {
+  $updated_guide_page_id = $updated_guide_page->id();
+
+  // Query to find all guide pages that reference the updated guide page.
+  $query = \Drupal::entityQuery('node')
+    ->condition('type', 'guide_page')
+    ->condition('field_reference_node', $updated_guide_page_id)
+    ->accessCheck(false);
+  $result = $query->execute();
+
+  // Load and update the referencing guide pages.
+  if (!empty($result)) {
+    $referencing_guide_pages = Node::loadMultiple($result);
+
+    foreach ($referencing_guide_pages as $guide_page) {
+      \Drupal::logger('my_module')->notice('<pre>' . print_r($guide_page->id(), TRUE) . '</pre>');
+      $guide_page->set('title', $updated_guide_page->label());
+      $guide_page->set('field_description', $updated_guide_page->get('field_description')->value);
+      $guide_page->set('field_child_boxes', $updated_guide_page->get('field_child_boxes')->referencedEntities());
+      $guide_page->set('field_hide_description', $updated_guide_page->get('field_hide_description')->value == '0');
+      $guide_page->set('status', $updated_guide_page->isPublished());
+
+      $guide_page->save();
     }
   }
 }

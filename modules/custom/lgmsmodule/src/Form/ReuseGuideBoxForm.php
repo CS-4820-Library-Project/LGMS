@@ -115,7 +115,35 @@ class ReuseGuideBoxForm extends FormBase {
       $new_box = $box->createDuplicate();
       $new_box->set('field_parent_node', $nid);
       $new_box->set('title', $form_state->getValue('title'));
+      $new_box->save();
 
+      $items = $box->get('field_box_items')->referencedEntities();
+
+      $new_items_list = [];
+      foreach ($items as $item){
+        $new_item = $item->createDuplicate();
+        $new_item->set('field_parent_box', $new_box);
+
+        if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
+          $html = $item->get('field_html_item')->entity;
+          $html = $html->createDuplicate();
+
+          $new_item->set('field_html_item', $html);
+
+        } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
+          $database = $item->get('field_database_item')->entity;
+          $new_item->set('field_database_item', $database);
+
+        } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
+          $media = $item->get('field_media_image')->entity;
+          $new_item->set('field_media_image', $media);
+        }
+
+        $new_item->save();
+        $new_items_list[] = $new_item;
+      }
+
+      $new_box->set('field_box_items', $new_items_list);
       $new_box->save();
 
       $box = $new_box;

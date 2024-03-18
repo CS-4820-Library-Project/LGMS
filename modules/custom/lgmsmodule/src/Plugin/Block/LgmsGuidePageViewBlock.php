@@ -77,7 +77,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $sub_pages = $page->get('field_child_pages')->referencedEntities();
 
       // Add sub-pages to the list if they exist.
-      if (!empty($sub_pages)) {
+      if (!empty($sub_pages) && $page->get('field_parent_guide')->entity->id() == $current_guide->id()) {
         foreach ($sub_pages as $sub_page) {
           $sub_page_class = '';
           if($sub_page->isPublished() == 0){
