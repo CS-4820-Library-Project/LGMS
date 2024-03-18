@@ -132,3 +132,8 @@
 .tabs-list li a.active {
   background-color: #ccc;
 }
+
+.page-item-wrapper {
+  display: flex;
+  justify-content: space-between; /* Adjust as needed for your design */
+}
