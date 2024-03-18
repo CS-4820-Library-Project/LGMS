@@ -16,6 +16,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\lgmsmodule\sql\sqlMethods;
 use Drupal\link\LinkItemInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -347,7 +348,100 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
 
     $edit_route = 'AddHTMLForm';
     $delete_route = 'delete_html.form';
-  } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
+  }
+  elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
+    $html = $item->get('field_book_item')->entity;
+
+    $item_container['content'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#attached' => [
+        'library' => [
+          'lgmsmodule/lgmsmodule',
+        ],
+      ],
+      '#attributes' => [
+        'class' => 'book-container',
+      ],
+    ];
+
+    $cover_picture = $html->get('field_book_cover_picture')?->entity;
+    $cover_picture_uri = $cover_picture?->getFileUri();
+    if($cover_picture_uri) {
+      $item_container['content']['image'] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => 'book-cover-picture-container',
+        ],
+      ];
+
+      $item_container['content']['image'][] = [
+        '#theme' => 'image',
+        '#uri' => $cover_picture_uri,
+        '#attributes' => [
+          'class' => 'book-cover-picture'
+        ],
+      ];
+    }
+
+    $item_container['content']['details'] = [
+      '#type' => 'container', // Using a container for the render array
+      '#attributes' => [
+        'class' => 'book-details', // Render array takes remaining space
+      ],
+    ];
+
+    $item_container['content']['details'][] = [
+      '#markup' => '<strong>' . $html->get('title')->value . '</strong>',
+    ];
+
+    $item_container['content']['details'][] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'by ' . $html->get('field_book_author_or_editor')->value,
+    ];
+
+    $item_container['content']['details'][] = [
+      '#markup' => '<p><i> Publisher: ' . $html->get('field_book_publisher')->value . ', Edition: ' . $html->get('field_book_edition')->value . ', Year: ' . $html->get('field_book_year')->value. '</i></p>',
+    ];
+
+    $item_container['content']['details'][] = [
+      '#type' => 'processed_text',
+      '#text' => $html->get('field_book_description')->value,
+      '#format' => $html->get('field_book_description')->format,
+    ];
+
+    $item_container['content']['details'][] = [
+      '#markup' => '<div>URL: <a href="' . $html->get('field_book_url')->uri . '">' . $html->get('title')->value . '</a></div>'
+    ];
+
+    if(Term::load($html->get('field_book_type')->target_id)->getName() == 'print') {
+      $item_container['content']['details'][] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#value' => 'Location: '. $html->get('field_book_location')->value,
+      ];
+
+      $item_container['content']['details'][] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#value' => 'Call Number: '. $html->get('field_book_call_number')->value,
+      ];
+
+      $item_container['content']['details'][] = [
+        '#markup' => '<div>Cat Record: <a href="' . $html->get('field_book_cat_record')->uri . '">' . $html->get('field_book_cat_record')->title . '</a></div>'
+      ];
+    }
+    else {
+      $item_container['content']['details'][] = [
+        '#markup' => '<div>Pub Finder: <a href="' . $html->get('field_book_pub_finder')->uri . '">' . $html->get('field_book_pub_finder')->title . '</a></div>'
+      ];
+    }
+
+    $edit_route = 'AddBookForm';
+    $delete_route = 'delete_book.form';
+  }
+  elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
     $database = $item->get('field_database_item')->entity;
     $link = $database->get('field_database_link')->first()->getValue();
 
@@ -365,7 +459,8 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
 
     $edit_route = 'add_database.form';
     $delete_route = 'delete_database.form';
-  } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
+  }
+  elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
     $media = $item->get('field_media_image')->entity;
     $media_type = $media->bundle();
     $media_item = \Drupal::entityTypeManager()->getViewBuilder('media')->view($media, 'full');
@@ -511,7 +606,8 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     }*/
     $edit_route = 'add_media.form';
     $delete_route = 'delete_database.form';
-  } else {
+  }
+  else {
     return [];
   }
 
@@ -522,11 +618,27 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       $json_data = json_encode($ids);
       $ids = urlencode($json_data);
 
-      $array_of_objects = [(object)['name' => 'Edit HTML', 'form' => $edit_route]];
-      $json_data = json_encode($array_of_objects);
-      $query_param = urlencode($json_data);
+      $url = '';
 
-      $url =  Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $query_param]]);
+      if ($edit_route == 'AddHTMLForm'){
+        $array_of_objects = [(object)['name' => 'Edit HTML', 'form' => $edit_route]];
+        $json_data = json_encode($array_of_objects);
+        $query_param = urlencode($json_data);
+        $url =  Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $query_param]]);
+      }
+      else if($edit_route == 'AddBookForm'){
+        $array_of_objects = [(object)['name' => 'Edit Book', 'form' => $edit_route]];
+        $json_data = json_encode($array_of_objects);
+        $book_query_param = urlencode($json_data);
+        $url =  Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $book_query_param]]);
+      }
+      else {
+        $url = Url::fromRoute($edit_route, [], ['query' => [
+          'current_node' => $entity->id(),
+          'current_box' => $box->id(),
+          'current_item' => $item->id()]
+        ]);
+      }
 
       $edit_link = [
         '#type' => 'link',
@@ -546,32 +658,6 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
           'style' => 'text-decoration: none;',
         ],
       ];
-
-      if($edit_route == 'add_database.form' || $edit_route == 'add_media.form'){
-        $url = Url::fromRoute($edit_route, [], ['query' => [
-          'current_node' => $entity->id(),
-          'current_box' => $box->id(),
-          'current_item' => $item->id()]
-        ]);
-        $edit_link = [
-          '#type' => 'link',
-          '#title' => [
-            '#type' => 'html_tag',
-            '#tag' => 'i',
-            '#attributes' => [
-              'class' => ['fa', 'fa-edit', 'edit-icon'],
-            ],
-          ],
-          '#url' => $url,
-          '#attributes' => [
-            'class' => ['use-ajax'],
-            'data-dialog-type' => 'modal',
-            'data-dialog-options' => Json::encode(['width' => 800]),
-            'title' => 'Edit Item',
-            'style' => 'text-decoration: none;',
-          ],
-        ];
-      }
 
       $item_container['edit_link'] = $edit_link;
     }
@@ -603,7 +689,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $item_container['delete_link'] = $delete_link;
   }
 
-  return$item_container;
+  return $item_container;
 }
 
 /**
@@ -733,7 +819,11 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
       $array_of_objects = [(object)['name' => 'Add HTML', 'form' => 'AddHTMLForm'],(object) ['name' => 'Reuse HTML', 'form' => 'ReuseHTMLItemForm']];
       $json_data = json_encode($array_of_objects);
-      $query_param = urlencode($json_data);
+      $html_query_param = urlencode($json_data);
+
+      $array_of_objects = [(object)['name' => 'Add Book', 'form' => 'AddBookForm'],(object) ['name' => 'Reuse Book', 'form' => 'ReuseBookForm']];
+      $json_data = json_encode($array_of_objects);
+      $book_query_param = urlencode($json_data);
 
       if($box->access('update')) {
         $guide_box_build['items_list'] = [
@@ -746,7 +836,23 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
               'content' => [
                 '#type' => 'link',
                 '#title' => ('Add/Reuse HTML'),
-                '#url' => Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $query_param]]),
+                '#url' => Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $html_query_param]]),
+                '#attributes' => [
+                  'class' => ['use-ajax'],
+                  'data-dialog-type' => 'modal',
+                  'data-dialog-options' => Json::encode(['width' => 800]),
+                  'title' => 'Re-position Box',
+                  'style' => 'text-decoration: none;',
+                ],
+              ],
+            ],
+            'book_item' => [
+              '#type' => 'html_tag',
+              '#tag' => 'li',
+              'content' => [
+                '#type' => 'link',
+                '#title' => ('Add/Reuse Book'),
+                '#url' => Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $book_query_param]]),
                 '#attributes' => [
                   'class' => ['use-ajax'],
                   'data-dialog-type' => 'modal',
@@ -1016,6 +1122,7 @@ function lgmsModule_install(): void
   createContentType('guide_item', 'Guide Box Item');
   createContentType('guide_html_item', 'HTML Box Item');
   createContentType('guide_database_item', 'Database Box Item');
+  createContentType('guide_book_item', 'Book Box Item');
 
   // Create a new Guide Type taxonomy.
   create_vocab('LGMS_Guide_Type', 'Guide Type', 'Use Guide Type to group guides by their type');
@@ -1283,6 +1390,7 @@ function lgmsModule_install(): void
     1,
     ''
   );
+
 
 //add page description field
   createField(
@@ -1755,24 +1863,97 @@ function lgmsModule_install(): void
     'The user\'s profile picture.'
   );
 
+//  createField(
+//    'field_media_image',
+//    'node',
+//    'guide_item',
+//    'Media',
+//    'entity_reference',
+//    ['target_type' => 'media'],
+//    [
+//      'handler' => 'default:media',
+//      'handler_settings' => [
+//        'sort' => ['field' => '_none'],
+//      ],
+//    ],
+//    'media_library_widget',
+//    [],
+//    TRUE,
+//    false,
+//    0,
+//    ''
+//  );
+
   createField(
-    'field_media_image',
+    'field_book_item',
     'node',
     'guide_item',
-    'Media',
+    'Book item',
     'entity_reference',
-    ['target_type' => 'media'],
-    [
-      'handler' => 'default:media',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
       'handler_settings' => [
-        'sort' => ['field' => '_none'],
+        'target_bundles' => [
+          'guide_book_item' => 'guide_book_item',
+        ],
+      ],
+      'sort' => [
+        'field' => '_none',
       ],
     ],
-    'media_library_widget',
+    'entity_reference_autocomplete',
     [],
     TRUE,
-    false,
-    0,
+    True,
+    4,
+    ''
+  );
+
+  createField(
+    'field_book_author_or_editor',
+    'node',
+    'guide_book_item',
+    'Author/Editor',
+    'string',
+    [],
+    [],
+    'string_textfield',
+    [],
+    TRUE,
+    FALSE,
+    1,
+    ''
+  );
+
+  createField(
+    'field_book_publisher',
+    'node',
+    'guide_book_item',
+    'Publisher',
+    'string',
+    [],
+    [],
+    'string_textfield',
+    [],
+    TRUE,
+    FALSE,
+    2,
+    ''
+  );
+
+  createField(
+    'field_book_year',
+    'node',
+    'guide_book_item',
+    'Year',
+    'string',
+    [],
+    [],
+    'string_textfield',
+    [],
+    TRUE,
+    FALSE,
+    3,
     ''
   );
 
@@ -1797,6 +1978,168 @@ function lgmsModule_install(): void
   );
 
 
+  createField(
+    'field_book_edition',
+    'node',
+    'guide_book_item',
+    'Edition',
+    'string',
+    [],
+    [],
+    'string_textfield',
+    [],
+    TRUE,
+    FALSE,
+    4,
+    ''
+  );
+
+  createField(
+    'field_book_cover_picture',
+    'node',
+    'guide_book_item',
+    'Cover Picture',
+    'image',
+    ['uri_scheme' => 'public', 'file_extensions' => 'png jpg jpeg'],
+    [],
+    'image_image',
+    ['progress_indicator' => 'throbber'],
+    TRUE,
+    FALSE,
+    5,
+    ''
+  );
+
+  createField(
+    'field_book_url',
+    'node',
+    'guide_book_item',
+    'URL',
+    'link',
+    [],
+    ['link_type' => LinkItemInterface::LINK_GENERIC],
+    'link_default',
+    [],
+    TRUE,
+    FALSE,
+    6,
+    ''
+  );
+
+  createField(
+    'field_book_description',
+    'node',
+    'guide_book_item',
+    'Description',
+    'text_long',
+    [],
+    [],
+    'text_textarea',
+    ['rows' => 20,],
+    TRUE,
+    FALSE,
+    7,
+    ''
+  );
+
+  // Create a new Guide Subject taxonomy.
+  create_vocab('LGMS_Guide_Book_Type', 'Guide Book Type', 'Use Guide Book Type to add extra fields to Book content type');
+
+  // Add terms to the Guide Group taxonomy
+  $terms = array(
+    'print',
+    'eBook',
+  );
+
+  add_terms($terms, 'LGMS_Guide_Book_Type');
+
+  // Create field storages and instances...
+  createField(
+    'field_book_type',
+    'node',
+    'guide_book_item',
+    'Type',
+    'entity_reference',
+    ['target_type' => 'taxonomy_term',],
+    ['handler' => 'default:taxonomy_term',
+      'handler_settings' => [
+        'target_bundles' => [
+          'LGMS_Guide_Book_Type' => 'LGMS_Guide_Book_Type',
+        ],
+      ],
+    ],
+    'options_select',
+    [],
+    False,
+    False,
+    8,
+    ''
+  );
+
+
+  createField(
+    'field_book_call_number',
+    'node',
+    'guide_book_item',
+    'Call Number',
+    'string',
+    [],
+    [],
+    'string_textfield',
+    [],
+    TRUE,
+    FALSE,
+    9,
+    ''
+  );
+
+  createField(
+    'field_book_location',
+    'node',
+    'guide_book_item',
+    'Location',
+    'string',
+    [],
+    [],
+    'string_textfield',
+    [],
+    TRUE,
+    FALSE,
+    10,
+    ''
+  );
+
+  createField(
+    'field_book_cat_record',
+    'node',
+    'guide_book_item',
+    'Cat Record',
+    'link',
+    [],
+    ['link_type' => LinkItemInterface::LINK_GENERIC],
+    'link_default',
+    [],
+    TRUE,
+    FALSE,
+    11,
+    ''
+  );
+
+  createField(
+    'field_book_pub_finder',
+    'node',
+    'guide_book_item',
+    'Pub Finder',
+    'link',
+    [],
+    ['link_type' => LinkItemInterface::LINK_GENERIC],
+    'link_default',
+    [],
+    TRUE,
+    FALSE,
+    12,
+    ''
+  );
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
   disable_field('guide', 'display_submitted');
@@ -1804,6 +2147,7 @@ function lgmsModule_install(): void
   disable_field('guide_box', 'display_submitted');
   disable_field('sub_page', 'display_submitted');
   disable_field('guide_database_item', 'display_submitted');
+  disable_field('guide_book_item', 'display_submitted');
 }
 
 /**
@@ -1971,6 +2315,9 @@ function lgmsModule_uninstall(): void
   // Delete the Guide Group taxonomy vocabulary and its terms.
   delete_taxonomies('LGMS_Guide_Group');
 
+  // Delete the Guide Book Type vocabulary and its terms.
+  delete_taxonomies('LGMS_Guide_Book_Type');
+
   // Delete field storages.
   delete_field_storage('field_lgms_guide_subject');
   delete_field_storage('field_lgms_guide_type');
@@ -1990,6 +2337,20 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_lgms_phone_number');
   delete_field_storage('field_lgms_user_picture');
   delete_field_storage('field_db_guide_subject');
+  delete_field_storage('field_book_author_or_editor');
+  delete_field_storage('field_book_publisher');
+  delete_field_storage('field_book_year');
+  delete_field_storage('field_book_edition');
+  delete_field_storage('field_book_cover_picture');
+  delete_field_storage('field_book_url');
+  delete_field_storage('field_book_description');
+  delete_field_storage('field_book_type');
+  delete_field_storage('field_book_call_number');
+  delete_field_storage('field_book_location');
+  delete_field_storage('field_book_cat_record');
+  delete_field_storage('field_book_pub_finder');
+  delete_field_storage('field_book_item');
+
 
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
@@ -2007,6 +2368,9 @@ function lgmsModule_uninstall(): void
   $content_type?->delete();
 
   $content_type = NodeType::load('guide_database_item');
+  $content_type?->delete();
+
+  $content_type = NodeType::load('guide_book_item');
   $content_type?->delete();
 
   $view_id = 'lgms_databases';
