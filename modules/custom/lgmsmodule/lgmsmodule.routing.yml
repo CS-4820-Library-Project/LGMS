@@ -230,3 +230,11 @@ reuse_book.form:
     _title: 'Reuse Book Box Items'
   requirements:
     _permission: 'create guide_item content'
+
+re_order_page.form:
+  path: '/re_order_page'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\ReOrderPagesForm'
+    _title: 'Re-Order Guide Pages'
+  requirements:
+    _permission: 'create guide_box content'

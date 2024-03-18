@@ -154,4 +154,7 @@
   flex: 1;
 }
 
-
+.page-item-wrapper {
+  display: flex;
+  justify-content: space-between; /* Adjust as needed for your design */
+}

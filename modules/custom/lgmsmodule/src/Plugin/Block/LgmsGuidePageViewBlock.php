@@ -61,23 +61,45 @@ class LgmsGuidePageViewBlock extends BlockBase {
         }
         $class = 'node--unpublished';
       }
+      // Retrieve sub-pages for the current page.
+      $sub_pages = $page->get('field_child_pages')->referencedEntities();
 
       $url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $page->id()]);
       $link = \Drupal\Core\Link::fromTextAndUrl($page->label(), $url)->toString();
 
-      $page_item['page'] = [
-        '#markup' => '<div class="' . $class . '">' . $link . '</div>', // Wrap in div for styling purposes.
-        'sub_pages' => [
-          '#theme' => 'item_list',
-          '#items' => [],
+      $page_item['wrapper'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#attributes' => ['class' => ['page-item-wrapper']], // Ensure this class is defined in your CSS
+        'page' => [
+          '#markup' => '<div class="' . $class . '">' . $link . '</div>',
+          'sub_pages' => [
+            '#theme' => 'item_list',
+            '#items' => [],
+          ],
         ],
+        're_order_icon' => !empty($sub_pages)?[
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-bars', 're-order-icon'],
+            ],
+          ],
+          '#url' => Url::fromRoute('re_order_page.form', [], ['query' => ['guide_id' => $page->id(), 'current_node' => \Drupal::routeMatch()->getParameter('node')->id()]]),
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+            'title' => 'Re-position Box',
+            'style' => 'text-decoration: none;',
+          ],
+        ]:[],
       ];
 
-      // Retrieve sub-pages for the current page.
-      $sub_pages = $page->get('field_child_pages')->referencedEntities();
-
       // Add sub-pages to the list if they exist.
-      if (!empty($sub_pages)) {
+      if (!empty($sub_pages) && $page->get('field_parent_guide')->entity->id() == $current_guide->id()) {
         foreach ($sub_pages as $sub_page) {
           $sub_page_class = '';
           if($sub_page->isPublished() == 0){
@@ -123,6 +145,15 @@ class LgmsGuidePageViewBlock extends BlockBase {
       // Render the link somewhere in your build array.
       $build['guide_page_modal'] = $link;
 
+      $re_order_url = Url::fromRoute('re_order_page.form', [], ['query' => ['guide_id' => $current_guide_id, 'current_node' => \Drupal::routeMatch()->getParameter('node')->id()]]);
+      $re_order_link = Link::fromTextAndUrl(t('Re-Order'), $re_order_url)->toRenderable();
+      $re_order_link['#attributes'] = [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode(['width' => 800]),
+      ];
+
+      $build['re_order'] = $re_order_link;
     }
 
 
