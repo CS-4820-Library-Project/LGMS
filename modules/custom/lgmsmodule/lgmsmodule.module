@@ -621,9 +621,8 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     return [];
   }
 
-  if($item->access('update') && !$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()) {
+  if($item->access('update') && !$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty() && $entity->id() === $box->get('field_parent_node')->entity->id()) {
     if ($box->id() === $item->get('field_parent_box')->entity->id()){
-
       $ids = [ 'current_node' => $entity->id(), 'current_box' => $box->id(), 'current_item' => $item->id()];
       $json_data = json_encode($ids);
       $ids = urlencode($json_data);
