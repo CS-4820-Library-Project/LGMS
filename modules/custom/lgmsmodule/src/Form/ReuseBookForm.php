@@ -1,19 +1,16 @@
 <?php
+
 namespace Drupal\lgmsmodule\Form;
 
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\CloseModalDialogCommand;
-use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
-class ReuseHTMLItemForm extends FormBase {
+class ReuseBookForm extends FormBase {
 
   public function getFormId() {
-    return 'reuse_html_item_form';
+    return 'reuse_book_item_form';
   }
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
@@ -38,17 +35,17 @@ class ReuseHTMLItemForm extends FormBase {
 
     $form['box'] = [
       '#type' => 'entity_autocomplete',
-      '#title' => $this->t('HTML Item Name'),
+      '#title' => $this->t('Book Item Name'),
       '#target_type' => 'node',
       '#selection_settings' => [
-        'target_bundles' => ['guide_html_item'],
+        'target_bundles' => ['guide_book_item'],
       ],
       '#required' => TRUE,
     ];
 
     $form['reference'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('<Strong>Reference:</Strong> By selecting this, a reference of the HTML item will be created. it will be un-editable from this box'),
+      '#title' => $this->t('<Strong>Reference:</Strong> By selecting this, a reference of the Book item will be created. it will be un-editable from this box'),
     ];
 
     $form['title'] = [
@@ -91,7 +88,7 @@ class ReuseHTMLItemForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'HTML Item created successfully.');
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'Book created successfully.');
   }
 
 
@@ -126,7 +123,7 @@ class ReuseHTMLItemForm extends FormBase {
 
       $new_item->set('field_parent_box', $current_box);
       $new_item->set('title', $form_state->getValue('title'));
-      $new_item->set('field_html_item', $new_html);
+      $new_item->set('field_book_item', $new_html);
 
       $new_item->save();
 
@@ -143,3 +140,4 @@ class ReuseHTMLItemForm extends FormBase {
     $ajaxHelper->updateParent($form, $form_state);
   }
 }
+

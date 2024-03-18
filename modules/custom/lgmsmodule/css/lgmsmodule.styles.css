@@ -132,3 +132,26 @@
 .tabs-list li a.active {
   background-color: #ccc;
 }
+
+.book-container {
+  display: flex;
+  padding: 10px
+}
+
+.book-cover-picture {
+  width: 100px;
+  height: 100px;
+  min-width: 100px;
+  min-height: 100px;
+}
+
+.book-cover-picture-container {
+  flex: 0 0 100px;
+  padding-right: 10px;
+}
+
+.book-details {
+  flex: 1;
+}
+
+
