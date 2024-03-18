@@ -785,7 +785,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
               '#type' => 'html_tag',
               '#tag' => 'i',
               '#attributes' => [
-                'class' => ['fa', 'fa-print'],
+                'class' => \Drupal::currentUser()->isAuthenticated()? ['fa', 'fa-print'] : ['fa', 'fa-print', 'print_icon'],
               ],
             ],
             '#url' => Url::fromRoute('lgmsmodule.download_guide', ['node' => $entity->id()]),
