@@ -76,9 +76,10 @@ class LgmsGuidePageViewBlock extends BlockBase {
           'sub_pages' => [
             '#theme' => 'item_list',
             '#items' => [],
+            'icons'=>[]
           ],
         ],
-        're_order_icon' => !empty($sub_pages)?[
+        're_order_icon' => !empty($sub_pages)&& (\Drupal::currentUser()->isAuthenticated() && \Drupal::currentUser()->hasPermission('edit guide page content'))?[
           '#type' => 'link',
           '#title' => [
             '#type' => 'html_tag',
@@ -95,7 +96,43 @@ class LgmsGuidePageViewBlock extends BlockBase {
             'title' => 'Re-position Box',
             'style' => 'text-decoration: none;',
           ],
+        ] :[],
+        'edit_icon' => (\Drupal::currentUser()->isAuthenticated() && \Drupal::currentUser()->hasPermission('edit guide page content'))? [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-edit', 'edit-icon'],
+            ],
+          ],
+          '#url' => Url::fromRoute('edit_guide_page.form', [], ['query' => ['current_page' => $page->id(),]]),
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+            'title' => 'Edit Box',
+            'style' => 'text-decoration: none;',
+          ],
         ]:[],
+        'close_icon' =>  (\Drupal::currentUser()->isAuthenticated() && \Drupal::currentUser()->hasPermission('edit guide page content'))?[
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-times', 'close-icon'],
+            ],
+          ],
+          '#url' => Url::fromRoute('delete_guide_page.form', [], ['query' => ['current_page' =>$page->id()]]),
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+            'title' => 'Delete Page',
+            'style' => 'text-decoration: none;',
+          ],
+        ]:[]
       ];
 
       // Add sub-pages to the list if they exist.
@@ -113,7 +150,45 @@ class LgmsGuidePageViewBlock extends BlockBase {
           $sub_link = \Drupal\Core\Link::fromTextAndUrl($sub_page->label(), $sub_url)->toString();
           $page_item['sub_pages']['#items'][] = [
             '#markup' => '<div class="' . $sub_page_class . ' sub-page-item">' . $sub_link . '</div>',
-          ];
+            'edit_icon' => (\Drupal::currentUser()->isAuthenticated() && \Drupal::currentUser()->hasPermission('edit sub page content'))?[
+              '#type' => 'link',
+              '#title' => [
+                '#type' => 'html_tag',
+                '#tag' => 'i',
+                '#attributes' => [
+                  'class' => ['fa', 'fa-edit', 'edit-icon'],
+                ],
+              ],
+              '#url' => Url::fromRoute('edit_guide_page.form', [], ['query' => ['current_page' =>$sub_page->id()]]),
+              '#attributes' => [
+                'class' => ['use-ajax'],
+                'data-dialog-type' => 'modal',
+                'data-dialog-options' => Json::encode(['width' => 800]),
+                'title' => 'Edit Box',
+                'style' => 'text-decoration: none;',
+              ],
+            ]:[],
+            'close_icon' =>  (\Drupal::currentUser()->isAuthenticated() && \Drupal::currentUser()->hasPermission('edit sub page content'))?[
+              '#type' => 'link',
+              '#title' => [
+                '#type' => 'html_tag',
+                '#tag' => 'i',
+                '#attributes' => [
+                  'class' => ['fa', 'fa-times', 'close-icon'],
+                ],
+              ],
+              '#url' => Url::fromRoute('delete_guide_page.form', [], ['query' => ['current_page' =>$sub_page->id()]]),
+              '#attributes' => [
+                'class' => ['use-ajax'],
+                'data-dialog-type' => 'modal',
+                'data-dialog-options' => Json::encode(['width' => 800]),
+                'title' => 'Delete Sub Page',
+                'style' => 'text-decoration: none;',
+              ],
+            ]:[]
+          ]
+          ;
+
         }
       }
 
