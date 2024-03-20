@@ -22,13 +22,22 @@
   };
   Drupal.behaviors.tabSwitchingBehavior = {
     attach: function (context, settings) {
-      // Hide all tab content by default
-      $('.tab-content').hide();
-      // Show the first tab content by default
-      $('.tab-content').first().show();
+      // Check if any tab is already marked as active
+      var activeTabExists = $('.tabs-list .tab-link.active').length > 0;
 
-      // Set the first tab link as active
-      $('.tabs-list .tab-link').first().addClass('active');
+      if (activeTabExists) {
+        // If an active tab exists, show its content
+        var activeTabId = $('.tabs-list .tab-link.active').attr('href');
+        $(activeTabId).show();
+      } else {
+        // If no active tab exists, default to the first tab
+        // Hide all tab content by default
+        $('.tab-content').hide();
+        // Show the first tab content
+        $('.tab-content').first().show();
+        // Set the first tab link as active
+        $('.tabs-list .tab-link').first().addClass('active');
+      }
 
       $('.tab-link', context).click(function () {
         var tabId = $(this).attr('href');
