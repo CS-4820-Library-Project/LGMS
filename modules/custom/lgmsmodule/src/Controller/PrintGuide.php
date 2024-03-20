@@ -35,10 +35,6 @@ class PrintGuide extends ControllerBase {
       $html .= $this->processPage($page, $baseUrl);
     }
 
-    if (empty($guideBoxes)) {
-      $html .= "<div>No child boxes content available.</div>";
-    }
-
     $this->generatePdf($html, $node->getTitle());
 
     // Prevent further Drupal processing by returning a response

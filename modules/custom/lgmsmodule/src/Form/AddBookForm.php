@@ -103,26 +103,6 @@ class AddBookForm extends FormBase {
       '#description' => $this->t('Allowed extensions: png jpg jpeg'),
     ];
 
-    $form['url_group'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('URL'),
-      '#collapsible' => FALSE,
-      '#collapsed' => FALSE,
-    ];
-
-    $form['url_group']['label'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Link Text'),
-      '#default_value' => $edit? $current_item->get('field_book_url')->title: '',
-    );
-
-    $form['url_group']['url'] = array(
-      '#type' => 'url',
-      '#title' => $this->t('URL'),
-      '#required' => TRUE,
-      '#default_value' => $edit? $current_item->get('field_book_url')->uri: '',
-    );
-
     $form['description'] = [
       '#type' => 'text_format',
       '#title' => $this->t('Description'),
