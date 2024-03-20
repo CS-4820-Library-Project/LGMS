@@ -4,7 +4,6 @@ namespace Drupal\lgmsmodule\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Database\Database;
-use Drupal\lgmsmodule\sql\sqlMethods;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Component\Serialization\Json;

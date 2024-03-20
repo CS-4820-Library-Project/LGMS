@@ -3,18 +3,15 @@
 namespace Drupal\lgmsmodule\Controller;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\lgmsmodule\sql\sqlMethods;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
-
 class ByGroupController {
   public function byGroup(){
     $build = [];
     $data = [];
-    $sqlMethods = new sqlMethods(\Drupal::database());
-    $landingMethods = new landingPageHelper();
+    $landingMethods = new helperFunction(\Drupal::database());
 
-    $result = $sqlMethods->getFromTable('node__field_lgms_guide_group');
+    $result = $landingMethods->getFromTable('node__field_lgms_guide_group');
 
     foreach ($result as $record) {
       $nid = $record->entity_id;
