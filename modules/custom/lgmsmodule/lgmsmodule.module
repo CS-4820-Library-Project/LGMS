@@ -1260,7 +1260,7 @@ function lgmsModule_install(): void
     ''
   );
 
-// Guide Description field
+  // Guide Description field
   createField(
     'field_description',
     'node',
