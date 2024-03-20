@@ -211,20 +211,6 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $phone_number_raw;
   }
 
-  public function getCurrentGuideId()
-  {
-    $current_node = \Drupal::routeMatch()->getParameter('node');
-    if ($current_node->getType() == 'guide') {
-      return $current_node->id();
-    }
-    elseif ($current_node->getType() == 'guide_page') {
-
-      $sqlMethods = new sqlMethods(\Drupal::database());
-      return $sqlMethods->getGuideNodeIdByPageId($current_node->id());
-
-    }
-    return NULL;
-  }
   public function getCacheMaxAge(): int
   {
     // Disable caching for this block.
