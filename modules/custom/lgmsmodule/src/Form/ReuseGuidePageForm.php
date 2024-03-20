@@ -2,6 +2,7 @@
 namespace Drupal\lgmsmodule\Form;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
+use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityMalformedException;
@@ -18,6 +19,13 @@ class ReuseGuidePageForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+    $form['#prefix'] = '<div id="modal-form">';
+    $form['#suffix'] = '</div>';
+    $form['messages'] = [
+      '#weight' => -9999,
+      '#type' => 'status_messages',
+    ];
+
     $form['select_page'] = [
       '#type' => 'select',
       '#title' => $this->t('Select Page'),
@@ -25,6 +33,26 @@ class ReuseGuidePageForm extends FormBase {
       '#empty_option' => $this->t('- Select a Page -'),
       '#validated' => TRUE,
       '#required' => TRUE,
+      '#ajax' => [
+        'callback' => '::include_sub_callback',
+        'wrapper' => 'include-sub-wrapper',
+        'event' => 'change',
+      ],
+    ];
+
+    $form['include_sub_wrapper'] = [
+      '#type' => 'container',
+      '#attributes' => ['id' => 'include-sub-wrapper'],
+    ];
+
+    $form['include_sub_wrapper']['include_sub'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Include Subpages'),
+      '#ajax' => [
+        'callback' => '::position_callback',
+        'wrapper' => 'position-wrapper',
+        'event' => 'change',
+      ],
     ];
 
     $form['copy'] = [
@@ -42,7 +70,12 @@ class ReuseGuidePageForm extends FormBase {
       ],
     ];
 
-    $form['position'] = [
+    $form['position_wrapper'] = [
+      '#type' => 'container',
+      '#attributes' => ['id' => 'position-wrapper'],
+    ];
+
+    $form['position_wrapper']['position'] = [
       '#type' => 'select',
       '#title' => $this->t('Position'),
       '#options' => $this->getPageList($ids->current_guide_id),
@@ -74,6 +107,53 @@ class ReuseGuidePageForm extends FormBase {
     return $form;
   }
 
+  public function position_callback(array &$form, FormStateInterface $form_state) {
+      $include_sub = $form_state->getValue('include_sub');
+
+    if ($include_sub == '0') {
+      unset($form['position_wrapper']['position']['#attributes']['disabled']);
+    } else {
+      $form['position_wrapper']['position']['#options'] = ['Top Level' => ['top_level' => $this->t('Top Level')]];
+    }
+
+    return $form['position_wrapper'];
+  }
+
+  public function include_sub_callback(array &$form, FormStateInterface $form_state) {
+    $selected_page = $form_state->getValue('select_page');
+
+    // Check if a page is selected and it's not the empty option.
+    if (!empty($selected_page)) {
+      // Load the selected page node to check its field_child_pages.
+      $page_node = Node::load($selected_page);
+      if ($page_node) {
+        $child_pages = $page_node->get('field_child_pages')->getValue();
+        // If there are no child pages, disable the "Include Subpages" checkbox.
+        if (empty($child_pages)) {
+          $form['include_sub_wrapper']['include_sub']['#checked'] = FALSE;
+          $form['include_sub_wrapper']['include_sub']['#attributes']['disabled'] = 'disabled';
+
+          //unset($form['position_wrapper']['position']['#attributes']['disabled']);
+        } else {
+          // Ensure it is not disabled if there are child pages.
+          unset($form['include_sub_wrapper']['include_sub']['#attributes']['disabled']);
+
+          if($form_state->getValue('include_sub') != '0'){
+            //$form['position_wrapper']['position']['#attributes']['disabled'] = 'disabled';
+          }
+        }
+      }
+    } else {
+      // If no page is selected, ensure the "Include Subpages" checkbox is not disabled.
+      unset($form['include_sub_wrapper']['include_sub']['#attributes']['disabled']);
+      //unset($form['position_wrapper']['position']['#attributes']['disabled']);
+    }
+
+    // Return parts of the form that need to be re-rendered.
+    // Ensure you return both the 'position_wrapper' and 'include_sub' elements if they both need updating.
+    return $form['include_sub_wrapper'];
+  }
+
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $guide = Node::load($form_state->getValue('current_guide'));
     $page = Node::load($form_state->getValue('select_page'));
@@ -82,57 +162,21 @@ class ReuseGuidePageForm extends FormBase {
     if($form_state->getValue('position')  == 'top_level')
       $parent = $guide;
 
-
     if($form_state->getValue('copy')){
-      $new_page = $page->createDuplicate();
+      $new_page = $this->copyPage($page, $parent, $form_state->getValue('title'));
 
-      $new_page->set('field_parent_guide', $parent);
-      $new_page->set('title', $form_state->getValue('title'));
-      $new_page->save();
+      if($form_state->getValue('include_sub') == '1'){
+        $children = $page->get('field_child_pages')->referencedEntities();
 
-      $boxes = $page->get('field_child_boxes')->referencedEntities();
-
-      $new_box_list = [];
-      foreach ($boxes as $box){
-        $new_box = $box->createDuplicate();
-        $new_box->set('field_parent_node', $new_page);
-        $new_box->save();
-
-        $items = $box->get('field_box_items')->referencedEntities();
-
-        $new_items_list = [];
-        foreach ($items as $item){
-          $new_item = $item->createDuplicate();
-          $new_item->set('field_parent_box', $new_box);
-
-          if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
-            $html = $item->get('field_html_item')->entity;
-            $html = $html->createDuplicate();
-
-            $new_item->set('field_html_item', $html);
-
-          } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
-            $database = $item->get('field_database_item')->entity;
-            $new_item->set('field_database_item', $database);
-
-          } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
-            $media = $item->get('field_media_image')->entity;
-            $new_item->set('field_media_image', $media);
-          }
-
-          $new_item->save();
-          $new_items_list[] = $new_item;
+        $child_list = [];
+        foreach ($children as $child){
+          $child_list[] =  $this->copyPage($child, $new_page, $child->label());
         }
 
-        $new_box->set('field_box_items', $new_items_list);
-        $new_box->save();
+        $new_page->set('field_child_pages', $child_list);
+        $new_page->save();
 
-        $new_box_list[] = $new_box;
       }
-
-      $new_page->set('field_child_boxes', $new_box_list);
-      $new_page->save();
-
       $page = $new_page;
 
       $form_state->setValue('current_node', $page->id());
@@ -160,6 +204,60 @@ class ReuseGuidePageForm extends FormBase {
     $parent->set('field_child_pages', $page_list);
     $parent->set('changed', \Drupal::time()->getRequestTime());
     $parent->save();
+  }
+
+  public function copyPage($page, $parent, $title)
+  {
+    $new_page = $page->createDuplicate();
+
+    $new_page->set('field_parent_guide', $parent);
+    $new_page->set('title', $title);
+    $new_page->save();
+
+    $boxes = $page->get('field_child_boxes')->referencedEntities();
+
+    $new_box_list = [];
+    foreach ($boxes as $box){
+      $new_box = $box->createDuplicate();
+      $new_box->set('field_parent_node', $new_page);
+      $new_box->save();
+
+      $items = $box->get('field_box_items')->referencedEntities();
+
+      $new_items_list = [];
+      foreach ($items as $item){
+        $new_item = $item->createDuplicate();
+        $new_item->set('field_parent_box', $new_box);
+
+        if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
+          $html = $item->get('field_html_item')->entity;
+          $html = $html->createDuplicate();
+
+          $new_item->set('field_html_item', $html);
+
+        } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
+          $database = $item->get('field_database_item')->entity;
+          $new_item->set('field_database_item', $database);
+
+        } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
+          $media = $item->get('field_media_image')->entity;
+          $new_item->set('field_media_image', $media);
+        }
+
+        $new_item->save();
+        $new_items_list[] = $new_item;
+      }
+
+      $new_box->set('field_box_items', $new_items_list);
+      $new_box->save();
+
+      $new_box_list[] = $new_box;
+    }
+
+    $new_page->set('field_child_boxes', $new_box_list);
+    $new_page->save();
+
+    return $new_page;
   }
 
   /**

@@ -76,26 +76,9 @@ class LgmsGuidePageViewBlock extends BlockBase {
           'sub_pages' => [
             '#theme' => 'item_list',
             '#items' => [],
+            'icons'=>[]
           ],
         ],
-        're_order_icon' => !empty($sub_pages)?[
-          '#type' => 'link',
-          '#title' => [
-            '#type' => 'html_tag',
-            '#tag' => 'i',
-            '#attributes' => [
-              'class' => ['fa', 'fa-bars', 're-order-icon'],
-            ],
-          ],
-          '#url' => Url::fromRoute('re_order_page.form', [], ['query' => ['guide_id' => $page->id(), 'current_node' => \Drupal::routeMatch()->getParameter('node')->id()]]),
-          '#attributes' => [
-            'class' => ['use-ajax'],
-            'data-dialog-type' => 'modal',
-            'data-dialog-options' => Json::encode(['width' => 800]),
-            'title' => 'Re-position Box',
-            'style' => 'text-decoration: none;',
-          ],
-        ]:[],
       ];
 
       // Add sub-pages to the list if they exist.
