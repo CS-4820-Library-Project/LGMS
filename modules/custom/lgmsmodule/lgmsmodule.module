@@ -62,22 +62,6 @@ function lgmsmodule_generate_url_alias(NodeInterface $node) {
       // If there's no parent guide, fallback to just using the page title.
       $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
     }
-  } elseif ($node->getType() == 'sub_page') {
-    $parent_page = $node->get('field_parent_page')->entity;
-
-    if ($parent_page) {
-      // Construct the alias using the parent guide's title and the page's title.
-      $parent_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_page->getTitle()));
-      $parent_guide = $parent_page->get('field_parent_guide')->entity;
-      if($parent_guide){
-        $parent_guide_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_guide->getTitle()));
-        $child_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
-        $alias = '/' . $parent_guide_alias . '/' . $parent_alias . '/' . $child_alias;
-      }
-    } else {
-      // If there's no parent guide, fallback to just using the page title.
-      $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
-    }
   } else {
     // If the content type is neither 'guide' nor 'page', do nothing.
     return;
@@ -1077,7 +1061,6 @@ function lgmsModule_install(): void
           'bundles' => [
             'guide' => 'guide',
             'guide_page' => 'guide_page',
-            'sub_page' => 'sub_page'
           ],
           'negate' => FALSE,
           'context_mapping' => [
@@ -1115,7 +1098,6 @@ function lgmsModule_install(): void
           'bundles' => [
             'guide' => 'guide',
             'guide_page'=>'guide_page',
-            'sub_page'=>'sub_page'
           ],
           'negate' => FALSE,
           'context_mapping' => [
@@ -1131,15 +1113,15 @@ function lgmsModule_install(): void
     \Drupal::messenger()->addMessage('The LGMS Page View Block already exists.');
   }
 
-  // Create content types.
-  createContentType('guide', 'Guide','Use <em>Guide</em> content type to create custom library guides.');
-  createContentType('guide_page', 'Guide Page',  'Guide Page');
-  createContentType('guide_box', 'Guide Box','Box');
-  createContentType('sub_page', 'Sub Page',);
-  createContentType('guide_item', 'Guide Box Item');
-  createContentType('guide_html_item', 'HTML Box Item');
-  createContentType('guide_database_item', 'Database Box Item');
-  createContentType('guide_book_item', 'Book Box Item');
+  // Create content types with brief descriptions.
+  createContentType('guide', 'Guide', 'Comprehensive collections of resources on specific subjects.');
+  createContentType('guide_page', 'Guide Page', 'Segments within a Guide for organizing content.');
+  createContentType('guide_box', 'Guide Box', 'Containers within Guide Pages for grouping related items.');
+  createContentType('guide_item', 'Guide Box Item', 'Generic items within Guide Boxes.');
+  createContentType('guide_html_item', 'HTML Box Item', 'Embeddable HTML content within Guide Boxes.');
+  createContentType('guide_database_item', 'Database Box Item', 'Links to databases within Guide Boxes.');
+  createContentType('guide_book_item', 'Book Box Item', 'References to books within Guide Boxes.');
+
 
   // Create a new Guide Type taxonomy.
   create_vocab('LGMS_Guide_Type', 'Guide Type', 'Use Guide Type to group guides by their type');
@@ -1386,27 +1368,7 @@ function lgmsModule_install(): void
     ''
   );
 
-  createField(
-    'field_parent_page',
-    'node',
-    'sub_page',
-    'Parent Page',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
-      'handler_settings' => [
-        'target_bundles' => [
-          'guide_page' => 'guide_page',
-        ],
-      ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    False,
-    1,
-    ''
-  );
+
 
 
 //add page description field
@@ -1446,41 +1408,7 @@ function lgmsModule_install(): void
     ''
   );
 
-  createField(
-    'field_draft_mode',
-    'node',
-    'sub_page',
-    'Draft Mode',
-    'boolean',
-    [],
-    [],
-    'boolean_checkbox',
-    [ // Widget settings.
-      'settings' => [
-        'display_label' => TRUE,
-      ],
-    ],
-    FALSE,
-    FALSE,
-    5,
-    ''
-  );
 
-  createField(
-    'field_description',
-    'node',
-    'sub_page',
-    'Description',
-    'text_long',
-    [],
-    [],
-    'text_textarea',
-    ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
-    TRUE,
-    False,
-    3,
-    ''
-  );
 
   createField(
     'field_description',
@@ -1713,7 +1641,7 @@ function lgmsModule_install(): void
     [],
     TRUE,
     TRUE,
-    5,
+    6,
     ''
   );
 
@@ -1739,7 +1667,7 @@ function lgmsModule_install(): void
     [],
     TRUE,
     TRUE,
-    6,
+    7,
     ''
   );
 
@@ -2187,7 +2115,6 @@ function lgmsModule_install(): void
   disable_field('guide', 'display_submitted');
   disable_field('guide_page', 'display_submitted');
   disable_field('guide_box', 'display_submitted');
-  disable_field('sub_page', 'display_submitted');
   disable_field('guide_database_item', 'display_submitted');
   disable_field('guide_book_item', 'display_submitted');
 }
@@ -2490,8 +2417,6 @@ function lgmsModule_uninstall(): void
   $content_type = NodeType::load('guide_box');
   $content_type?->delete();
 
-  $content_type = NodeType::load('sub_page');
-  $content_type?->delete();
 
   $content_type = NodeType::load('guide_item');
   $content_type?->delete();
