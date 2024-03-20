@@ -12,12 +12,6 @@ class sqlMethods {
     $this->database = $database;
   }
 
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('database')
-    );
-  }
-
   public function getFromTable(String $tableName): array {
     $splitName = explode('__', $tableName);
     $field_name = end($splitName);
