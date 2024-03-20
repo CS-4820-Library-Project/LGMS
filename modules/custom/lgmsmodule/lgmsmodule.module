@@ -53,11 +53,16 @@ function lgmsmodule_generate_url_alias(NodeInterface $node) {
   elseif ($node->getType() == 'guide_page') {
     // Load the parent guide node.
     $parent_guide = $node->get('field_parent_guide')->entity;
-    if ($parent_guide) {
+    if ($parent_guide->bundle() == 'guide') {
       // Construct the alias using the parent guide's title and the page's title.
       $parent_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_guide->getTitle()));
       $child_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
       $alias = '/' . $parent_alias . '/' . $child_alias;
+    } else if ($parent_guide->bundle() == 'guide_page'){
+      $grand_parent_alies = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_guide->get('field_parent_guide')->entity->getTitle()));
+      $parent_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $parent_guide->getTitle()));
+      $child_alias = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));
+      $alias = '/' . $grand_parent_alies . '/' . $parent_alias . '/' . $child_alias;
     } else {
       // If there's no parent guide, fallback to just using the page title.
       $alias = '/' . strtolower(preg_replace('/[^a-z0-9]+/i', '-', $node->getTitle()));

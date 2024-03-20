@@ -177,8 +177,8 @@ class ReuseGuidePageForm extends FormBase {
         $new_page->save();
 
       }
-      $page = $new_page;
 
+      $page = $new_page;
       $form_state->setValue('current_node', $page->id());
     } else {
       $new_page = Node::create([
@@ -193,6 +193,33 @@ class ReuseGuidePageForm extends FormBase {
       ]);
 
       $new_page->save();
+
+      if($form_state->getValue('include_sub') == '1'){
+        \Drupal::logger('my_module')->notice('<pre>' . print_r('1111', TRUE) . '</pre>');
+        $children = $page->get('field_child_pages')->referencedEntities();
+
+        $child_list = [];
+        foreach ($children as $child){
+          \Drupal::logger('my_module')->notice('<pre>' . print_r('2222', TRUE) . '</pre>');
+          $new_child =  Node::create([
+            'type' => 'guide_page',
+            'title' => $child->label(),
+            'field_description' => $child->get('field_description'),
+            'field_parent_guide' => $new_page,
+            'field_child_boxes' => $child->get('field_child_boxes')->referencedEntities(),
+            'field_reference_node' => $child,
+            'field_hide_description' => $child->get('field_hide_description'),
+            'status' => $child->isPublished(),
+          ]);
+          $new_child->save();
+
+          $child_list[] = $new_child;
+        }
+
+        $new_page->set('field_child_pages', $child_list);
+        $new_page->save();
+        \Drupal::logger('my_module')->notice('<pre>' . print_r('3333', TRUE) . '</pre>');
+      }
 
       $page = $new_page;
       $form_state->setValue('current_node', $page->id());
