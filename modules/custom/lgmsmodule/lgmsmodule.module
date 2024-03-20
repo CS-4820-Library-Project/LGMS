@@ -2411,6 +2411,9 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_book_item');
 
 
+  $content_type = NodeType::load('guide');
+  $content_type?->delete();
+
   $content_type = NodeType::load('guide_page');
   $content_type?->delete();
 
