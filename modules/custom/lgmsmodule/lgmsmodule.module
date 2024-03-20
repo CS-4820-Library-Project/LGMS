@@ -187,13 +187,14 @@ function add_terms(array $terms, string $vid): void {
  * Helper function to create content types.
  * @throws EntityStorageException
  */
-function createContentType($id, $name): void
+function createContentType($id, $name, $desc = ''): void
 {
   $type = NodeType::load($id);
   if (!$type) {
     $type = NodeType::create([
       'type' => $id,
       'name' => $name,
+      'description' => $desc,
     ]);
     $type->save();
   }
@@ -1131,9 +1132,10 @@ function lgmsModule_install(): void
   }
 
   // Create content types.
-  createContentType('guide_page', 'Guide Page');
-  createContentType('guide_box', 'Guide Box');
-  createContentType('sub_page', 'Sub Page');
+  createContentType('guide', 'Guide','Use <em>Guide</em> content type to create custom library guides.');
+  createContentType('guide_page', 'Guide Page',  'Guide Page');
+  createContentType('guide_box', 'Guide Box','Box');
+  createContentType('sub_page', 'Sub Page',);
   createContentType('guide_item', 'Guide Box Item');
   createContentType('guide_html_item', 'HTML Box Item');
   createContentType('guide_database_item', 'Database Box Item');
