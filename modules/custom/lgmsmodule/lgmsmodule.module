@@ -1814,21 +1814,21 @@ function lgmsModule_install(): void
     'The user\'s phone number.'
   );
 
-  // User Picture
+  // Body
   createField(
-    'field_lgms_user_picture',
+    'field_lgms_body',
     'user',
     'user',
-    'User Picture',
-    'image',
-    ['uri_scheme' => 'public', 'file_extensions' => 'png jpg jpeg'],
+    'Body',
+    'text_long',
     [],
-    'image_image',
-    ['progress_indicator' => 'throbber'],
+    [],
+    'text_textarea',
+    [],
     TRUE,
     FALSE,
-    4,
-    'The user\'s profile picture.'
+    3,
+    'The user\'s custom body.'
   );
 
   createField(
@@ -2392,7 +2392,6 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_lgms_first_name');
   delete_field_storage('field_lgms_last_name');
   delete_field_storage('field_lgms_phone_number');
-  delete_field_storage('field_lgms_user_picture');
   delete_field_storage('field_db_guide_subject');
   delete_field_storage('field_book_author_or_editor');
   delete_field_storage('field_book_publisher');
