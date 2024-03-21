@@ -190,27 +190,29 @@ class EditPageForm extends FormBase {
     $form_state->getValue('draft_mode') == '0'? $selected_page->setPublished(): $selected_page->setUnpublished();
 
 
-    $parent = $selected_page->get('field_parent_guide')->entity;
+    if($selected_page->hasField('field_parent_guide')){
+      $parent = $selected_page->get('field_parent_guide')->entity;
 
-    $child_pages = $parent->get('field_child_pages')->getValue();
+      $child_pages = $parent->get('field_child_pages')->getValue();
 
-    $child_pages = array_filter($child_pages, function ($page) use ($selected_page) {
-      return $page['target_id'] != $selected_page->id();
-    });
+      $child_pages = array_filter($child_pages, function ($page) use ($selected_page) {
+        return $page['target_id'] != $selected_page->id();
+      });
 
-    $parent->set('field_child_pages', $child_pages);
-    $parent->save();
+      $parent->set('field_child_pages', $child_pages);
+      $parent->save();
 
-    $new_parent = Node::load($form_state->getValue('position'));
-    $selected_page->set('field_parent_guide', $new_parent);
-    $selected_page->save();
+      $new_parent = Node::load($form_state->getValue('position'));
+      $selected_page->set('field_parent_guide', $new_parent);
+      $selected_page->save();
 
-    $page_list = $new_parent->get('field_child_pages')->getValue();
-    $page_list[] = ['target_id' => $selected_page->id()];
+      $page_list = $new_parent->get('field_child_pages')->getValue();
+      $page_list[] = ['target_id' => $selected_page->id()];
 
-    $new_parent->set('field_child_pages', $page_list);
-    $new_parent->set('changed', \Drupal::time()->getRequestTime());
-    $new_parent->save();
+      $new_parent->set('field_child_pages', $page_list);
+      $new_parent->set('changed', \Drupal::time()->getRequestTime());
+      $new_parent->save();
+    }
 
 
     $ajaxHelper = new FormHelper();
