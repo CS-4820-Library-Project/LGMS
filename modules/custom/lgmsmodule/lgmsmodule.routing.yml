@@ -238,3 +238,19 @@ re_order_page.form:
     _title: 'Re-Order Guide Pages'
   requirements:
     _permission: 'create guide_box content'
+
+delete_guide_page.form:
+  path: '/delete_guide_page'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\DeletePageForm'
+    _title: 'Delete Guide Page'
+  requirements:
+    _permission: 'delete guide page content'
+
+edit_guide_page.form:
+  path: '/edit_guide_page'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\EditPageForm'
+    _title: 'Edit Guide Page'
+  requirements:
+    _permission: 'edit guide page content'

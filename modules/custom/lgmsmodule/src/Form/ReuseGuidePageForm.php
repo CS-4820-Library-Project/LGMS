@@ -34,7 +34,7 @@ class ReuseGuidePageForm extends FormBase {
       '#validated' => TRUE,
       '#required' => TRUE,
       '#ajax' => [
-        'callback' => '::include_sub_callback',
+        'callback' => '::IncludeSubCallBack',
         'wrapper' => 'include-sub-wrapper',
         'event' => 'change',
       ],
@@ -119,7 +119,7 @@ class ReuseGuidePageForm extends FormBase {
     return $form['position_wrapper'];
   }
 
-  public function include_sub_callback(array &$form, FormStateInterface $form_state) {
+  public function IncludeSubCallBack(array &$form, FormStateInterface $form_state) {
     $selected_page = $form_state->getValue('select_page');
 
     // Check if a page is selected and it's not the empty option.

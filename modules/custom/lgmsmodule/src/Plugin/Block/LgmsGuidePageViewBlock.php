@@ -137,6 +137,26 @@ class LgmsGuidePageViewBlock extends BlockBase {
       ];
 
       $build['re_order'] = $re_order_link;
+
+      $edit_url = Url::fromRoute('edit_guide_page.form', [], ['query' => ['guide_id' => $current_guide_id, 'current_node' => \Drupal::routeMatch()->getParameter('node')->id()]]);
+      $edit_link = Link::fromTextAndUrl(t('edit'), $edit_url)->toRenderable();
+      $edit_link['#attributes'] = [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode(['width' => 800]),
+      ];
+
+      $build['edit'] = $edit_link;
+
+      $delete_url = Url::fromRoute('delete_guide_page.form', [], ['query' => ['guide_id' => $current_guide_id, 'current_node' => \Drupal::routeMatch()->getParameter('node')->id()]]);
+      $delete_link = Link::fromTextAndUrl(t('delete'), $delete_url)->toRenderable();
+      $delete_link['#attributes'] = [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-dialog-options' => Json::encode(['width' => 800]),
+      ];
+
+      $build['delete'] = $delete_link;
     }
 
 
