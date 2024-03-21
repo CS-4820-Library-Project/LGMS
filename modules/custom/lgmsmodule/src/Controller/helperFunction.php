@@ -2,8 +2,17 @@
 
 namespace Drupal\lgmsmodule\Controller;
 
-class landingPageHelper
+use Drupal\Core\Database\Connection;
+
+class helperFunction
 {
+
+  protected Connection $database;
+
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
+
   public function getLink(String $nid): string
   {
     return 'http://' . $_SERVER['HTTP_HOST'] . \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $nid])->toString();
@@ -59,4 +68,18 @@ class landingPageHelper
 
     return $render;
   }
+
+  public function getFromTable(String $tableName): array {
+    $splitName = explode('__', $tableName);
+    $field_name = end($splitName);
+    $termColName = $field_name . '_target_id';
+
+    // Assuming that the field is also attached to the 'guide' content type
+    $query = $this->database->select($tableName, 'n')
+      ->condition('n.bundle', 'guide') // Changed from 'article' to 'guide'
+      ->fields('n', ['entity_id', $termColName]);
+
+    return $query->execute()->fetchAll();
+  }
+
 }

@@ -21,7 +21,7 @@ class lgmsDatabasesController extends ControllerBase
   public function databases() {
     $build = [];
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
-    $landingMethods = new landingPageHelper();
+    $landingMethods = new helperFunction(\Drupal::database());
     $view = Views::getView('lgms_databases');
 
     if (is_object($view)) {

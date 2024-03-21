@@ -3,7 +3,6 @@
 namespace Drupal\lgmsmodule\Controller;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\lgmsmodule\sql\sqlMethods;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 
@@ -11,10 +10,9 @@ class BySubjectController {
   public function bySubject(){
     $build = [];
     $data = [];
-    $sqlMethods = new sqlMethods(\Drupal::database());
-    $landingMethods = new landingPageHelper();
+    $landingMethods = new helperFunction(\Drupal::database());
 
-    $result = $sqlMethods->getFromTable('	node__field_lgms_guide_subject');
+    $result = $landingMethods->getFromTable('	node__field_lgms_guide_subject');
 
     foreach ($result as $record) {
       $nid = $record->entity_id;

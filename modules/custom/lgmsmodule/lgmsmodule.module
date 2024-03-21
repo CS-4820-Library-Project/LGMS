@@ -3,7 +3,6 @@ use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
-use Drupal\lgmsmodule\Controller\landingPageHelper;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Serialization\Json;
@@ -16,7 +15,6 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\lgmsmodule\sql\sqlMethods;
 use Drupal\link\LinkItemInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -1528,7 +1526,7 @@ function lgmsModule_install(): void
     [],
     TRUE,
     TRUE,
-    5,
+    6,
     ''
   );
 
@@ -1646,7 +1644,7 @@ function lgmsModule_install(): void
     [],
     TRUE,
     TRUE,
-    6,
+    7,
     ''
   );
 
@@ -1672,7 +1670,7 @@ function lgmsModule_install(): void
     [],
     TRUE,
     TRUE,
-    7,
+    6,
     ''
   );
 
@@ -1821,21 +1819,21 @@ function lgmsModule_install(): void
     'The user\'s phone number.'
   );
 
-  // User Picture
+  // Body
   createField(
-    'field_lgms_user_picture',
+    'field_lgms_body',
     'user',
     'user',
-    'User Picture',
-    'image',
-    ['uri_scheme' => 'public', 'file_extensions' => 'png jpg jpeg'],
+    'Body',
+    'text_long',
     [],
-    'image_image',
-    ['progress_indicator' => 'throbber'],
+    [],
+    'text_textarea',
+    [],
     TRUE,
     FALSE,
-    4,
-    'The user\'s profile picture.'
+    3,
+    'The user\'s custom body.'
   );
 
   createField(
@@ -2399,7 +2397,6 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_lgms_first_name');
   delete_field_storage('field_lgms_last_name');
   delete_field_storage('field_lgms_phone_number');
-  delete_field_storage('field_lgms_user_picture');
   delete_field_storage('field_db_guide_subject');
   delete_field_storage('field_book_author_or_editor');
   delete_field_storage('field_book_publisher');
@@ -2414,7 +2411,6 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_book_cat_record');
   delete_field_storage('field_book_pub_finder');
   delete_field_storage('field_book_item');
-
 
   $content_type = NodeType::load('guide');
   $content_type?->delete();
@@ -2439,6 +2435,14 @@ function lgmsModule_uninstall(): void
   $content_type?->delete();
 
   $view_id = 'lgms_databases';
+  $view = View::load($view_id);
+  $view?->delete();
+
+  $view_id = 'lgms_all_guides_table';
+  $view = View::load($view_id);
+  $view?->delete();
+
+  $view_id = 'lgms_dashboard_table';
   $view = View::load($view_id);
   $view?->delete();
 }

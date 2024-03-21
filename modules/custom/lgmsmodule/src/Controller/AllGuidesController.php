@@ -11,7 +11,6 @@ use Drupal\Core\Url;
 use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\lgmsmodule\sql\sqlMethods;
 
 /**
  * Returns responses for LGMS Module routes.
@@ -25,7 +24,7 @@ class AllGuidesController extends ControllerBase
   public function allGuides(): array
   {
     $build = [];
-    $landingMethods = new landingPageHelper();
+    $landingMethods = new helperFunction(\Drupal::database());
     $view = Views::getView('lgms_all_guides_table');
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
 
