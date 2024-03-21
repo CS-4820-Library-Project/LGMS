@@ -89,6 +89,13 @@ class DeletePageForm extends FormBase
     return $form;
   }
 
+  public function submitAjax(array &$form, FormStateInterface $form_state) {
+    // Create an array of AJAX commands.
+    $ajaxHelper = new FormHelper();
+
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.');
+  }
+
   public function IncludeSubCallBack(array &$form, FormStateInterface $form_state) {
     $selected_page = $form_state->getValue('select_page');
 
