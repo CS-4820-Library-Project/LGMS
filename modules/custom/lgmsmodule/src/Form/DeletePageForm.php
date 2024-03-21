@@ -79,6 +79,10 @@ class DeletePageForm extends FormBase
         '#button_type' => 'danger',
       ];
 
+      $form['actions']['submit']['#ajax'] = [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ];
     } else {
       $form['error'] = [
         '#type' => 'markup',
