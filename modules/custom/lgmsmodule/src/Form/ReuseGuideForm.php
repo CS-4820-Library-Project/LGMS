@@ -62,7 +62,7 @@ class ReuseGuideForm extends FormBase
   {
     $query = \Drupal::entityQuery('node')
       ->condition('type', 'guide_box')
-      ->condition('field_parent_page', $pageId)
+      ->condition('field_parent_node', $pageId)
       ->accessCheck(TRUE);
     $result = $query->execute();
     return Node::loadMultiple($result); // Assuming you have 'id()' on the box entity
@@ -88,7 +88,7 @@ class ReuseGuideForm extends FormBase
         $boxes = $this->getChildBoxes($page->id());
         foreach ($boxes as $box) {
           $cloned_box = $box->createDuplicate();
-          $cloned_box->set('field_parent_page', $cloned_page->id()); // Update Parent Page reference
+          $cloned_box->set('field_parent_node', $cloned_page->id()); // Update Parent Page reference
           $cloned_box->save();
         }
       }

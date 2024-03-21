@@ -246,6 +246,7 @@ class LgmsGuideOwnerBlock extends BlockBase {
         '#url' => $user_edit_url,
         '#attributes' => [
           'class' => ['button'],
+          'style' => 'margin-bottom: 10px;',
         ],
       ]
     ];
