@@ -34,7 +34,7 @@ class DeletePageForm extends FormBase
 
 
     if ($current_guide) {
-      $form['current_page'] = [
+      $form['current_node'] = [
         '#type' => 'hidden',
         '#value' => $current_guide->id(),
       ];
@@ -103,7 +103,7 @@ class DeletePageForm extends FormBase
     if (!empty($selected_page)) {
       // Load the selected page node to check its field_child_pages.
       if ($selected_page == 'top_level')
-        $selected_page = $form_state->getValue('current_page');
+        $selected_page = $form_state->getValue('current_node');
 
       $page_node = Node::load($selected_page);
       if ($page_node) {
@@ -118,7 +118,7 @@ class DeletePageForm extends FormBase
           // Ensure it is not disabled if there are child pages.
           unset($form['include_sub_wrapper']['include_sub']['#attributes']['disabled']);
 
-          if($selected_page == $form_state->getValue('current_page')){
+          if($selected_page == $form_state->getValue('current_node')){
             $form['include_sub_wrapper']['include_sub']['#title'] = 'All Page and subPages of this Guide will be deleted.';
             $form['include_sub_wrapper']['include_sub']['#required'] = true;
           }
@@ -141,7 +141,7 @@ class DeletePageForm extends FormBase
     $delete_sub = $form_state->getValue('include_sub') == '1';
 
     if ($selected_page == 'top_level'){
-      $selected_page = $form_state->getValue('current_page');
+      $selected_page = $form_state->getValue('current_node');
     }
 
     $selected_page = Node::load($selected_page);
