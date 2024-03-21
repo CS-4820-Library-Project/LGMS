@@ -68,6 +68,11 @@ class EditPageForm extends FormBase {
       $form['update_wrapper']['hide_description'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Hide description'),
+        '#ajax' => [
+          'callback' => '::hideDescriptionCallback',
+          'wrapper' => 'update-wrapper', // This should be the ID of the element you want to replace or update, you can adjust as needed.
+          'event' => 'change',
+        ],
       ];
 
       // Description field with state controlled by hide_description checkbox.
@@ -130,6 +135,21 @@ class EditPageForm extends FormBase {
 
     return $form;
   }
+
+  public function hideDescriptionCallback(array &$form, FormStateInterface $form_state) {
+    $response = new AjaxResponse();
+
+    // Here, you would typically add commands to the response to update parts of the form.
+    // For example, to replace the update_wrapper element with its updated version:
+    $response->addCommand(new ReplaceCommand('#update-wrapper', $form['update_wrapper']));
+
+    // Assuming you have a custom JS command to resize/reposition the modal, you would add it here.
+    // This example assumes you have a JS command 'repositionModal' implemented.
+    //$response->addCommand(['command' => 'repositionModal']);
+
+    return $response;
+  }
+
 
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     // Create an array of AJAX commands.
