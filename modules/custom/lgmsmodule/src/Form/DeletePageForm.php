@@ -243,8 +243,8 @@ class DeletePageForm extends FormBase
 
         // Create options array from the child pages.
         foreach ($child_pages as $child_page) {
+          $options[$group_label][$child_page->id()] = $child_page->label();
           if ($child_page->get('field_parent_guide')->entity->id() == $guide_id) {
-            $options[$group_label][$child_page->id()] = $child_page->label();
 
             // Check if the child page has its own subpages.
             if ($child_page->hasField('field_child_pages')) {
