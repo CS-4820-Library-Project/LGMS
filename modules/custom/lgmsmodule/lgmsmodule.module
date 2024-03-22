@@ -827,7 +827,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       $json_data = json_encode($array_of_objects);
       $book_query_param = urlencode($json_data);
 
-      if($box->access('update') && !$reference_page) {
+      if($box->access('update') && !$reference_page && $entity->id() === $box->get('field_parent_node')->entity->id()) {
         $guide_box_build['items_list'] = [
           '#type' => 'container',
           '#attributes' => ['id' => 'add-reorder-list', 'class' => ['guide-item2']],
