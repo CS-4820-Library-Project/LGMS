@@ -1371,6 +1371,27 @@ function lgmsModule_install(): void
     ''
   );
 
+  createField(
+    'field_parent_item',
+    'node',
+    'guide_book_item',
+    'Parent node',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_item' => 'guide_item',
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    False,
+    0,
+    ''
+  );
 
 
 

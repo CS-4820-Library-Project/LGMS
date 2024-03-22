@@ -338,7 +338,8 @@ class AddBookForm extends FormBase {
       ]);
 
       $new_item->save();
-
+      $new_html->set('field_parent_item', $new_item);
+      $new_html->save();
       $boxList = $current_box->get('field_box_items')->getValue();
       $boxList[] = ['target_id' => $new_item->id()];
 
