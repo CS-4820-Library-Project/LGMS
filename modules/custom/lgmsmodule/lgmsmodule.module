@@ -447,10 +447,12 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       '#url' => Url::fromRoute('entity.node.canonical', ['node' => $node_id]), // Generate the URL to the node.
     ];
 
-    $item_container['content'][] = [
-      '#type' => 'markup',
-      '#markup' => '— ' . $item->get('field_description')->value,
-    ];
+    if(!empty($item->get('field_description')->value)){
+      $item_container['content'][] = [
+        '#type' => 'markup',
+        '#markup' => '— ' . $item->get('field_description')->value,
+      ];
+    }
 
     $edit_route = 'add_database.form';
     $delete_route = 'delete_database.form';

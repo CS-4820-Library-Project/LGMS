@@ -68,7 +68,7 @@ class AddDatabaseForm extends FormBase {
     $form['include_desc'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Include Description'),
-      '#default_value' => True,
+      '#default_value' => !$edit || !empty($current_item->get('field_description')->value),
     ];
 
 
