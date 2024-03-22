@@ -110,20 +110,20 @@ class ReuseBookForm extends FormBase {
     $current_box = Node::load($current_box);
 
 
-    $html = Node::load($form_state->getValue('box'));
-    $item = $html->get('field_parent_item')->entity;
+    $book = Node::load($form_state->getValue('box'));
+    $item = $book->get('field_parent_item')->entity;
 
     if(!$form_state->getValue('reference')){
-      $new_html = $html->createDuplicate();
+      $new_book = $book->createDuplicate();
       $new_item = $item->createDuplicate();
 
-      $new_html->set('field_parent_item', $new_item);
-      $new_html->set('title', $form_state->getValue('title'));
-      $new_html->save();
+      $new_book->set('field_parent_item', $new_item);
+      $new_book->set('title', $form_state->getValue('title'));
+      $new_book->save();
 
       $new_item->set('field_parent_box', $current_box);
       $new_item->set('title', $form_state->getValue('title'));
-      $new_item->set('field_book_item', $new_html);
+      $new_item->set('field_book_item', $new_book);
 
       $new_item->save();
 

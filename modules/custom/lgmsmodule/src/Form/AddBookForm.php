@@ -112,21 +112,23 @@ class AddBookForm extends FormBase {
       '#format' => $edit ? $current_item->get('field_book_description')->format : 'basic_html',
     ];
 
-
     $term_ids = [];
-
 
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
       'name' => ['eBook', 'print'],
       'vid' => 'LGMS_Guide_Book_Type',
     ]);
 
-
     if (!empty($terms)) {
       foreach ($terms as $term) {
         $term_ids[$term->label()] = $term->id();
       }
     }
+
+    $form['terms'] = [
+      '#type' => 'hidden',
+      '#value' => $term_ids,
+    ];
 
     $form['type'] = [
       '#type' => 'select',
@@ -247,6 +249,8 @@ class AddBookForm extends FormBase {
       '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
     ];
 
+    $form['#validate'][] = '::validateFields';
+
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),
@@ -269,6 +273,27 @@ class AddBookForm extends FormBase {
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'an Book item has been added.');
   }
+
+  public function validateFields(array &$form, FormStateInterface $form_state) {
+    $terms = $form_state->getValue('terms');
+    if($form_state->getValue('type') == $terms['print']){
+      if(empty($form_state->getValue('call_number'))){
+        $form_state->setErrorByName('call_number', t('Call Number is required.'));
+      }
+      if(empty($form_state->getValue('location'))) {
+        $form_state->setErrorByName('location', t('Location is required.'));
+      }
+      if(empty($form_state->getValue(['cat_record_group', 'url']))){
+        $form_state->setErrorByName('cat_record_group][url', t('Cat Record\'s url is required.'));
+      }
+    }
+    else {
+      if(empty($form_state->getValue(['pub_finder_group', 'url']))){
+        $form_state->setErrorByName('pub_finder_group][url', t('Pub Finder\'s url is required.'));
+      }
+    }
+  }
+
 
   public static function hideTextFormatHelpText(array $element, FormStateInterface $form_state) {
     if (isset($element['format']['help'])) {
@@ -321,25 +346,25 @@ class AddBookForm extends FormBase {
       $current_box = $form_state->getValue('current_box');
       $current_box = Node::load($current_box);
 
-      $new_html = Node::create(['type' => 'guide_book_item', ...$form_field_values]);
+      $new_book = Node::create(['type' => 'guide_book_item', ...$form_field_values]);
 
-      $new_html->save();
+      $new_book->save();
 
-      $this->handleUserPicture($new_html, $form_state);
+      $this->handleUserPicture($new_book, $form_state);
 
-      $new_html->save();
+      $new_book->save();
 
       $new_item = Node::create([
         'type' => 'guide_item',
         'title' => $form_state->getValue('title'),
-        'field_book_item' => $new_html,
+        'field_book_item' => $new_book,
         'field_parent_box' => $current_box,
         'status' => $form_state->getValue('published') == '0',
       ]);
 
       $new_item->save();
-      $new_html->set('field_parent_item', $new_item);
-      $new_html->save();
+      $new_book->set('field_parent_item', $new_item);
+      $new_book->save();
       $boxList = $current_box->get('field_box_items')->getValue();
       $boxList[] = ['target_id' => $new_item->id()];
 
@@ -350,19 +375,19 @@ class AddBookForm extends FormBase {
       $current_item = $form_state->getValue('current_item');
       $current_item = Node::load($current_item);
 
-      $html = $current_item->get('field_book_item')->entity;
+      $book = $current_item->get('field_book_item')->entity;
 
       foreach ($form_field_values as $key => $value) {
-        $html->set($key, $value);
+        $book->set($key, $value);
       }
 
       $new_picture_fid = $form_state->getValue(['cover_picture', 0]);
-      $old_picture_fid = $html->get('field_book_cover_picture')->target_id;
+      $old_picture_fid = $book->get('field_book_cover_picture')->target_id;
 
       if(!($new_picture_fid &&  $old_picture_fid == $new_picture_fid)){
 
         if($old_picture_fid){
-          $html->set('field_book_cover_picture', NULL);
+          $book->set('field_book_cover_picture', NULL);
           $file = File::load($old_picture_fid);
           $file_usage = \Drupal::service('file.usage');
           $file_usage->delete($file, 'lgmsmodule');
@@ -370,11 +395,11 @@ class AddBookForm extends FormBase {
         }
 
         if($new_picture_fid){
-          $this->handleUserPicture($html, $form_state);
+          $this->handleUserPicture($book, $form_state);
         }
       }
 
-      $html->save();
+      $book->save();
 
       $current_item->set('title', $form_state->getValue('title'));
       $current_item->set('status', $form_state->getValue('published') == '0');
