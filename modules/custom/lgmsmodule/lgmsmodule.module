@@ -409,10 +409,6 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       '#format' => $html->get('field_book_description')->format,
     ];
 
-    $item_container['content']['details'][] = [
-      '#markup' => '<div>URL: <a href="' . $html->get('field_book_url')->uri . '">' . $html->get('title')->value . '</a></div>'
-    ];
-
     if(Term::load($html->get('field_book_type')->target_id)->getName() == 'print') {
       $item_container['content']['details'][] = [
         '#type' => 'html_tag',
