@@ -174,6 +174,7 @@ class ReuseGuidePageForm extends FormBase {
         }
 
         $new_page->set('field_child_pages', $child_list);
+        $new_page->setOwnerId(\Drupal::currentUser()->id());
         $new_page->save();
 
       }
@@ -237,6 +238,7 @@ class ReuseGuidePageForm extends FormBase {
   {
     $new_page = $page->createDuplicate();
 
+    $new_page->setOwnerId(\Drupal::currentUser()->id());
     $new_page->set('field_parent_guide', $parent);
     $new_page->set('title', $title);
     $new_page->save();
@@ -247,6 +249,7 @@ class ReuseGuidePageForm extends FormBase {
     foreach ($boxes as $box){
       $new_box = $box->createDuplicate();
       $new_box->set('field_parent_node', $new_page);
+      $new_box->setOwnerId(\Drupal::currentUser()->id());
       $new_box->save();
 
       $items = $box->get('field_box_items')->referencedEntities();
@@ -255,10 +258,13 @@ class ReuseGuidePageForm extends FormBase {
       foreach ($items as $item){
         $new_item = $item->createDuplicate();
         $new_item->set('field_parent_box', $new_box);
+        $new_item->setOwnerId(\Drupal::currentUser()->id());
 
         if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
           $html = $item->get('field_html_item')->entity;
           $html = $html->createDuplicate();
+          $html->setOwnerId(\Drupal::currentUser()->id());
+          $html->save();
 
           $new_item->set('field_html_item', $html);
 
