@@ -441,18 +441,19 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   }
   elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
     $database = $item->get('field_database_item')->entity;
-    $link = $database->get('field_database_link')->first()->getValue();
+    $node_id = $database->id();
+    $node_label = $database->label();
 
     //$item_container['content'][] = \Drupal::entityTypeManager()->getViewBuilder('node')->view($database, 'full');
     $item_container['content'][] = [
       '#type' => 'link',
-      '#title' => $link['title'],
-      '#url' => Url::fromUri($link['uri']),
+      '#title' => $node_label, // Use the node's label as the link text.
+      '#url' => Url::fromRoute('entity.node.canonical', ['node' => $node_id]), // Generate the URL to the node.
     ];
 
     $item_container['content'][] = [
       '#type' => 'markup',
-      '#markup' => $item->get('field_description')->value,
+      '#markup' => '— ' . $item->get('field_description')->value,
     ];
 
     $edit_route = 'add_database.form';

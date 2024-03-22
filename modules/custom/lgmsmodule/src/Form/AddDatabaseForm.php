@@ -114,7 +114,7 @@ class AddDatabaseForm extends FormBase {
   public function validateFields(array &$form, FormStateInterface $form_state) {
     $reference = $form_state->getValue('include_desc');
     $title = $form_state->getValue('description');
-    if (!$reference && empty($title)) {
+    if ($reference && empty($title)) {
       $form_state->setErrorByName('description', $this->t('description: field is required.'));
     }
   }
