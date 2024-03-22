@@ -118,6 +118,7 @@ class ReuseBookForm extends FormBase {
       $new_item = $item->createDuplicate();
 
       $new_book->set('field_parent_item', $new_item);
+      $new_book->set('field_book_cover_picture', NULL);
       $new_book->set('title', $form_state->getValue('title'));
       $new_book->save();
 
