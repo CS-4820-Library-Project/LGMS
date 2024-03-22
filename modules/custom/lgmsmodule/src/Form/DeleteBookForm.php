@@ -45,12 +45,7 @@ class DeleteBookForm extends FormBase {
 
     $parent_box = $current_item->get('field_parent_box')->entity;
 
-    if($current_box->id() == $parent_box->id()){
-      $title = $this->t('<Strong>Are you Sure you want to Delete This Box?</Strong>
-                                if you delete this box, it will be permanently Deleted and restoring it would be impossible!!');
-    } else {
-      $title = $this->t('This item will be deleted only from this page');
-    }
+    $title = $this->t('<Strong>Are you Sure you want to Delete This Item?</Strong>');
 
     $form['Delete'] = [
       '#type' => 'checkbox',
@@ -123,8 +118,6 @@ class DeleteBookForm extends FormBase {
         $box->set('field_box_items', $child_items);
         $box->save();
       }
-
-      $current_item->get('field_book_item')->entity?->delete();
 
       $current_item?->delete();
     }
