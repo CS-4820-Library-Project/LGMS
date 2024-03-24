@@ -783,7 +783,7 @@ function box_display(EntityInterface $entity, EntityInterface $box)
             '#type' => 'html_tag',
             '#tag' => 'i',
             '#attributes' => [
-              'class' => ['fa', 'fa-bars', 're-order-icon'],
+              'class' => ['fa', 'fa-up-down-left-right', 're-order-icon'],
             ],
           ],
           '#url' => Url::fromRoute('re_order_guide_box.form', [], ['query' => ['current_node' => $entity->id()]]),
