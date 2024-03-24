@@ -38,7 +38,7 @@ class ReuseHTMLItemForm extends FormBase {
 
     $form['box'] = [
       '#type' => 'entity_autocomplete',
-      '#title' => $this->t('HTML Item Name'),
+      '#title' => $this->t('HTML Item Title'),
       '#target_type' => 'node',
       '#selection_settings' => [
         'target_bundles' => ['guide_html_item'],

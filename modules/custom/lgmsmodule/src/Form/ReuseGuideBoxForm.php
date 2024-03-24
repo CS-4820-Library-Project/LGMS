@@ -33,7 +33,7 @@ class ReuseGuideBoxForm extends FormBase {
 
     $form['box'] = [
       '#type' => 'entity_autocomplete',
-      '#title' => $this->t('Box Name'),
+      '#title' => $this->t('Box Title'),
       '#target_type' => 'node', // Adjust according to your needs
       '#selection_settings' => [
         'target_bundles' => ['guide_box'], // Adjust to your guide page bundle

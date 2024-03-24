@@ -56,7 +56,7 @@ class AddDatabaseForm extends FormBase {
 
     $form['database'] = [
       '#type' => 'entity_autocomplete',
-      '#title' => $this->t('Database Name'),
+      '#title' => $this->t('Database Title'),
       '#target_type' => 'node', // Adjust according to your needs
       '#selection_settings' => [
         'target_bundles' => ['guide_database_item'], // Adjust to your guide page bundle

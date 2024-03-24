@@ -35,7 +35,7 @@ class ReuseBookForm extends FormBase {
 
     $form['box'] = [
       '#type' => 'entity_autocomplete',
-      '#title' => $this->t('Book Item Name'),
+      '#title' => $this->t('Book Item Title'),
       '#target_type' => 'node',
       '#selection_settings' => [
         'target_bundles' => ['guide_book_item'],
