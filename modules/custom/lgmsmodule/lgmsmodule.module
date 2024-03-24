@@ -688,38 +688,45 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   return $item_container;
 }
 
+function database_display(EntityInterface $entity)
+{
+  $build['db_title'] = [
+    '#type' => 'markup',
+    '#markup' => t('<h1><strong>'.$entity->label() . '</h1></strong>'),
+  ];
+
+  if (!$entity->get('field_database_link')->isEmpty()) {
+    // Fetch the first item of the field_database_link field
+    $link_item = $entity->get('field_database_link')->first();
+    // Get the URL from the link field
+    $url = $link_item->getUrl()->toString();
+    // Get the link title (text) from the link field, fall back to the URL if the title is empty
+    $link_text = $link_item->title ?: $url;
+
+    $build['db_link'] = [
+      '#type' => 'markup',
+      '#markup' => '<h3><div class="link-icon"><i class="fa fa-link" aria-hidden="true"></i> <a href="' . $url . '">' . $link_text . '</a></div></h3>',
+    ];
+
+  }
+
+  if (!$entity->get('field_database_body')->isEmpty()) {
+    $body_value = $entity->get('field_database_body')->value;
+    $build['db_body'] = [
+      '#type' => 'markup',
+      '#markup' => '<div>' . $body_value . '</div>',
+    ];
+  }
+
+  return $build;
+}
+
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
   if($entity->bundle() === 'guide_database_item' && $view_mode === 'full'){
-    $build['db_title'] = [
-      '#type' => 'markup',
-      '#markup' => t('<h1><strong>'.$entity->label() . '</h1></strong>'),
-    ];
-
-    if (!$entity->get('field_database_link')->isEmpty()) {
-      // Fetch the first item of the field_database_link field
-      $link_item = $entity->get('field_database_link')->first();
-      // Get the URL from the link field
-      $url = $link_item->getUrl()->toString();
-      // Get the link title (text) from the link field, fall back to the URL if the title is empty
-      $link_text = $link_item->title ?: $url;
-
-      $build['db_link'] = [
-        '#type' => 'markup',
-        '#markup' => '<h3><div class="link-icon"><i class="fa fa-link" aria-hidden="true"></i> <a href="' . $url . '">' . $link_text . '</a></div></h3>',
-      ];
-
-    }
-
-    if (!$entity->get('field_database_body')->isEmpty()) {
-      $body_value = $entity->get('field_database_body')->value;
-      $build['db_body'] = [
-        '#type' => 'markup',
-        '#markup' => '<div>' . $body_value . '</div>',
-      ];
-    }
+    $build['db'] = database_display($entity);
   }
 
   if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
