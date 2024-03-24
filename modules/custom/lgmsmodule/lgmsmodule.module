@@ -471,7 +471,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
         '#type' => 'html_tag',
         '#tag' => 'i',
         '#attributes' => [
-          'class' => ['fa', 'fa-times', 'close-icon'],
+          'class' => ['fa', 'fa-trash', 'close-icon'],
         ],
       ],
       '#url' => $url,
@@ -812,7 +812,7 @@ function box_display(EntityInterface $entity, EntityInterface $box)
             '#type' => 'html_tag',
             '#tag' => 'i',
             '#attributes' => [
-              'class' => ['fa', 'fa-times', 'close-icon'],
+              'class' => ['fa', 'fa-trash', 'close-icon'],
             ],
           ],
           '#url' => Url::fromRoute('delete_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' =>$box->id()]]),
@@ -1069,7 +1069,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                 '#type' => 'html_tag',
                 '#tag' => 'i',
                 '#attributes' => [
-                  'class' => ['fa', 'fa-bars', 're-order-icon'],
+                  'class' => ['fa', 'fa-arrows-alt', 're-order-icon'],
                 ],
               ],
               '#url' => Url::fromRoute('re_order_guide_box.form', [], ['query' => ['current_node' => $entity->id()]]),
@@ -1105,7 +1105,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
                 '#type' => 'html_tag',
                 '#tag' => 'i',
                 '#attributes' => [
-                  'class' => ['fa', 'fa-times', 'close-icon'],
+                  'class' => ['fa', 'fa-trash', 'close-icon'],
                 ],
               ],
               '#url' => Url::fromRoute('delete_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' =>$box->id()]]),
