@@ -129,7 +129,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $build['guide_page_modal'] = $link;
 
       $re_order_url = Url::fromRoute('re_order_page.form', [], ['query' => ['guide_id' => $current_guide_id, 'current_node' => \Drupal::routeMatch()->getParameter('node')->id()]]);
-      $re_order_link = Link::fromTextAndUrl(t('Re-Order'), $re_order_url)->toRenderable();
+      $re_order_link = Link::fromTextAndUrl(t('Re-Order Pages'), $re_order_url)->toRenderable();
       $re_order_link['#attributes'] = [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',
@@ -140,7 +140,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $build['re_order'] = $re_order_link;
 
       $edit_url = Url::fromRoute('edit_guide_page.form', [], ['query' => ['guide_id' => $current_guide_id, 'current_node' => \Drupal::routeMatch()->getParameter('node')->id()]]);
-      $edit_link = Link::fromTextAndUrl(t('Edit'), $edit_url)->toRenderable();
+      $edit_link = Link::fromTextAndUrl(t('Edit A Page'), $edit_url)->toRenderable();
       $edit_link['#attributes'] = [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',
@@ -151,7 +151,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $build['edit'] = $edit_link;
 
       $delete_url = Url::fromRoute('delete_guide_page.form', [], ['query' => ['guide_id' => $current_guide_id, 'current_node' => \Drupal::routeMatch()->getParameter('node')->id()]]);
-      $delete_link = Link::fromTextAndUrl(t('Delete'), $delete_url)->toRenderable();
+      $delete_link = Link::fromTextAndUrl(t('Delete A Page'), $delete_url)->toRenderable();
       $delete_link['#attributes'] = [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',
