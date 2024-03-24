@@ -316,7 +316,7 @@ class ReuseGuidePageForm extends FormBase {
     );
 
     foreach ($guides as $guide) {
-      if ($guide->id() != $guide_id && $guide->hasField('field_child_pages')) {
+      if ($guide->hasField('field_child_pages')) {
         $child_pages_ids = array_column($guide->get('field_child_pages')->getValue(), 'target_id');
         $child_pages = !empty($child_pages_ids) ? Node::loadMultiple($child_pages_ids) : [];
 
