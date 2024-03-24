@@ -113,7 +113,7 @@ class ReuseGuidePageForm extends FormBase {
     if ($include_sub == '0') {
       unset($form['position_wrapper']['position']['#attributes']['disabled']);
     } else {
-      $form['position_wrapper']['position']['#options'] = ['Top Level' => ['top_level' => $this->t('Top Level')]];
+      $form['position_wrapper']['position']['#options'] = ['Page Level' => ['top_level' => $this->t('Page Level')]];
     }
 
     return $form['position_wrapper'];
@@ -348,7 +348,7 @@ class ReuseGuidePageForm extends FormBase {
   public function getPageList($guide_id) {
     $options = [];
 
-    $options['Top Level']['top_level'] = t('Top Level');
+    $options['Page Level']['top_level'] = t('Page Level');
 
     // Load the guide entity.
     $guide = Node::load($guide_id);

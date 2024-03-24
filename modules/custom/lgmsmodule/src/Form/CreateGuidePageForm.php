@@ -190,7 +190,7 @@ class CreateGuidePageForm extends FormBase
   public function getPageList($guide_id) {
     $options = [];
 
-    $options['Top Level']['top_level'] = t('Top Level');
+    $options['Page Level']['top_level'] = t('Page Level');
 
     // Load the guide entity.
     $guide = Node::load($guide_id);

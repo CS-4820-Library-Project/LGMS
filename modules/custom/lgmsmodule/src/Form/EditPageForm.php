@@ -237,7 +237,7 @@ class EditPageForm extends FormBase {
     $options = [];
     $guide = Node::load($guide_id);
 
-    $label = $include_sub? 'Guide' : 'Top Level';
+    $label = $include_sub? 'Guide' : 'Page Level';
 
     $options[$label][$guide->id()] = $label;
 

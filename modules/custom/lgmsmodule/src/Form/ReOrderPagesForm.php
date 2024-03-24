@@ -156,7 +156,7 @@ class ReOrderPagesForm extends FormBase {
     // Load the guide entity.
     $guide = Node::load($guide_id);
 
-    $options['Top Level'][$guide->id()] = t('Top Level');
+    $options['Page Level'][$guide->id()] = t('Page Level');
 
     // Check if the guide has been loaded and has the field_child_pages field.
     if ($guide && $guide->hasField('field_child_pages')) {
