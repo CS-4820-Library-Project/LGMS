@@ -45,7 +45,7 @@ class ReuseBookForm extends FormBase {
 
     $form['reference'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('<Strong>Reference:</Strong> By selecting this, a reference of the Book item will be created. it will be un-editable from this box'),
+      '#title' => $this->t('<Strong>Link:</Strong> By selecting this, a link to the HTML item will be created. it will be un-editable from this box'),
     ];
 
     $form['title'] = [

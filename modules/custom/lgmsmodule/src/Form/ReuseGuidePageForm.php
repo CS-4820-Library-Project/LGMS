@@ -55,9 +55,9 @@ class ReuseGuidePageForm extends FormBase {
       ],
     ];
 
-    $form['copy'] = [
+    $form['reference'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Copy'),
+      '#title' => $this->t('<Strong>Link:</Strong> By selecting this, a link to the HTML item will be created. it will be un-editable from this box'),
     ];
 
     $form['title'] = [
@@ -65,7 +65,7 @@ class ReuseGuidePageForm extends FormBase {
       '#title' => $this->t('Title'),
       '#states' => [
         'visible' => [
-          ':input[name="copy"]' => ['checked' => TRUE],
+          ':input[name="reference"]' => ['checked' => False],
         ],
       ],
     ];
@@ -162,7 +162,7 @@ class ReuseGuidePageForm extends FormBase {
     if($form_state->getValue('position')  == 'top_level')
       $parent = $guide;
 
-    if($form_state->getValue('copy')){
+    if(!$form_state->getValue('reference')){
       $new_page = $this->copyPage($page, $parent, $form_state->getValue('title'));
 
       if($form_state->getValue('include_sub') == '1'){
