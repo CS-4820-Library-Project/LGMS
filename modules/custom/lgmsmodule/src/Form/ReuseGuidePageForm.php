@@ -360,7 +360,7 @@ class ReuseGuidePageForm extends FormBase {
 
       if (!empty($child_pages)) {
         // Group label for child pages.
-        $group_label = 'Sub page of';
+        $group_label = 'Sub-page Level';
 
         // Initialize the group if it's not set.
         if (!isset($options[$group_label])) {
