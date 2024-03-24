@@ -56,8 +56,11 @@ class EditGuideBoxForm extends FormBase {
       ];
 
     } else {
+      $node_url = $parent_page->toUrl()->toString();
+      $link_html = '<a href="' . $node_url . '">' . $parent_page->getTitle() . '</a>';
+
       $form['title'] = [
-        '#markup' => 'This Box can not be edited from this Guide',
+        '#markup' => 'This Box can not be edited from this Guide, you can edit it from: ' . $link_html,
       ];
       return $form;
     }
