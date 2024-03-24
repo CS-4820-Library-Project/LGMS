@@ -688,8 +688,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   return $item_container;
 }
 
-function database_display(EntityInterface $entity)
-{
+function database_display(EntityInterface $entity){
   $build['db_title'] = [
     '#type' => 'markup',
     '#markup' => t('<h1><strong>'.$entity->label() . '</h1></strong>'),
@@ -721,12 +720,33 @@ function database_display(EntityInterface $entity)
   return $build;
 }
 
+function html_display(EntityInterface $entity){
+  $build['html_title'] = [
+    '#type' => 'markup',
+    '#markup' => t('<h1><strong>'.$entity->label() . '</h1></strong>'),
+  ];
+
+  if (!$entity->get('field_text_box_item2')->isEmpty()) {
+    $build['html_body'][] = [
+      '#type' => 'processed_text',
+      '#text' => $entity->get('field_text_box_item2')->value,
+      '#format' => $entity->get('field_text_box_item2')->format,
+    ];
+  }
+
+  return $build;
+}
+
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
-  if($entity->bundle() === 'guide_database_item' && $view_mode === 'full'){
-    $build['db'] = database_display($entity);
+  if($view_mode === 'full'){
+    if($entity->bundle() === 'guide_database_item'){
+      $build['db'] = database_display($entity);
+    } elseif ($entity->bundle() === 'guide_html_item'){
+      $build['html'] = html_display($entity);
+    }
   }
 
   if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
