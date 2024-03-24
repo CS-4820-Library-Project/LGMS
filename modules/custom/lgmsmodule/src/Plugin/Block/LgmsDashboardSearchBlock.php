@@ -25,7 +25,7 @@ class LgmsDashboardSearchBlock extends BlockBase {
 
     $build['search'] = [
       '#type' => 'search',
-      '#attributes' => ['class' => ['lgms-search lgms-dashboard-search'], 'placeholder' => $this->t('Search by guide name...'),],
+      '#attributes' => ['class' => ['lgms-search lgms-dashboard-search'], 'placeholder' => $this->t('Search ...'),],
     ];
 
     return $build;

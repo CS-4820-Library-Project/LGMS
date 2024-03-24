@@ -25,7 +25,7 @@ class LgmsTableSearchBlock extends BlockBase {
 
     $build['search'] = [
       '#type' => 'search',
-      '#attributes' => ['class' => ['lgms-search lgms-all_guides-search'], 'placeholder' => $this->t('Search by guide name...'),],
+      '#attributes' => ['class' => ['lgms-search lgms-all_guides-search'], 'placeholder' => $this->t('Search ...'),],
     ];
 
     return $build;
