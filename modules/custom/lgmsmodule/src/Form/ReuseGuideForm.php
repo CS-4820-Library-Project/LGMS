@@ -34,8 +34,9 @@ class ReuseGuideForm extends FormBase
       '#type' => 'select',
       '#title' => $this->t('Select a Guide to Reuse'),
       '#options' => $options,
-      '#empty_option' => $this->t('- Select a Guide -'),
+      '#empty_option' => count($options) <= 0? $this->t('The Website does not have any Guides to reuse') : $this->t('- Select a Guide -'),
       '#required' => TRUE,
+      '#disabled' => count($options) <= 0,
     ];
 
     $form['submit'] = [
