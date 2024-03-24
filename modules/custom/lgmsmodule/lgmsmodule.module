@@ -737,6 +737,92 @@ function html_display(EntityInterface $entity){
   return $build;
 }
 
+function book_display(EntityInterface $entity){
+  $build['book_container'] = [
+    '#type' => 'html_tag',
+    '#tag' => 'div',
+    '#attached' => [
+      'library' => [
+        'lgmsmodule/lgmsmodule',
+      ],
+    ],
+    '#attributes' => [
+      'class' => 'book-container',
+    ],
+  ];
+
+  $cover_picture = $entity->get('field_book_cover_picture')?->entity;
+  $cover_picture_uri = $cover_picture?->getFileUri();
+  if($cover_picture_uri) {
+    $build['book_container']['image'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => 'book-cover-picture-container',
+      ],
+    ];
+
+    $build['book_container']['image'][] = [
+      '#theme' => 'image',
+      '#uri' => $cover_picture_uri,
+      '#attributes' => [
+        'class' => 'book-cover-picture'
+      ],
+    ];
+  }
+
+  $build['book_container']['details'] = [
+    '#type' => 'container', // Using a container for the render array
+    '#attributes' => [
+      'class' => 'book-details', // Render array takes remaining space
+    ],
+  ];
+
+  $build['book_container']['details'][] = [
+    '#markup' => '<strong>' . $entity->get('title')->value . '</strong>',
+  ];
+
+  $build['book_container']['details'][] = [
+    '#type' => 'html_tag',
+    '#tag' => 'div',
+    '#value' => 'by ' . $entity->get('field_book_author_or_editor')->value,
+  ];
+
+  $build['book_container']['details'][] = [
+    '#markup' => '<p><i> Publisher: ' . $entity->get('field_book_publisher')->value . ', Edition: ' . $entity->get('field_book_edition')->value . ', Year: ' . $entity->get('field_book_year')->value. '</i></p>',
+  ];
+
+  $build['book_container']['details'][] = [
+    '#type' => 'processed_text',
+    '#text' => $entity->get('field_book_description')->value,
+    '#format' => $entity->get('field_book_description')->format,
+  ];
+
+  if(Term::load($entity->get('field_book_type')->target_id)->getName() == 'print') {
+    $build['book_container']['details'][] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'Location: '. $entity->get('field_book_location')->value,
+    ];
+
+    $build['book_container']['details'][] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'Call Number: '. $entity->get('field_book_call_number')->value,
+    ];
+
+    $build['book_container']['details'][] = [
+      '#markup' => '<div>Cat Record: <a href="' . $entity->get('field_book_cat_record')->uri . '">' . $entity->get('field_book_cat_record')->title . '</a></div>'
+    ];
+  }
+  else {
+    $build['book_container']['details'][] = [
+      '#markup' => '<div>Pub Finder: <a href="' . $entity->get('field_book_pub_finder')->uri . '">' . $entity->get('field_book_pub_finder')->title . '</a></div>'
+    ];
+  }
+
+  return $build;
+}
+
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
@@ -746,6 +832,8 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       $build['db'] = database_display($entity);
     } elseif ($entity->bundle() === 'guide_html_item'){
       $build['html'] = html_display($entity);
+    } elseif ($entity->bundle() === 'guide_book_item'){
+      $build['book'] = book_display($entity);
     }
   }
 
