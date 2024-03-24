@@ -158,7 +158,3 @@
   display: flex;
   justify-content: space-between; /* Adjust as needed for your design */
 }
-
-.print_icon {
-  margin: 32px !important;
-}
