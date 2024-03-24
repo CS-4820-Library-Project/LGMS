@@ -333,118 +333,27 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   ];
 
   $edit_route = '';
-  $delete_route = '';//add_database.form
+  $delete_route = '';
 
   if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
-    $html = $item->get('field_html_item')->entity;
-
-    $item_container['content'][] = [
-      '#type' => 'processed_text',
-      '#text' => $html->get('field_text_box_item2')->value,
-      '#format' => $html->get('field_text_box_item2')->format,
-    ];
+    $item_container['content'][] = html_display($item->get('field_html_item')->entity, false);
 
     $edit_route = 'AddHTMLForm';
     $delete_route = 'delete_html.form';
-  }
-  elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
-    $html = $item->get('field_book_item')->entity;
-
-    $item_container['content'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'div',
-      '#attached' => [
-        'library' => [
-          'lgmsmodule/lgmsmodule',
-        ],
-      ],
-      '#attributes' => [
-        'class' => 'book-container',
-      ],
-    ];
-
-    $cover_picture = $html->get('field_book_cover_picture')?->entity;
-    $cover_picture_uri = $cover_picture?->getFileUri();
-    if($cover_picture_uri) {
-      $item_container['content']['image'] = [
-        '#type' => 'container',
-        '#attributes' => [
-          'class' => 'book-cover-picture-container',
-        ],
-      ];
-
-      $item_container['content']['image'][] = [
-        '#theme' => 'image',
-        '#uri' => $cover_picture_uri,
-        '#attributes' => [
-          'class' => 'book-cover-picture'
-        ],
-      ];
-    }
-
-    $item_container['content']['details'] = [
-      '#type' => 'container', // Using a container for the render array
-      '#attributes' => [
-        'class' => 'book-details', // Render array takes remaining space
-      ],
-    ];
-
-    $item_container['content']['details'][] = [
-      '#markup' => '<strong>' . $html->get('title')->value . '</strong>',
-    ];
-
-    $item_container['content']['details'][] = [
-      '#type' => 'html_tag',
-      '#tag' => 'div',
-      '#value' => 'by ' . $html->get('field_book_author_or_editor')->value,
-    ];
-
-    $item_container['content']['details'][] = [
-      '#markup' => '<p><i> Publisher: ' . $html->get('field_book_publisher')->value . ', Edition: ' . $html->get('field_book_edition')->value . ', Year: ' . $html->get('field_book_year')->value. '</i></p>',
-    ];
-
-    $item_container['content']['details'][] = [
-      '#type' => 'processed_text',
-      '#text' => $html->get('field_book_description')->value,
-      '#format' => $html->get('field_book_description')->format,
-    ];
-
-    if(Term::load($html->get('field_book_type')->target_id)->getName() == 'print') {
-      $item_container['content']['details'][] = [
-        '#type' => 'html_tag',
-        '#tag' => 'div',
-        '#value' => 'Location: '. $html->get('field_book_location')->value,
-      ];
-
-      $item_container['content']['details'][] = [
-        '#type' => 'html_tag',
-        '#tag' => 'div',
-        '#value' => 'Call Number: '. $html->get('field_book_call_number')->value,
-      ];
-
-      $item_container['content']['details'][] = [
-        '#markup' => '<div>Cat Record: <a href="' . $html->get('field_book_cat_record')->uri . '">' . $html->get('field_book_cat_record')->title . '</a></div>'
-      ];
-    }
-    else {
-      $item_container['content']['details'][] = [
-        '#markup' => '<div>Pub Finder: <a href="' . $html->get('field_book_pub_finder')->uri . '">' . $html->get('field_book_pub_finder')->title . '</a></div>'
-      ];
-    }
+  } elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
+    $item_container['content'][] = book_display($item->get('field_book_item')->entity, false);
 
     $edit_route = 'AddBookForm';
     $delete_route = 'delete_book.form';
-  }
-  elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
+  } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
     $database = $item->get('field_database_item')->entity;
     $node_id = $database->id();
     $node_label = $database->label();
 
-    //$item_container['content'][] = \Drupal::entityTypeManager()->getViewBuilder('node')->view($database, 'full');
     $item_container['content'][] = [
       '#type' => 'link',
-      '#title' => $node_label, // Use the node's label as the link text.
-      '#url' => Url::fromRoute('entity.node.canonical', ['node' => $node_id]), // Generate the URL to the node.
+      '#title' => $node_label,
+      '#url' => Url::fromRoute('entity.node.canonical', ['node' => $node_id]),
     ];
 
     if(!empty($item->get('field_description')->value)){
@@ -456,8 +365,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
 
     $edit_route = 'add_database.form';
     $delete_route = 'delete_database.form';
-  }
-  elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
+  } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
     $media = $item->get('field_media_image')->entity;
     $media_type = $media->bundle();
     $media_item = \Drupal::entityTypeManager()->getViewBuilder('media')->view($media, 'full');
@@ -495,120 +403,12 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     }
 
     $item_container['content'][] = $media_item;
-/*
-    switch ($media_type) {
-      case 'image':
-        $file = $media->get('field_media_image')->entity;
-        if ($file) {
-          $image_url = \Drupal\image\Entity\ImageStyle::load('thumbnail')->buildUrl($file->getFileUri());
-          $item_container['content'][] = [
-            '#type' => 'html_tag',
-            '#tag' => 'img',
-            '#attributes' => ['src' => $image_url],
-          ];
-        }
-        break;
-      case 'video':
-        $video_file = $media->get('field_media_video_file')->entity;
-        if ($video_file) {
-          // Get the URI of the video file
-          $video_uri = $video_file->getFileUri();
 
-          // Convert the URI to a URL
-          $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
-          $video_url = $stream_wrapper_manager->getViaUri($video_uri)->getExternalUrl();
-
-          // Add video rendering logic here
-          $item_container['content'][] = [
-            '#type' => 'html_tag',
-            '#tag' => 'video',
-            '#attributes' => [
-              'src' => $video_url,
-              'controls' => true,
-              'width' => '640', // Adjust the width as necessary
-              'height' => '360', // Adjust the height as necessary
-            ],
-            '#value' => t('Your browser does not support the video tag.'),
-          ];
-        }
-        break;
-      case 'remote_video':
-        $standard_video_url = $media->get('field_media_oembed_video')->value;
-
-        parse_str(parse_url($standard_video_url, PHP_URL_QUERY), $query);
-        $video_id = $query['v'];
-
-        $embed_url = "https://www.youtube.com/embed/{$video_id}";
-
-        $item_container['content'][] = [
-          '#type' => 'html_tag',
-          '#tag' => 'iframe',
-          '#attributes' => [
-            'src' => $embed_url,
-            'frameborder' => '0',
-            'allowfullscreen' => 'allowfullscreen',
-            'width' => '640',
-            'height' => '360',
-          ],
-        ];
-        break;
-      case 'audio':
-        // Similar handling for audio files
-        $audio_file = $media->get('field_media_audio_file')->entity;
-        if ($audio_file) {
-          // Get the URI of the audio file
-          $audio_uri = $audio_file->getFileUri();
-
-          // Convert the URI to a URL
-          $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
-          $audio_url = $stream_wrapper_manager->getViaUri($audio_uri)->getExternalUrl();
-
-          // Add audio rendering logic here
-          $item_container['content'][] = [
-            '#type' => 'html_tag',
-            '#tag' => 'audio',
-            '#attributes' => [
-              'src' => $audio_url,
-              'controls' => 'controls',
-            ],
-            '#attached' => [
-              'library' => [
-                'core/html5shiv',
-              ],
-            ],
-          ];
-        }
-        break;
-      case 'document':
-        // Handling for generic file downloads
-        $file = $media->get('field_media_document')->entity;
-        if ($file) {
-          $file_uri = $file->getFileUri();
-          $file_url = \Drupal::service('stream_wrapper_manager')->getViaUri($file_uri)->getExternalUrl();
-
-          $item_container['content'][] = [
-            '#type' => 'link',
-            '#title' => $file->label(),
-            '#url' => Url::fromUri($file_url),
-            '#attributes' => ['target' => '_blank'],
-          ];
-        }
-        break;
-      default:
-        // Default case to handle any other media types not explicitly covered above
-        // For example, you might simply display the media name or a generic icon
-        $item_container['content'][] = ['#markup' => $media->label()];
-        print_r('url ');
-        break;
-    }*/
     $edit_route = 'add_media.form';
     $delete_route = 'delete_database.form';
   }
-  else {
-    return [];
-  }
 
-  if($item->access('update') && (!$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()) && $entity->id() === $box->get('field_parent_node')->entity->id()) {
+  if(($item->access('update') && (!$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()) && $entity->id() === $box->get('field_parent_node')->entity->id()) || ($entity->id() == $box->id())) {
     if ($box->id() === $item->get('field_parent_box')->entity->id()){
       $ids = [ 'current_node' => $entity->id(), 'current_box' => $box->id(), 'current_item' => $item->id()];
       $json_data = json_encode($ids);
@@ -643,6 +443,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
           '#tag' => 'i',
           '#attributes' => [
             'class' => ['fa', 'fa-edit', 'edit-icon'],
+            'style' => 'margin-left: 5px',
           ],
         ],
         '#url' => $url,
@@ -688,37 +489,362 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   return $item_container;
 }
 
+function database_display(EntityInterface $entity){
+  $build['db_title'] = [
+    '#type' => 'markup',
+    '#markup' => t('<h1><strong>'.$entity->label() . '</h1></strong>'),
+  ];
+
+  if (!$entity->get('field_database_link')->isEmpty()) {
+    // Fetch the first item of the field_database_link field
+    $link_item = $entity->get('field_database_link')->first();
+    // Get the URL from the link field
+    $url = $link_item->getUrl()->toString();
+    // Get the link title (text) from the link field, fall back to the URL if the title is empty
+    $link_text = $link_item->title ?: $url;
+
+    $build['db_link'] = [
+      '#type' => 'markup',
+      '#markup' => '<h3><div class="link-icon"><i class="fa fa-link" aria-hidden="true"></i> <a href="' . $url . '">' . $link_text . '</a></div></h3>',
+    ];
+
+  }
+
+  if (!$entity->get('field_database_body')->isEmpty()) {
+    $body_value = $entity->get('field_database_body')->value;
+    $build['db_body'] = [
+      '#type' => 'markup',
+      '#markup' => '<div>' . $body_value . '</div>',
+    ];
+  }
+
+  return $build;
+}
+
+function html_display(EntityInterface $entity, bool $include_title = true){
+  if($include_title){
+    $build['html_title'] = [
+      '#type' => 'markup',
+      '#markup' => t('<h1><strong>'.$entity->label() . '</h1></strong>'),
+    ];
+  }
+
+  if (!$entity->get('field_text_box_item2')->isEmpty()) {
+    $build['html_body'][] = [
+      '#type' => 'processed_text',
+      '#text' => $entity->get('field_text_box_item2')->value,
+      '#format' => $entity->get('field_text_box_item2')->format,
+    ];
+  }
+
+  return $build;
+}
+
+function book_display(EntityInterface $entity , bool $include_title = true){
+  if($include_title){
+    $build['book_title'] = [
+      '#type' => 'markup',
+      '#markup' => t('<h1><strong>Book: '.$entity->label() . '</h1></strong>'),
+    ];
+  }
+
+  $build['book_container'] = [
+    '#type' => 'html_tag',
+    '#tag' => 'div',
+    '#attached' => [
+      'library' => [
+        'lgmsmodule/lgmsmodule',
+      ],
+    ],
+    '#attributes' => [
+      'class' => 'book-container',
+    ],
+  ];
+
+  $cover_picture = $entity->get('field_book_cover_picture')?->entity;
+  $cover_picture_uri = $cover_picture?->getFileUri();
+  if($cover_picture_uri) {
+    $build['book_container']['image'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => 'book-cover-picture-container',
+      ],
+    ];
+
+    $build['book_container']['image'][] = [
+      '#theme' => 'image',
+      '#uri' => $cover_picture_uri,
+      '#attributes' => [
+        'class' => 'book-cover-picture'
+      ],
+    ];
+  }
+
+  $build['book_container']['details'] = [
+    '#type' => 'container', // Using a container for the render array
+    '#attributes' => [
+      'class' => 'book-details', // Render array takes remaining space
+    ],
+  ];
+
+  $build['book_container']['details'][] = [
+    '#markup' => '<strong>' . $entity->get('title')->value . '</strong>',
+  ];
+
+  $build['book_container']['details'][] = [
+    '#type' => 'html_tag',
+    '#tag' => 'div',
+    '#value' => 'by ' . $entity->get('field_book_author_or_editor')->value,
+  ];
+
+  $build['book_container']['details'][] = [
+    '#markup' => '<p><i> Publisher: ' . $entity->get('field_book_publisher')->value . ', Edition: ' . $entity->get('field_book_edition')->value . ', Year: ' . $entity->get('field_book_year')->value. '</i></p>',
+  ];
+
+  $build['book_container']['details'][] = [
+    '#type' => 'processed_text',
+    '#text' => $entity->get('field_book_description')->value,
+    '#format' => $entity->get('field_book_description')->format,
+  ];
+
+  if(Term::load($entity->get('field_book_type')->target_id)->getName() == 'print') {
+    $build['book_container']['details'][] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'Location: '. $entity->get('field_book_location')->value,
+    ];
+
+    $build['book_container']['details'][] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'Call Number: '. $entity->get('field_book_call_number')->value,
+    ];
+
+    $build['book_container']['details'][] = [
+      '#markup' => '<div>Cat Record: <a href="' . $entity->get('field_book_cat_record')->uri . '">' . $entity->get('field_book_cat_record')->title . '</a></div>'
+    ];
+  }
+  else {
+    $build['book_container']['details'][] = [
+      '#markup' => '<div>Pub Finder: <a href="' . $entity->get('field_book_pub_finder')->uri . '">' . $entity->get('field_book_pub_finder')->title . '</a></div>'
+    ];
+  }
+
+  return $build;
+}
+
+function box_display(EntityInterface $entity, EntityInterface $box)
+{
+
+  $items = $box->get('field_box_items')->referencedEntities();
+
+  $guide_box_build['items'] = [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['guide-box-items-container']],
+  ];
+
+  foreach ($items as $item) {
+    // Add the item container to the guide box items.
+    $guide_box_build['items'][] = build_item($entity, $box, $item);
+  }
+
+  $ids = ['current_box' => $box->id(), 'current_node' => $entity->id()];
+  $json_data = json_encode($ids);
+  $ids = urlencode($json_data);
+
+  $array_of_objects = [(object)['name' => 'Add HTML', 'form' => 'AddHTMLForm'],(object) ['name' => 'Reuse HTML', 'form' => 'ReuseHTMLItemForm']];
+  $json_data = json_encode($array_of_objects);
+  $html_query_param = urlencode($json_data);
+
+  $array_of_objects = [(object)['name' => 'Add Book', 'form' => 'AddBookForm'],(object) ['name' => 'Reuse Book', 'form' => 'ReuseBookForm']];
+  $json_data = json_encode($array_of_objects);
+  $book_query_param = urlencode($json_data);
+
+  if($entity->access('update')) {
+    $guide_box_build['items_list'] = [
+      '#type' => 'container',
+      '#attributes' => ['id' => 'add-reorder-list', 'class' => ['guide-item2']],
+      'children' => [
+        'html_item' => [
+          '#type' => 'html_tag',
+          '#tag' => 'li',
+          'content' => [
+            '#type' => 'link',
+            '#title' => ('Add/Reuse HTML'),
+            '#url' => Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $html_query_param]]),
+            '#attributes' => [
+              'class' => ['use-ajax'],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => Json::encode(['width' => 800]),
+              'title' => 'Re-position Box',
+              'style' => 'text-decoration: none;',
+            ],
+          ],
+        ],
+        'book_item' => [
+          '#type' => 'html_tag',
+          '#tag' => 'li',
+          'content' => [
+            '#type' => 'link',
+            '#title' => ('Add/Reuse Book'),
+            '#url' => Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $book_query_param]]),
+            '#attributes' => [
+              'class' => ['use-ajax'],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => Json::encode(['width' => 800]),
+              'title' => 'Re-position Box',
+              'style' => 'text-decoration: none;',
+            ],
+          ],
+        ],
+        'database_item' => [
+          '#type' => 'html_tag',
+          '#tag' => 'li',
+          'content' => [
+            '#type' => 'link',
+            '#title' => ('Database'),
+            '#url' => Url::fromRoute('add_database.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
+            '#attributes' => [
+              'class' => ['use-ajax'],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => Json::encode(['width' => 800]),
+              'title' => 'Re-position Box',
+              'style' => 'text-decoration: none;',
+            ],
+          ],
+        ],
+        'media_item' => [
+          '#type' => 'html_tag',
+          '#tag' => 'li',
+          'content' => [
+            '#type' => 'link',
+            '#title' => ('Media'),
+            '#url' => Url::fromRoute('add_media.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
+            '#attributes' => [
+              'class' => ['use-ajax'],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => Json::encode(['width' => 800]),
+              'title' => 'Re-position Box',
+              'style' => 'text-decoration: none;',
+            ],
+          ],
+        ],
+        're-order' => [
+          '#type' => 'html_tag',
+          '#tag' => 'li',
+          'content' => [
+            '#type' => 'link',
+            '#title' => t('Re-Order'),
+            '#url' => Url::fromRoute('re_order_box_item.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
+            '#attributes' => [
+              'class' => ['use-ajax'],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => Json::encode(['width' => 800]),
+              'title' => 'Re-position Box',
+              'style' => 'text-decoration: none;',
+            ],
+          ],
+        ],
+      ],
+    ];
+  }
+
+  $build['boxes'][] = [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['guide-box-container']],
+    'title_wrapper' => [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#attributes' => [
+        'class' => ['title-edit-wrapper'],
+      ],
+      'title' => [
+        '#type' => 'html_tag',
+        '#tag' => 'h3',
+        '#value' => $box->label(),
+        '#attributes' => ['class' => ['guide-box-title']],
+      ],
+      'icons' => $entity !== $box ?[
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#attributes' => [
+          'class' => ['icons-container'],
+        ],
+        're_order_icon' => [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-bars', 're-order-icon'],
+            ],
+          ],
+          '#url' => Url::fromRoute('re_order_guide_box.form', [], ['query' => ['current_node' => $entity->id()]]),
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+            'title' => 'Re-position Box',
+            'style' => 'text-decoration: none;',
+          ],
+        ],
+        'edit_icon' => [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-edit', 'edit-icon'],
+            ],
+          ],
+          '#url' => Url::fromRoute('edit_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' =>$box->id()]]),
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+            'title' => 'Edit Box',
+            'style' => 'text-decoration: none;',
+          ],
+        ],
+        'close_icon' => [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-times', 'close-icon'],
+            ],
+          ],
+          '#url' => Url::fromRoute('delete_guide_box.form', [], ['query' => ['current_node' => $entity->id(), 'current_box' =>$box->id()]]),
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+            'title' => 'Delete Box',
+            'style' => 'text-decoration: none;',
+          ],
+        ],
+      ] : [],
+    ],
+    'body' => $guide_box_build,
+  ];
+
+  return $build;
+}
+
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
-  if($entity->bundle() === 'guide_database_item' && $view_mode === 'full'){
-    $build['db_title'] = [
-      '#type' => 'markup',
-      '#markup' => t('<h1><strong>'.$entity->label() . '</h1></strong>'),
-    ];
-
-    if (!$entity->get('field_database_link')->isEmpty()) {
-      // Fetch the first item of the field_database_link field
-      $link_item = $entity->get('field_database_link')->first();
-      // Get the URL from the link field
-      $url = $link_item->getUrl()->toString();
-      // Get the link title (text) from the link field, fall back to the URL if the title is empty
-      $link_text = $link_item->title ?: $url;
-
-      $build['db_link'] = [
-        '#type' => 'markup',
-        '#markup' => '<h3><div class="link-icon"><i class="fa fa-link" aria-hidden="true"></i> <a href="' . $url . '">' . $link_text . '</a></div></h3>',
-      ];
-
-    }
-
-    if (!$entity->get('field_database_body')->isEmpty()) {
-      $body_value = $entity->get('field_database_body')->value;
-      $build['db_body'] = [
-        '#type' => 'markup',
-        '#markup' => '<div>' . $body_value . '</div>',
-      ];
+  if($view_mode === 'full'){
+    if($entity->bundle() === 'guide_database_item'){
+      $build['db'] = database_display($entity);
+    } elseif ($entity->bundle() === 'guide_html_item'){
+      $build['html'] = html_display($entity);
+    } elseif ($entity->bundle() === 'guide_book_item'){
+      $build['book'] = book_display($entity);
+    } elseif ($entity->bundle() === 'guide_box'){
+      $build['box'] = box_display($entity, $entity);
     }
   }
 

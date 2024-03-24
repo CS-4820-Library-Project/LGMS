@@ -176,6 +176,7 @@ class AddDatabaseForm extends FormBase {
 
 
       $current_item->set('title', $database->label());
+      $current_item->set('field_database_item', $database);
       $current_item->set('status', $form_state->getValue('published') == '0');
       $current_item->set('field_description', $form_state->getValue('include_desc') == '0'? '': $form_state->getValue('description'));
       $current_item->set('changed', \Drupal::time()->getRequestTime());
