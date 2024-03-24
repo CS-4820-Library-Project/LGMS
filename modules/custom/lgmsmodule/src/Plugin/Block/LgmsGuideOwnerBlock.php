@@ -277,8 +277,6 @@ class LgmsGuideOwnerBlock extends BlockBase {
    */
   protected function formatPhoneNumber($phone_number_raw): string
   {
-    \Drupal::logger('lgmsmodule')->notice('Phone number raw: @number', ['@number' => $phone_number_raw]);
-
     // Remove any non-numeric characters from the phone number.
     $digits = preg_replace('/\D+/', '', $phone_number_raw);
 
