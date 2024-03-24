@@ -74,7 +74,7 @@ class AddDatabaseForm extends FormBase {
 
     // Body field
     $form['description'] = [
-      '#type' => 'textfield',
+      '#type' => 'textarea',
       '#title' => $this->t('Body'),
       '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
       '#default_value' => $edit? $current_item->get('field_description')->value: '',
