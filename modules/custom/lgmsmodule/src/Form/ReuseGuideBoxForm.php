@@ -138,6 +138,13 @@ class ReuseGuideBoxForm extends FormBase {
           $database = $item->get('field_database_item')->entity;
           $new_item->set('field_database_item', $database);
 
+        } elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
+          $book = $item->get('field_book_item')->entity;
+          $book = $book->createDuplicate();
+          $book->setOwnerId(\Drupal::currentUser()->id());
+          $book->save();
+
+          $new_item->set('field_book_item', $book);
         } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
           $media = $item->get('field_media_image')->entity;
           $new_item->set('field_media_image', $media);

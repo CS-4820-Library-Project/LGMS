@@ -39,12 +39,6 @@ class DeleteBookForm extends FormBase {
       '#value' => $current_item,
     ];
 
-    $current_item = Node::load($current_item);
-
-    $current_box = Node::load($current_box);
-
-    $parent_box = $current_item->get('field_parent_box')->entity;
-
     $title = $this->t('<Strong>Are you Sure you want to Delete This Item?</Strong>');
 
     $form['Delete'] = [
@@ -82,9 +76,6 @@ class DeleteBookForm extends FormBase {
 
     $current_box = $form_state->getValue('current_box');
     $current_box = Node::load($current_box);
-
-    $current_node = $form_state->getValue('current_node');
-    $current_node = Node::load($current_node);
 
     $current_item = $form_state->getValue('current_item');
     $current_item = Node::load($current_item);

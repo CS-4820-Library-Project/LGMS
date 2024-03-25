@@ -268,6 +268,13 @@ class ReuseGuidePageForm extends FormBase {
 
           $new_item->set('field_html_item', $html);
 
+        } elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
+          $book = $item->get('field_book_item')->entity;
+          $book = $book->createDuplicate();
+          $book->setOwnerId(\Drupal::currentUser()->id());
+          $book->save();
+
+          $new_item->set('field_book_item', $book);
         } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
           $database = $item->get('field_database_item')->entity;
           $new_item->set('field_database_item', $database);

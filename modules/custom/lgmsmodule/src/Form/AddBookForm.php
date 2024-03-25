@@ -196,6 +196,11 @@ class AddBookForm extends FormBase {
     $form['cat_record_group']['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Link Text'),
+      '#states' => [
+        'required' => [
+          ':input[name="type"]' => ['value' => $term_ids['print']],
+        ],
+      ],
       '#default_value' => $edit? $current_item->get('field_book_cat_record')->title: '',
     );
 
@@ -228,6 +233,11 @@ class AddBookForm extends FormBase {
     $form['pub_finder_group']['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Link Text'),
+      '#states' => [
+        'required' => [
+          ':input[name="type"]' => ['value' => $term_ids['eBook']],
+        ],
+      ],
       '#default_value' => $edit? $current_item->get('field_book_pub_finder')->title: '',
     );
 
@@ -286,10 +296,17 @@ class AddBookForm extends FormBase {
       if(empty($form_state->getValue(['cat_record_group', 'url']))){
         $form_state->setErrorByName('cat_record_group][url', t('Cat Record\'s url is required.'));
       }
+      if(empty($form_state->getValue(['cat_record_group', 'label']))){
+        $form_state->setErrorByName('cat_record_group][label', t('Cat Record\'s label is required.'));
+      }
+
     }
     else {
       if(empty($form_state->getValue(['pub_finder_group', 'url']))){
         $form_state->setErrorByName('pub_finder_group][url', t('Pub Finder\'s url is required.'));
+      }
+      if(empty($form_state->getValue(['pub_finder_group', 'label']))){
+        $form_state->setErrorByName('pub_finder_group][label', t('Pub Finder\'s label is required.'));
       }
     }
   }
