@@ -771,7 +771,7 @@ function box_display(EntityInterface $entity, EntityInterface $box)
         '#value' => $box->label(),
         '#attributes' => ['class' => ['guide-box-title ' . $unpublished_class]],
       ],
-      'icons' => $entity !== $box ?[
+      'icons' => $entity !== $box && $entity->access('update')?[
         '#type' => 'html_tag',
         '#tag' => 'div',
         '#attributes' => [
