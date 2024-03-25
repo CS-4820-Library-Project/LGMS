@@ -105,6 +105,12 @@ class PrintGuide extends ControllerBase {
               $documentTitle = $mediaItem->getName();
               $boxHtml .= "Document: <a href=\"{$documentUrl}\">{$documentTitle}</a><br>";
               break;
+            case 'audio':
+              $file = $mediaItem->field_media_audio_file->entity;
+              $audioUrl = $fileUrlGenerator->generateAbsoluteString($file->getFileUri());
+              $audioTitle = $mediaItem->getName(); // Gets the name/title of the media item.
+              $boxHtml .= "Audio: <a href=\"{$audioUrl}\">{$audioTitle}</a><br>";
+              break;
           }
         }
       }
