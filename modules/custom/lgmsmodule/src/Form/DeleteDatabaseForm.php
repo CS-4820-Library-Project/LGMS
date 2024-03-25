@@ -21,10 +21,10 @@ class DeleteDatabaseForm extends FormBase {
       '#type' => 'status_messages',
     ];
 
-    $current_box = \Drupal::request()->query->get('current_box');
-    $form['current_box'] = [
+    $current_box_content = \Drupal::request()->query->get('current_box_content');
+    $form['current_box_content'] = [
       '#type' => 'hidden',
-      '#value' => $current_box,
+      '#value' => $current_box_content,
     ];
 
     $current_node = \Drupal::request()->query->get('current_node');
@@ -38,12 +38,6 @@ class DeleteDatabaseForm extends FormBase {
       '#type' => 'hidden',
       '#value' => $current_item,
     ];
-
-    $current_item = Node::load($current_item);
-
-    $current_box = Node::load($current_box);
-
-    $parent_box = $current_item->get('field_parent_box')->entity;
 
     $title = $this->t('<Strong>Are you Sure you want to Delete This Item?</Strong>');
 
@@ -80,43 +74,40 @@ class DeleteDatabaseForm extends FormBase {
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
-
-    $current_node = $form_state->getValue('current_node');
-    $current_node = Node::load($current_node);
+    $current_box_content = $form_state->getValue('current_box_content');
+    $current_box_content = Node::load($current_box_content);
 
     $current_item = $form_state->getValue('current_item');
     $current_item = Node::load($current_item);
 
-    $child_items = $current_box->get('field_box_items')->getValue();
+    $child_items = $current_box_content->get('field_box_items')->getValue();
 
     $child_items = array_filter($child_items, function ($item) use ($current_item) {
       return $item['target_id'] != $current_item->id();
     });
 
-    $current_box->set('field_box_items', $child_items);
-    $current_box->save();
+    $current_box_content->set('field_box_items', $child_items);
+    $current_box_content->save();
 
-    $parent_box = $current_item->get('field_parent_box')->entity;
+    $parent_content = $current_item->get('field_parent_box_content')->entity;
 
-    if($current_box->id() == $parent_box->id()){
+    if($current_box_content->id() == $parent_content->id()){
       $query = \Drupal::entityQuery('node')
-        ->condition('type', 'guide_box')
+        ->condition('type', 'guide_box_content')
         ->condition('field_box_items', $current_item->id())
         ->accessCheck(TRUE);
       $result = $query->execute();
 
-      foreach ($result as $box){
-        $box = Node::load($box);
-        $child_items = $box->get('field_box_items')->getValue();
+      foreach ($result as $content){
+        $content = Node::load($content);
+        $child_items = $content->get('field_box_items')->getValue();
 
         $child_items = array_filter($child_items, function ($box) use ($current_item) {
           return $box['target_id'] != $current_item->id();
         });
 
-        $box->set('field_box_items', $child_items);
-        $box->save();
+        $content->set('field_box_items', $child_items);
+        $content->save();
       }
 
       $current_item?->delete();

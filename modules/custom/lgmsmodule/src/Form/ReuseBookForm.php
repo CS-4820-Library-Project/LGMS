@@ -21,11 +21,10 @@ class ReuseBookForm extends FormBase {
       '#type' => 'status_messages',
     ];
 
-    $form['current_box'] = [
+    $form['current_box_content'] = [
       '#type' => 'hidden',
-      '#value' => $ids->current_box,
+      '#value' => $ids->current_box_content,
     ];
-
 
     $form['current_node'] = [
       '#type' => 'hidden',
@@ -106,8 +105,8 @@ class ReuseBookForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
+    $current_box_content = $form_state->getValue('current_box_content');
+    $current_box_content = Node::load($current_box_content);
 
 
     $book = Node::load($form_state->getValue('box'));
@@ -122,7 +121,7 @@ class ReuseBookForm extends FormBase {
       $new_book->set('title', $form_state->getValue('title'));
       $new_book->save();
 
-      $new_item->set('field_parent_box', $current_box);
+      $new_item->set('field_parent_box_content', $current_box_content);
       $new_item->set('title', $form_state->getValue('title'));
       $new_item->set('field_book_item', $new_book);
 
@@ -131,11 +130,11 @@ class ReuseBookForm extends FormBase {
       $item = $new_item;
     }
 
-    $boxList = $current_box->get('field_box_items')->getValue();
+    $boxList = $current_box_content->get('field_box_items')->getValue();
     $boxList[] = ['target_id' => $item->id()];
 
-    $current_box->set('field_box_items', $boxList);
-    $current_box->save();
+    $current_box_content->set('field_box_items', $boxList);
+    $current_box_content->save();
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);

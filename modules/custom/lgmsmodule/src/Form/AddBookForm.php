@@ -26,9 +26,9 @@ class AddBookForm extends FormBase {
       '#type' => 'status_messages',
     ];
 
-    $form['current_box'] = [
+    $form['current_box_content'] = [
       '#type' => 'hidden',
-      '#value' => $ids->current_box,
+      '#value' => $ids->current_box_content,
     ];
 
     $form['current_node'] = [
@@ -343,8 +343,8 @@ class AddBookForm extends FormBase {
     ];
 
     if($edit == '0'){
-      $current_box = $form_state->getValue('current_box');
-      $current_box = Node::load($current_box);
+      $current_box_content = $form_state->getValue('current_box_content');
+      $current_box_content = Node::load($current_box_content);
 
       $new_book = Node::create(['type' => 'guide_book_item', ...$form_field_values]);
 
@@ -358,18 +358,18 @@ class AddBookForm extends FormBase {
         'type' => 'guide_item',
         'title' => $form_state->getValue('title'),
         'field_book_item' => $new_book,
-        'field_parent_box' => $current_box,
+        'field_parent_box_content' => $current_box_content,
         'status' => $form_state->getValue('published') == '0',
       ]);
 
       $new_item->save();
       $new_book->set('field_parent_item', $new_item);
       $new_book->save();
-      $boxList = $current_box->get('field_box_items')->getValue();
+      $boxList = $current_box_content->get('field_box_items')->getValue();
       $boxList[] = ['target_id' => $new_item->id()];
 
-      $current_box->set('field_box_items', $boxList);
-      $current_box->save();
+      $current_box_content->set('field_box_items', $boxList);
+      $current_box_content->save();
     }
     else {
       $current_item = $form_state->getValue('current_item');

@@ -30,8 +30,7 @@
         var activeTabId = $('.tabs-list .tab-link.active').attr('href');
         $(activeTabId).show();
       } else {
-        // If no active tab exists, default to the first tab
-        // Hide all tab content by default
+
         $('.tab-content').hide();
         // Show the first tab content
         $('.tab-content').first().show();

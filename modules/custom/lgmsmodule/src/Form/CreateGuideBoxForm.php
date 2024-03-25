@@ -83,22 +83,36 @@ class CreateGuideBoxForm extends FormBase {
     $curr_node = Node::load($curr_node);
     $nid = $curr_node->id();
 
-
-    $new_node = Node::create([
+    $new_box = Node::create([
       'type' => 'guide_box',
       'title' => $form_state->getValue('title'),
       'field_parent_node' => ['target_id' => $nid],
       'status' => $form_state->getValue('published') == '0',
     ]);
 
-    $new_node->save();
+    $new_box->save();
+
+    $new_box_content = Node::create([
+      'type' => 'guide_box_content',
+      'title' => $form_state->getValue('title'),
+      'field_parent_box' => ['target_id' => $new_box->id()],
+      'status' => $form_state->getValue('published') == '0',
+    ]);
+
+    $new_box_content->save();
 
     $page = Node::load($nid);
     $boxList = $page->get('field_child_boxes')->getValue();
-    $boxList[] = ['target_id' => $new_node->id()];
+    $boxList[] = ['target_id' => $new_box->id()];
 
     $page->set('field_child_boxes', $boxList);
     $page->save();
+
+    $contentList = $new_box->get('field_box_contents')->getValue();
+    $contentList[] = ['target_id' => $new_box_content->id()];
+
+    $new_box->set('field_box_contents', $contentList);
+    $new_box->save();
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);

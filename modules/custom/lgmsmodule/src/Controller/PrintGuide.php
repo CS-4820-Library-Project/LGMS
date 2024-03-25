@@ -43,15 +43,17 @@ class PrintGuide extends ControllerBase {
 
   protected function processBox($box, $baseUrl) {
     $boxHtml = '<h3>' . htmlspecialchars($box->getTitle()) . '</h3>';
-    $itemEntities = $box->hasField('field_box_items') && !$box->get('field_box_items')->isEmpty() ? $box->get('field_box_items')->referencedEntities() : [];
-
-    foreach ($itemEntities as $itemEntity) {
-      if ($itemEntity->hasField('field_html_item') && !$itemEntity->get('field_html_item')->isEmpty()) {
-        $htmlBoxItems = $itemEntity->get('field_html_item')->referencedEntities();
-        foreach ($htmlBoxItems as $htmlBoxItem) {
-          if ($htmlBoxItem->hasField('field_text_box_item2') && !$htmlBoxItem->get('field_text_box_item2')->isEmpty()) {
-            $rawHtmlContent = $htmlBoxItem->get('field_text_box_item2')->value;
-            $boxHtml .= $this->modifyHtmlContent($rawHtmlContent, $baseUrl);
+    $contentEntities = $box->hasField('field_box_contents') && !$box->get('field_box_contents')->isEmpty() ? $box->get('field_box_contents')->referencedEntities() : [];
+    foreach ($contentEntities as $contentEntity) {
+      $itemEntities = $box->hasField('field_box_items') && !$box->get('field_box_items')->isEmpty() ? $box->get('field_box_items')->referencedEntities() : [];
+      foreach ($itemEntities as $itemEntity) {
+        if ($itemEntity->hasField('field_html_item') && !$itemEntity->get('field_html_item')->isEmpty()) {
+          $htmlBoxItems = $itemEntity->get('field_html_item')->referencedEntities();
+          foreach ($htmlBoxItems as $htmlBoxItem) {
+            if ($htmlBoxItem->hasField('field_text_box_item2') && !$htmlBoxItem->get('field_text_box_item2')->isEmpty()) {
+              $rawHtmlContent = $htmlBoxItem->get('field_text_box_item2')->value;
+              $boxHtml .= $this->modifyHtmlContent($rawHtmlContent, $baseUrl);
+            }
           }
         }
       }

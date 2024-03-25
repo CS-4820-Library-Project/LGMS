@@ -172,7 +172,7 @@ class DeletePageForm extends FormBase
 
     foreach($boxes as $box){
       if($parent->id() == $box->get('field_parent_node')->entity->id()){
-        $this->deleteItems($box);
+        $this->deleteContent($box);
 
         $query = \Drupal::entityQuery('node')
           ->condition('type', 'guide_page')
@@ -197,6 +197,36 @@ class DeletePageForm extends FormBase
     }
   }
 
+  public function deleteContent($parent){
+    $contents = $parent->get('field_box_contents')->referencedEntities();
+
+    foreach($contents as $content){
+      if($parent->id() == $content->get('field_parent_box')->entity->id()){
+        $this->deleteItems($content);
+
+        $query = \Drupal::entityQuery('node')
+          ->condition('type', 'guide_box')
+          ->condition('field_box_contents', $content->id())
+          ->accessCheck(TRUE);
+        $result = $query->execute();
+
+        foreach ($result as $box){
+          $box = Node::load($box);
+          $child_contents = $box->get('field_box_contents')->getValue();
+
+          $child_contents = array_filter($child_contents, function ($box_new) use ($box) {
+            return $box_new['target_id'] != $box->id();
+          });
+
+          $box->set('field_box_contents', $child_contents);
+          $box->save();
+        }
+
+        $content?->delete();
+      }
+    }
+  }
+
   public function deleteItems($parent){
     $items = $parent->get('field_box_items')->referencedEntities();
 
@@ -209,16 +239,16 @@ class DeletePageForm extends FormBase
           ->accessCheck(TRUE);
         $result = $query->execute();
 
-        foreach ($result as $box){
-          $box = Node::load($box);
-          $child_items = $box->get('field_box_items')->getValue();
+        foreach ($result as $content){
+          $content = Node::load($content);
+          $child_items = $content->get('field_box_items')->getValue();
 
           $child_items = array_filter($child_items, function ($box) use ($item) {
             return $box['target_id'] != $item->id();
           });
 
-          $box->set('field_box_items', $child_items);
-          $box->save();
+          $content->set('field_box_items', $child_items);
+          $content->save();
         }
 
         $item->get('field_html_item')->entity?->delete();

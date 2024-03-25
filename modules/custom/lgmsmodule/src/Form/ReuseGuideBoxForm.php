@@ -118,36 +118,60 @@ class ReuseGuideBoxForm extends FormBase {
       $new_box->setOwnerId(\Drupal::currentUser()->id());
       $new_box->save();
 
-      $items = $box->get('field_box_items')->referencedEntities();
+      $contents = $box->get('field_box_contents')->referencedEntities();
 
-      $new_items_list = [];
-      foreach ($items as $item){
-        $new_item = $item->createDuplicate();
-        $new_item->set('field_parent_box', $new_box);
-        $new_item->setOwnerId(\Drupal::currentUser()->id());
+      $new_contents_list = [];
 
-        if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
-          $html = $item->get('field_html_item')->entity;
-          $html = $html->createDuplicate();
-          $html->setOwnerId(\Drupal::currentUser()->id());
-          $html->save();
+      foreach ($contents as $content){
+        $new_content = $content->createDuplicate();
+        $new_content->set('field_parent_box', $new_box);
+        $new_content->setOwnerId(\Drupal::currentUser()->id());
+        $new_content->save();
 
-          $new_item->set('field_html_item', $html);
+        $items = $content->get('field_box_items')->referencedEntities();
 
-        } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
-          $database = $item->get('field_database_item')->entity;
-          $new_item->set('field_database_item', $database);
+        $new_items_list = [];
 
-        } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
-          $media = $item->get('field_media_image')->entity;
-          $new_item->set('field_media_image', $media);
+        foreach ($items as $item) {
+          $new_item = $item->createDuplicate();
+          $new_item->set('field_parent_box_content', $new_content);
+          $new_item->setOwnerId(\Drupal::currentUser()->id());
+
+          if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
+            $html = $item->get('field_html_item')->entity;
+            $html = $html->createDuplicate();
+            $html->setOwnerId(\Drupal::currentUser()->id());
+            $html->save();
+
+            $new_item->set('field_html_item', $html);
+          }
+          elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
+            $database = $item->get('field_database_item')->entity;
+            $new_item->set('field_database_item', $database);
+          }
+          elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
+            $book = $item->get('field_book_item')->entity;
+            $book = $book->createDuplicate();
+            $book->setOwnerId(\Drupal::currentUser()->id());
+            $book->save();
+
+            $new_item->set('field_book_item', $book);
+          }
+          elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
+            $media = $item->get('field_media_image')->entity;
+            $new_item->set('field_media_image', $media);
+          }
+
+          $new_item->save();
+          $new_items_list[] = $new_item;
         }
 
-        $new_item->save();
-        $new_items_list[] = $new_item;
+        $new_content->set('field_box_items', $new_items_list);
+        $new_content->save();
+        $new_contents_list[] = $new_content;
       }
 
-      $new_box->set('field_box_items', $new_items_list);
+      $new_box->set('field_box_contents', $new_contents_list);
       $new_box->save();
 
       $box = $new_box;

@@ -21,10 +21,10 @@ class ReOderBoxItemsForm extends FormBase {
       '#type' => 'status_messages',
     ];
 
-    $current_box = \Drupal::request()->query->get('current_box');
-    $form['current_box'] = [
+    $current_box_content = \Drupal::request()->query->get('current_box_content');
+    $form['current_box_content'] = [
       '#type' => 'hidden',
-      '#value' => $current_box,
+      '#value' => $current_box_content,
     ];
 
     $current_node = \Drupal::request()->query->get('current_node');
@@ -43,9 +43,9 @@ class ReOderBoxItemsForm extends FormBase {
       ]],
     ];
 
-    $box = Node::load($current_box);
+    $content = Node::load($current_box_content);
 
-    $box_items = $box->get('field_box_items');
+    $box_items = $content->get('field_box_items');
 
     foreach ($box_items as $weight => $item) {
       $loaded_item = Node::load($item->target_id);
@@ -92,10 +92,10 @@ class ReOderBoxItemsForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValue('pages_table');
 
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
+    $current_box_content = $form_state->getValue('current_box_content');
+    $current_box_content = Node::load($current_box_content);
 
-    $items = $current_box->get('field_box_items')->getValue();
+    $items = $current_box_content->get('field_box_items')->getValue();
 
     $reordered_items = [];
 
@@ -107,8 +107,8 @@ class ReOderBoxItemsForm extends FormBase {
 
     ksort($reordered_items);
 
-    $current_box->set('field_box_items', array_values($reordered_items));
-    $current_box->save();
+    $current_box_content->set('field_box_items', array_values($reordered_items));
+    $current_box_content->save();
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);
