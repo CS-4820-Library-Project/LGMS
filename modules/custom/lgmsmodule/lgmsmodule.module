@@ -2253,8 +2253,9 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
   /** @var \Drupal\node\NodeInterface $node */
   $node = $form_state->getFormObject()->getEntity();
 
-  if ($node instanceof NodeInterface && $node->bundle() === 'guide_page')
+  if ($node instanceof NodeInterface && $node->bundle() === 'guide_page'){
     $form['#validate'][] = 'lgmsmodule_page_form_validate';
+  }
 
   // Check if the form is for a 'guide_database_item' node type.
   if ($node instanceof NodeInterface && $node->bundle() === 'guide_database_item') {
@@ -2269,23 +2270,9 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
       foreach (Element::children($fieldWidget) as $delta) {
         if (isset($fieldWidget[$delta]['uri']['#default_value'])) {
           $current_value = $fieldWidget[$delta]['uri']['#default_value'];
-          // Ensure $current_value is a string before calling strpos().
-          if (!is_null($current_value) && strpos((string) $current_value, $proxy_prefix) !== 0) {
-            // Prepend the proxy prefix to the URL if not already there.
-            $fieldWidget[$delta]['uri']['#default_value'] = $proxy_prefix . $current_value;
-          }
-        }
-      }
-    } else if (isset($form['field_database_link']) && !$make_proxy) {
-      $fieldWidget = &$form['field_database_link']['widget'];
-      foreach (Element::children($fieldWidget) as $delta) {
-        if (isset($fieldWidget[$delta]['uri']['#default_value'])) {
-          $current_value = $fieldWidget[$delta]['uri']['#default_value'];
-          // If the proxy prefix is present, remove it.
-          if (!is_null($current_value) && strpos((string) $current_value, $proxy_prefix) === 0) {
-            $new_value = substr($current_value, strlen($proxy_prefix));
-            $fieldWidget[$delta]['uri']['#default_value'] = $new_value;
-          }
+
+          $new_value = substr($current_value, strlen($proxy_prefix));
+          $fieldWidget[$delta]['uri']['#default_value'] = $new_value;
         }
       }
     }
