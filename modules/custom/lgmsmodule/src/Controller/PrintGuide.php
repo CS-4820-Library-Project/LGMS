@@ -65,7 +65,6 @@ class PrintGuide extends ControllerBase {
     $boxHtml = '<h3>' . htmlspecialchars($box->getTitle()) . '</h3>';
 
     $itemEntities = $box->hasField('field_box_items') && !$box->get('field_box_items')->isEmpty() ? $box->get('field_box_items')->referencedEntities() : [];
-    $fileUrlGenerator = \Drupal::service('file_url_generator');
 
     foreach ($itemEntities as $itemEntity) {
       if ($itemEntity->hasField('field_html_item') && !$itemEntity->get('field_html_item')->isEmpty()) {
@@ -84,34 +83,7 @@ class PrintGuide extends ControllerBase {
       } else if ($itemEntity->hasField('field_media_image') && !$itemEntity->get('field_media_image')->isEmpty()) {
         $mediaItems = $itemEntity->get('field_media_image')->referencedEntities();
         foreach ($mediaItems as $mediaItem) {
-          $mediaType = $mediaItem->bundle();
-
-          switch ($mediaType) {
-            case 'image':
-              $file = $mediaItem->field_media_image->entity;
-              $imageUrl = $fileUrlGenerator->generateAbsoluteString($file->getFileUri());
-              $altText = $mediaItem->field_media_image->alt ?? 'Image';
-              $boxHtml .= "Image: <a href=\"{$imageUrl}\">{$altText}</a><br>";
-              break;
-
-            case 'remote_video':
-              $videoUrl = $mediaItem->field_media_oembed_video->value;
-              $boxHtml .= "Video URL: <a href=\"{$videoUrl}\">Watch Video</a><br>";
-              break;
-
-            case 'document':
-              $file = $mediaItem->field_media_document->entity;
-              $documentUrl = $fileUrlGenerator->generateAbsoluteString($file->getFileUri());
-              $documentTitle = $mediaItem->getName();
-              $boxHtml .= "Document: <a href=\"{$documentUrl}\">{$documentTitle}</a><br>";
-              break;
-            case 'audio':
-              $file = $mediaItem->field_media_audio_file->entity;
-              $audioUrl = $fileUrlGenerator->generateAbsoluteString($file->getFileUri());
-              $audioTitle = $mediaItem->getName(); // Gets the name/title of the media item.
-              $boxHtml .= "Audio: <a href=\"{$audioUrl}\">{$audioTitle}</a><br>";
-              break;
-          }
+          $boxHtml .= $this->processMediaItem($mediaItem, $baseUrl);
         }
       }
     }
@@ -119,7 +91,47 @@ class PrintGuide extends ControllerBase {
     return $boxHtml;
   }
 
-  function bookDisplayForPDF(EntityInterface $entity, bool $includeTitle = true) {
+  protected function processMediaItem($mediaItem, $baseUrl): string {
+    $boxHtml = '';
+    $fileUrlGenerator = Drupal::service('file_url_generator');
+
+    switch ($mediaItem->bundle()) {
+      case 'image':
+        $file = $mediaItem->field_media_image->entity;
+        $imageUrl = $fileUrlGenerator->generateAbsoluteString($file->getFileUri());
+        $altText = $mediaItem->field_media_image->alt ?? 'Image';
+        $boxHtml .= "Image: <a href=\"{$imageUrl}\">{$altText}</a><br>";
+        break;
+      case 'remote_video':
+        $videoUrl = $mediaItem->field_media_oembed_video->value;
+        $boxHtml .= "Video URL: <a href=\"{$videoUrl}\">Watch Video</a><br>";
+        break;
+      case 'document':
+      case 'audio':
+      case 'video':
+        $field = $this->getFieldNameByMediaType($mediaItem->bundle());
+        $file = $mediaItem->{$field}->entity;
+        $fileUrl = $fileUrlGenerator->generateAbsoluteString($file->getFileUri());
+        $title = $mediaItem->getName();
+        $mediaType = ucfirst($mediaItem->bundle());
+        $boxHtml .= "$mediaType: <a href=\"{$fileUrl}\">{$title}</a><br>";
+        break;
+    }
+
+    return $boxHtml;
+  }
+
+  protected function getFieldNameByMediaType($mediaType): string {
+    return match ($mediaType) {
+      'document' => 'field_media_document',
+      'audio' => 'field_media_audio_file',
+      'video' => 'field_media_video_file',
+      default => '',
+    };
+  }
+
+  function bookDisplayForPDF(EntityInterface $entity, bool $includeTitle = true): string
+  {
     // Initialize the HTML with the container for the book details
     $html = '<div class="book-container">';
 
