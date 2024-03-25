@@ -32,6 +32,7 @@ class AddHTMLForm extends FormBase {
     ];
 
     $current_item = null;
+    $current_html = null;
     $edit = false;
 
     if(property_exists($ids, 'current_item')){
@@ -43,7 +44,7 @@ class AddHTMLForm extends FormBase {
 
       $edit = true;
       $current_item = Node::load($current_item);
-      $current_item = $current_item->get('field_html_item')->entity;
+      $current_html = $current_item->get('field_html_item')->entity;
     }
 
 
@@ -56,7 +57,7 @@ class AddHTMLForm extends FormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Item Title:'),
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->getTitle(): '',
+      '#default_value' => $edit? $current_html->getTitle(): '',
     ];
 
 
@@ -66,8 +67,8 @@ class AddHTMLForm extends FormBase {
       '#title' => $this->t('Body'),
       '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->get('field_text_box_item2')->value: '',
-      '#format' => $edit ? $current_item->get('field_text_box_item2')->format : 'basic_html',
+      '#default_value' => $edit? $current_html->get('field_text_box_item2')->value: '',
+      '#format' => $edit ? $current_html->get('field_text_box_item2')->format : 'basic_html',
     ];
 
     $form['published'] = [
@@ -75,6 +76,7 @@ class AddHTMLForm extends FormBase {
       '#title' => $this->t('Draft mode:'),
       '#description' => $this->t('Un-check this box to publish.'),
       '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
+      '#disabled' => $edit && !$current_html->isPublished(),
     ];
 
 
@@ -162,7 +164,6 @@ class AddHTMLForm extends FormBase {
         'format' => $form_state->getValue('body')['format'],
       ]);
       $html->set('title', $form_state->getValue('title'));
-      $html->set('status', $form_state->getValue('published') == '0');
       $html->save();
 
       $current_item->set('title', $form_state->getValue('title'));

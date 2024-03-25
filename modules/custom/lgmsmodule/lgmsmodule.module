@@ -317,26 +317,41 @@ function lgmsmodule_refresh_cache(NodeInterface $node): void
   }
 }
 
+function unpublished_status(EntityInterface $node)
+{
+  if(!$node->isPublished()){
+   return 'node--unpublished';
+  }
+
+  return '';
+}
+
 function build_item(EntityInterface $entity, EntityInterface $box, EntityInterface $item): array
 {
-  $unpublished_class = '';
-  if(!$item->isPublished()){
-    if(!\Drupal::currentUser()->isAuthenticated()){
-      return [];
-    }
-    $unpublished_class = 'node--unpublished';
+  $unpublished_class = unpublished_status($item);
+  if($unpublished_class != '' && !\Drupal::currentUser()->isAuthenticated()){
+    return [];
   }
 
   $item_container = [
     '#type' => 'container',
-    '#attributes' => ['class' => ['guide-item ' . $unpublished_class]],
+    '#attributes' => ['class' => ['guide-item', $unpublished_class]],
   ];
 
   $edit_route = '';
   $delete_route = '';
 
   if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
-    $item_container['content'][] = html_display($item->get('field_html_item')->entity, false);
+    $html_item = $item->get('field_html_item')->entity;
+
+    $html_unpublished_class = unpublished_status($html_item);
+    if($html_unpublished_class != '' && !\Drupal::currentUser()->isAuthenticated()){
+      return [];
+    }
+
+    $item_container['#attributes']['class'][] = $html_unpublished_class;
+
+    $item_container['content'][] = html_display($html_item, false);
 
     $edit_route = 'AddHTMLForm';
     $delete_route = 'delete_html.form';
@@ -667,7 +682,7 @@ function box_display(EntityInterface $entity, EntityInterface $box)
   $json_data = json_encode($array_of_objects);
   $book_query_param = urlencode($json_data);
 
-  if($entity->access('update')) {
+  if($entity->access('update') && $box->access('update') && (($box->get('field_parent_node')->entity->id() == $entity->id()) || $entity->id() == $box->id())) {
     $guide_box_build['items_list'] = [
       '#type' => 'container',
       '#attributes' => ['id' => 'add-reorder-list', 'class' => ['guide-item2']],
@@ -843,6 +858,9 @@ function box_display(EntityInterface $entity, EntityInterface $box)
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
+  $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+  $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
+
   if($view_mode === 'full'){
     if($entity->bundle() === 'guide_database_item'){
       $build['db'] = database_display($entity);
@@ -856,8 +874,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
   }
 
   if (($entity->bundle() === 'guide' || $entity->bundle() === 'guide_page') && $view_mode === 'full') {
-    $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
-    $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
 
     $reference_page = true;
 
