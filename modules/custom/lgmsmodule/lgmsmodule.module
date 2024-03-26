@@ -359,7 +359,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $item_container['content'][] = book_display($item->get('field_book_item')->entity, false);
 
     $edit_route = 'AddBookForm';
-    $delete_route = 'delete_book.form';
+    $delete_route = 'delete_html.form';
   } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
     $database = $item->get('field_database_item')->entity;
     $node_id = $database->id();
@@ -379,7 +379,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     }
 
     $edit_route = 'AddDatabaseForm';
-    $delete_route = 'delete_database.form';
+    $delete_route = 'delete_html.form';
   } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
     $media = $item->get('field_media_image')->entity;
     $media_type = $media->bundle();
@@ -420,7 +420,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $item_container['content'][] = $media_item;
 
     $edit_route = 'add_media.form';
-    $delete_route = 'delete_database.form';
+    $delete_route = 'delete_html.form';
   }
 
   if(($item->access('update') && (!$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()) && $entity->id() === $box->get('field_parent_node')->entity->id()) || ($entity->id() == $box->id())) {
