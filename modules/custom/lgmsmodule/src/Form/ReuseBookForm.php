@@ -134,17 +134,8 @@ class ReuseBookForm extends FormBase {
 
       $item = $new_item;
     } else {
-      $new_book = $book->createDuplicate();
       $new_item = $item->createDuplicate();
-
-      // Setting 'field_book_reference' to TRUE since it's a reference.
-      $new_book->set('field_book_reference', TRUE);
-      $new_book->save();
-
-      $new_item->set('field_parent_box', $current_box);
-      $new_item->set('field_book_item', $new_book);
       $new_item->save();
-
       $item = $new_item;
     }
 

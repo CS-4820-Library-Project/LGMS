@@ -38,7 +38,7 @@ class AddDatabaseForm extends FormBase {
     $current_item = Node::load($ids->current_item);
     $form['current_item'] = [
       '#type' => 'hidden',
-      '#value' => $current_item->id(),
+      '#value' => $current_item?->id(),
     ];
 
     $database = $current_item?->get('field_database_item')->entity;
@@ -59,7 +59,7 @@ class AddDatabaseForm extends FormBase {
     ];
 
     $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
-    $current_value = $database->get('field_database_link')->uri;
+    $current_value = $database?->get('field_database_link')->uri;
 
     if ($edit && $database->get('field_make_proxy')->value){
       $current_value = substr($current_value, strlen($proxy_prefix));
