@@ -378,7 +378,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       ];
     }
 
-    $edit_route = 'add_database.form';
+    $edit_route = 'AddDatabaseForm';
     $delete_route = 'delete_database.form';
   } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
     $media = $item->get('field_media_image')->entity;
@@ -439,6 +439,12 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       }
       else if($edit_route == 'AddBookForm'){
         $array_of_objects = [(object)['name' => 'Edit Book', 'form' => $edit_route]];
+        $json_data = json_encode($array_of_objects);
+        $book_query_param = urlencode($json_data);
+        $url =  Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $book_query_param]]);
+      }
+      else if($edit_route == 'AddDatabaseForm'){
+        $array_of_objects = [(object)['name' => 'Edit Database', 'form' => $edit_route]];
         $json_data = json_encode($array_of_objects);
         $book_query_param = urlencode($json_data);
         $url =  Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $book_query_param]]);

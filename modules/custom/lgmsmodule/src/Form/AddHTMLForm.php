@@ -14,45 +14,16 @@ class AddHTMLForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
-    $form['#prefix'] = '<div id="modal-form">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
+    // Set the prefix, suffix, and hidden fields
+    $form_helper = new FormHelper();
+    $form_helper->set_form_data($form,$ids);
 
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_box,
-    ];
+    // In the case of editing an HTML, get the item
+    $current_item = Node::load($ids->current_item);
+    $current_html = $current_item?->get('field_html_item')->entity;
+    $edit = $current_item != null;
 
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_node,
-    ];
-
-    $current_item = null;
-    $current_html = null;
-    $edit = false;
-
-    if(property_exists($ids, 'current_item')){
-      $current_item = $ids->current_item;
-      $form['current_item'] = [
-        '#type' => 'hidden',
-        '#value' => $current_item,
-      ];
-
-      $edit = true;
-      $current_item = Node::load($current_item);
-      $current_html = $current_item->get('field_html_item')->entity;
-    }
-
-
-    $form['edit'] = [
-      '#type' => 'hidden',
-      '#value' => $edit,
-    ];
-
+    // Title field
     $form['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Item Title:'),
@@ -60,35 +31,34 @@ class AddHTMLForm extends FormBase {
       '#default_value' => $edit? $current_html->getTitle(): '',
     ];
 
-
     // Body field
     $form['body'] = [
       '#type' => 'text_format',
       '#title' => $this->t('Body'),
-      '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
+      //'#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
       '#required' => TRUE,
       '#default_value' => $edit? $current_html->get('field_text_box_item2')->value: '',
       '#format' => $edit ? $current_html->get('field_text_box_item2')->format : 'basic_html',
     ];
 
+    // Draft mode Field
     $form['published'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Draft mode:'),
-      '#description' => $this->t('Un-check this box to publish.'),
+      '#description' => $edit && !$current_html->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
       '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
       '#disabled' => $edit && !$current_html->isPublished(),
     ];
 
-
+    // Create submit button and attach ajax method to it
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ]
     ];
 
     return $form;
@@ -117,9 +87,7 @@ class AddHTMLForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $edit = $form_state->getValue('edit');
-
-    if($edit == '0'){
+    if($form_state->getValue('current_item') == null){
       $current_box = $form_state->getValue('current_box');
       $current_box = Node::load($current_box);
 

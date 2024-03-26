@@ -62,4 +62,29 @@ class FormHelper {
     $current_node->set('changed', \Drupal::time()->getRequestTime());
     $current_node->save();
   }
+
+  public function set_form_data(array &$form, $ids){
+    $form['#prefix'] = '<div id="modal-form">';
+    $form['#suffix'] = '</div>';
+    $form['messages'] = [
+      '#weight' => -9999,
+      '#type' => 'status_messages',
+    ];
+
+    $form['current_box'] = [
+      '#type' => 'hidden',
+      '#value' => property_exists($ids, 'current_box') ? $ids->current_box : null,
+    ];
+
+    $form['current_node'] = [
+      '#type' => 'hidden',
+      '#value' => property_exists($ids, 'current_node') ? $ids->current_node : null,
+    ];
+
+    $form['current_item'] = [
+      '#type' => 'hidden',
+      '#value' => property_exists($ids, 'current_item') ? $ids->current_item : null,
+    ];
+
+  }
 }
