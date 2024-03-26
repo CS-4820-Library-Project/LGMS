@@ -494,7 +494,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
         'class' => ['use-ajax'],
         'data-dialog-type' => 'modal',
         'data-dialog-options' => Json::encode(['width' => 800]),
-        'title' => 'Edit Item',
+        'title' => 'Delete Item',
         'style' => 'text-decoration: none;',
       ],
     ];
@@ -1980,6 +1980,27 @@ function lgmsModule_install(): void
     5,
     ''
   );
+
+  createField(
+    'field_book_reference',
+    'node',
+    'guide_book_item',
+    'Link',
+    'boolean',
+    [],
+    [],
+    'boolean_checkbox',
+    [ // Widget settings.
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+    ],
+    FALSE,
+    FALSE,
+    10,
+    ''
+  );
+
 
   createField(
     'field_book_url',

@@ -3,6 +3,7 @@
 namespace Drupal\lgmsmodule\Form;
 
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
@@ -105,6 +106,9 @@ class ReuseBookForm extends FormBase {
     return $element;
   }
 
+  /**
+   * @throws EntityStorageException
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $current_box = $form_state->getValue('current_box');
     $current_box = Node::load($current_box);
@@ -126,6 +130,19 @@ class ReuseBookForm extends FormBase {
       $new_item->set('title', $form_state->getValue('title'));
       $new_item->set('field_book_item', $new_book);
 
+      $new_item->save();
+
+      $item = $new_item;
+    } else {
+      $new_book = $book->createDuplicate();
+      $new_item = $item->createDuplicate();
+
+      // Setting 'field_book_reference' to TRUE since it's a reference.
+      $new_book->set('field_book_reference', TRUE);
+      $new_book->save();
+
+      $new_item->set('field_parent_box', $current_box);
+      $new_item->set('field_book_item', $new_book);
       $new_item->save();
 
       $item = $new_item;
