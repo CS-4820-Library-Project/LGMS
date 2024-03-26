@@ -73,47 +73,9 @@ class DeleteDatabaseForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
-
-    $current_item = $form_state->getValue('current_item');
-    $current_item = Node::load($current_item);
-
-    $child_items = $current_box->get('field_box_items')->getValue();
-
-    $child_items = array_filter($child_items, function ($item) use ($current_item) {
-      return $item['target_id'] != $current_item->id();
-    });
-
-    $current_box->set('field_box_items', $child_items);
-    $current_box->save();
-
-    $parent_box = $current_item->get('field_parent_box')->entity;
-
-    if($current_box->id() == $parent_box->id()){
-      $query = \Drupal::entityQuery('node')
-        ->condition('type', 'guide_box')
-        ->condition('field_box_items', $current_item->id())
-        ->accessCheck(TRUE);
-      $result = $query->execute();
-
-      foreach ($result as $box){
-        $box = Node::load($box);
-        $child_items = $box->get('field_box_items')->getValue();
-
-        $child_items = array_filter($child_items, function ($box) use ($current_item) {
-          return $box['target_id'] != $current_item->id();
-        });
-
-        $box->set('field_box_items', $child_items);
-        $box->save();
-      }
-
-      $current_item?->delete();
-    }
-
     $ajaxHelper = new FormHelper();
+    $ajaxHelper->delete_item($form, $form_state, 'field_database_item');
+
     $ajaxHelper->updateParent($form, $form_state);
   }
 }
