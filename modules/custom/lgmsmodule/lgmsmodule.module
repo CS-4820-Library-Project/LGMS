@@ -682,6 +682,10 @@ function box_display(EntityInterface $entity, EntityInterface $box)
   $json_data = json_encode($array_of_objects);
   $book_query_param = urlencode($json_data);
 
+  $array_of_objects = [(object)['name' => 'Add Database', 'form' => 'AddDatabaseForm'],(object) ['name' => 'Reuse Database', 'form' => 'ReuseDatabaseForm']];
+  $json_data = json_encode($array_of_objects);
+  $database_query_param = urlencode($json_data);
+
   if($entity->access('update') && $box->access('update') && (($box->get('field_parent_node')->entity->id() == $entity->id()) || $entity->id() == $box->id())) {
     $guide_box_build['items_list'] = [
       '#type' => 'container',
@@ -724,8 +728,8 @@ function box_display(EntityInterface $entity, EntityInterface $box)
           '#tag' => 'li',
           'content' => [
             '#type' => 'link',
-            '#title' => ('Database'),
-            '#url' => Url::fromRoute('add_database.form', [], ['query' => ['current_box' => $box->id(), 'current_node' => $entity->id()]]),
+            '#title' => ('Add/Reuse Database'),
+            '#url' => Url::fromRoute('lgmsmodule.popup_modal', [], ['query' => ['ids' => $ids, 'forms' => $database_query_param]]),
             '#attributes' => [
               'class' => ['use-ajax'],
               'data-dialog-type' => 'modal',
@@ -1326,6 +1330,28 @@ function lgmsModule_install(): void
     'field_parent_item',
     'node',
     'guide_book_item',
+    'Parent node',
+    'entity_reference',
+    ['target_type' => 'node',],
+    ['handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_item' => 'guide_item',
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete',
+    [],
+    TRUE,
+    False,
+    0,
+    ''
+  );
+
+  createField(
+    'field_parent_item',
+    'node',
+    'guide_database_item',
     'Parent node',
     'entity_reference',
     ['target_type' => 'node',],
