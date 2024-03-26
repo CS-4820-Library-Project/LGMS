@@ -145,7 +145,6 @@ class AddDatabaseForm extends FormBase {
     $form['#validate'][] = '::validateFields';
 
 
-    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),

@@ -63,7 +63,7 @@ class ReuseDatabaseForm extends FormBase {
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Save'),
+      '#value' => $this->t('Save 2'),
       '#button_type' => 'primary',
     ];
 
