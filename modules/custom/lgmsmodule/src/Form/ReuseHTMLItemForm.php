@@ -131,6 +131,10 @@ class ReuseHTMLItemForm extends FormBase {
       $new_item->save();
 
       $item = $new_item;
+    } else {
+      $new_item = $item->createDuplicate();
+      $new_item->save();
+      $item = $new_item;
     }
 
     $boxList = $current_box->get('field_box_items')->getValue();

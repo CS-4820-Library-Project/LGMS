@@ -135,6 +135,10 @@ class ReuseDatabaseForm extends FormBase {
       $new_item->save(); // Saving the new item
 
       $item = $new_item; // Update $item to refer to the new item
+    } else {
+      $new_item = $item->createDuplicate();
+      $new_item->save();
+      $item = $new_item;
     }
 
     // Updating the box list with the new item
