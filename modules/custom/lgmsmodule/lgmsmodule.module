@@ -1988,27 +1988,6 @@ function lgmsModule_install(): void
   );
 
   createField(
-    'field_book_reference',
-    'node',
-    'guide_book_item',
-    'Link',
-    'boolean',
-    [],
-    [],
-    'boolean_checkbox',
-    [ // Widget settings.
-      'settings' => [
-        'display_label' => TRUE,
-      ],
-    ],
-    FALSE,
-    FALSE,
-    10,
-    ''
-  );
-
-
-  createField(
     'field_book_url',
     'node',
     'guide_book_item',

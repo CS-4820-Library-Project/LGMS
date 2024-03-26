@@ -3,6 +3,7 @@
 namespace Drupal\lgmsmodule\Form;
 
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
@@ -62,7 +63,7 @@ class ReuseDatabaseForm extends FormBase {
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Save'),
+      '#value' => $this->t('Save 2'),
       '#button_type' => 'primary',
     ];
 
@@ -105,6 +106,9 @@ class ReuseDatabaseForm extends FormBase {
     return $element;
   }
 
+  /**
+   * @throws EntityStorageException
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
     // Attempt to load the 'current_box'

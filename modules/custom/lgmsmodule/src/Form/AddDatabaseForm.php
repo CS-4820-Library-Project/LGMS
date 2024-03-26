@@ -145,7 +145,6 @@ class AddDatabaseForm extends FormBase {
     $form['#validate'][] = '::validateFields';
 
 
-    $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),
@@ -221,8 +220,8 @@ class AddDatabaseForm extends FormBase {
 
       $new_item->save();
 
-//      $database->set('field_parent_item', $new_item);
-//      $database->save();
+      $database->set('field_parent_item', $new_item);
+      $database->save();
 
       $boxList = $current_box->get('field_box_items')->getValue();
       $boxList[] = ['target_id' => $new_item->id()];
