@@ -43,12 +43,7 @@ class DeleteHTMLForm extends FormBase {
 
     $current_item = Node::load($current_item);
     $field_to_delete = '';
-    $possible_fields = [
-      'field_database_item',
-      'field_html_item',
-      'field_book_item',
-      'field_media_image'
-    ];
+    $possible_fields = $form_helper->get_fields();
 
     foreach ($possible_fields as $field_name) {
       if (!$current_item->get($field_name)->isEmpty()) {
@@ -77,11 +72,10 @@ class DeleteHTMLForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Delete'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;

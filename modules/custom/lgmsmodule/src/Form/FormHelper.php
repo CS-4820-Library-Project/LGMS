@@ -5,6 +5,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -88,6 +89,65 @@ class FormHelper {
     $form['messages'] = [
       '#weight' => -9999,
       '#type' => 'status_messages',
+    ];
+  }
+
+  public function create_link(EntityInterface $new_content, String $current_box)
+  {
+    //find what item is being created
+    $field_name = '';
+    if ($new_content->bundle() == 'guide_html_item'){
+      $field_name = 'field_html_item';
+    } elseif ($new_content->bundle() == 'guide_book_item'){
+      $field_name = 'field_book_item';
+    } elseif ($new_content->bundle() == 'guide_database_item'){
+      $field_name = 'field_database_item';
+    }
+
+    // Create the item
+    $new_item = Node::create([
+      'type' => 'guide_item',
+      'title' => $new_content->label(),
+      $field_name => $new_content,
+      'field_parent_box' => $current_box,
+      'status' => $new_content->isPublished(),
+    ]);
+
+    $new_item->save();
+
+    // Update the box item list
+    $current_box = Node::load($current_box);
+    $boxList = $current_box->get('field_box_items')->getValue();
+    $boxList[] = ['target_id' => $new_item->id()];
+
+    $current_box->set('field_box_items', $boxList);
+    $current_box->save();
+
+    return $new_item;
+  }
+
+  public function get_filled_field($current_item): string
+  {
+    $possible_fields = $this->get_fields();
+    $field_to_delete = '';
+
+    foreach ($possible_fields as $field_name) {
+      if (!$current_item->get($field_name)->isEmpty()) {
+        $field_to_delete = $field_name;
+        break;
+      }
+    }
+
+    return $field_to_delete;
+  }
+
+  public function get_fields(): array
+  {
+    return [
+      'field_database_item',
+      'field_html_item',
+      'field_book_item',
+      'field_media_image'
     ];
   }
 }
