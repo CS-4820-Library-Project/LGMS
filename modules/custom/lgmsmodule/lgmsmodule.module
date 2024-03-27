@@ -374,7 +374,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     if(!empty($item->get('field_description')->value)){
       $item_container['content'][] = [
         '#type' => 'markup',
-        '#markup' => '— ' . $item->get('field_description')->value,
+        '#markup' => ' — ' . $item->get('field_description')->value,
       ];
     }
 
