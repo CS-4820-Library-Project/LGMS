@@ -141,6 +141,7 @@ class ReuseDatabaseForm extends FormBase {
       $item = $new_item; // Update $item to refer to the new item
     } else {
       $new_item = $item->createDuplicate();
+      $new_item->set('field_lgms_database_link', TRUE);
       $new_item->save();
       $item = $new_item;
     }

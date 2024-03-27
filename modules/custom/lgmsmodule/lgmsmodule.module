@@ -457,27 +457,31 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
         ]);
       }
 
-      $edit_link = [
-        '#type' => 'link',
-        '#title' => [
-          '#type' => 'html_tag',
-          '#tag' => 'i',
-          '#attributes' => [
-            'class' => ['fa', 'fa-edit', 'edit-icon'],
-            'style' => 'margin-left: 5px',
-          ],
-        ],
-        '#url' => $url,
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'modal',
-          'data-dialog-options' => Json::encode(['width' => 800]),
-          'title' => 'Edit Item',
-          'style' => 'text-decoration: none;',
-        ],
-      ];
+      if (!$item->get('field_lgms_database_link')->value) {
 
-      $item_container['edit_link'] = $edit_link;
+        $edit_link = [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-edit', 'edit-icon'],
+              'style' => 'margin-left: 5px',
+            ],
+          ],
+          '#url' => $url,
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => Json::encode(['width' => 800]),
+            'title' => 'Edit Item',
+            'style' => 'text-decoration: none;',
+          ],
+        ];
+
+        $item_container['edit_link'] = $edit_link;
+
+      }
     }
 
     $url = Url::fromRoute($delete_route, [], ['query' => [
@@ -1597,6 +1601,26 @@ function lgmsModule_install(): void
     TRUE,
     True,
     4,
+    ''
+  );
+
+  createField(
+    'field_lgms_database_link',
+    'node',
+    'guide_item',
+    'Link',
+    'boolean',
+    [],
+    [],
+    'boolean_checkbox',
+    [ // Widget settings.
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+    ],
+    FALSE,
+    FALSE,
+    10,
     ''
   );
 
