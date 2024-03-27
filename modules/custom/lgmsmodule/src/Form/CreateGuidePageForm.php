@@ -20,7 +20,7 @@ class CreateGuidePageForm extends FormBase
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null)
   {
-    $form['#prefix'] = '<div id="modal-form">';
+    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
       '#weight' => -9999,
@@ -116,7 +116,7 @@ class CreateGuidePageForm extends FormBase
     $response = new AjaxResponse();
 
     if ($form_state->hasAnyErrors()) {
-      $response->addCommand(new ReplaceCommand('#modal-form', $form));
+      $response->addCommand(new ReplaceCommand( '#'.$this->getFormId(), $form));
       return $response;
     }
 

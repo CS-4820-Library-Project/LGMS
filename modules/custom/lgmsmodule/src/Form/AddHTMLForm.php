@@ -16,7 +16,7 @@ class AddHTMLForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
-    $form_helper->set_form_data($form,$ids);
+    $form_helper->set_form_data($form,$ids, $this->getFormId());
 
     // In the case of editing an HTML, get the item
     $current_item = Node::load($ids->current_item);
@@ -69,7 +69,7 @@ class AddHTMLForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'an HTML field has been added.');
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'an HTML field has been added.', '#'.$this->getFormId());
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
