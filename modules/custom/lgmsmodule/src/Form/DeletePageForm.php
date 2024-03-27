@@ -9,8 +9,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+
 class DeletePageForm extends FormBase
 {
+
 
   public function getFormId()
   {
@@ -30,8 +32,6 @@ class DeletePageForm extends FormBase
     if ($current_guide) {
       $current_guide = Node::load($current_guide);
     }
-
-
 
     if ($current_guide) {
       $form['current_node'] = [
@@ -143,6 +143,7 @@ class DeletePageForm extends FormBase
   public function submitForm(array &$form, FormStateInterface $form_state){
     $selected_page = $form_state->getValue('select_page');
     $delete_sub = $form_state->getValue('include_sub') == '1';
+    $helper = new FormHelper();
 
     if ($selected_page == 'top_level'){
       $selected_page = $form_state->getValue('current_node');
@@ -150,85 +151,41 @@ class DeletePageForm extends FormBase
 
     $selected_page = Node::load($selected_page);
 
-    $this->deletePages($selected_page, $delete_sub);
+    $this->$helper->deletePages($selected_page, $delete_sub);
   }
 
-  public function deletePages($parent, $delete_sub){
-    $this->deleteBoxes($parent);
-
-    if($delete_sub) {
-      $pages = $parent->get('field_child_pages')->referencedEntities();
-      foreach ($pages as $page) {
-        $this->deleteBoxes($page);
-        $this->deletePages($page, $delete_sub);
-      }
-    }
-
-    $parent->delete();
-  }
-
-  public function deleteBoxes($parent){
-    $boxes = $parent->get('field_child_boxes')->referencedEntities();
-
-    foreach($boxes as $box){
-      if($parent->id() == $box->get('field_parent_node')->entity->id()){
-        $this->deleteItems($box);
-
-        $query = \Drupal::entityQuery('node')
-          ->condition('type', 'guide_page')
-          ->condition('field_child_boxes', $box->id())
-          ->accessCheck(TRUE);
-        $result = $query->execute();
-
-        foreach ($result as $page){
-          $page = Node::load($page);
-          $child_boxes = $page->get('field_child_boxes')->getValue();
-
-          $child_boxes = array_filter($child_boxes, function ($box_new) use ($box) {
-            return $box_new['target_id'] != $box->id();
-          });
-
-          $page->set('field_child_boxes', $child_boxes);
-          $page->save();
-        }
-
-        $box?->delete();
-      }
-    }
-  }
-
-  public function deleteItems($parent){
-    $items = $parent->get('field_box_items')->referencedEntities();
-
-    foreach($items as $item){
-      if($parent->id() == $item->get('field_parent_box')->entity->id()){
-
-        $query = \Drupal::entityQuery('node')
-          ->condition('type', 'guide_box')
-          ->condition('field_box_items', $item->id())
-          ->accessCheck(TRUE);
-        $result = $query->execute();
-
-        foreach ($result as $box){
-          $box = Node::load($box);
-          $child_items = $box->get('field_box_items')->getValue();
-
-          $child_items = array_filter($child_items, function ($box) use ($item) {
-            return $box['target_id'] != $item->id();
-          });
-
-          $box->set('field_box_items', $child_items);
-          $box->save();
-        }
-
-        $item->get('field_html_item')->entity?->delete();
-        $item->get('field_book_item')->entity?->delete();
-
-        $item?->delete();
-      }
-    }
-
-  }
+//  public function deleteItems($parent){
+//    $items = $parent->get('field_box_items')->referencedEntities();
+//
+//    foreach($items as $item){
+//      if($parent->id() == $item->get('field_parent_box')->entity->id()){
+//
+//        $query = \Drupal::entityQuery('node')
+//          ->condition('type', 'guide_box')
+//          ->condition('field_box_items', $item->id())
+//          ->accessCheck(TRUE);
+//        $result = $query->execute();
+//
+//        foreach ($result as $box){
+//          $box = Node::load($box);
+//          $child_items = $box->get('field_box_items')->getValue();
+//
+//          $child_items = array_filter($child_items, function ($box) use ($item) {
+//            return $box['target_id'] != $item->id();
+//          });
+//
+//          $box->set('field_box_items', $child_items);
+//          $box->save();
+//        }
+//
+//        $item->get('field_html_item')->entity?->delete();
+//        $item->get('field_book_item')->entity?->delete();
+//
+//        $item?->delete();
+//      }
+//    }
+//
+//  }
 
   public function getPageList($guide_id) {
     $options = [];

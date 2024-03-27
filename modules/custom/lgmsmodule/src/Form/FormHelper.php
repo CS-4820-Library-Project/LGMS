@@ -150,4 +150,48 @@ class FormHelper {
       'field_media_image'
     ];
   }
+
+  public function deletePages($parent, $delete_sub){
+    $this->deleteBoxes($parent);
+
+    if($delete_sub) {
+      $pages = $parent->get('field_child_pages')->referencedEntities();
+      foreach ($pages as $page) {
+        $this->deleteBoxes($page);
+        $this->deletePages($page, $delete_sub);
+      }
+    }
+
+    $parent->delete();
+  }
+
+  public function deleteBoxes($parent): void
+  {
+    $boxes = $parent->get('field_child_boxes')->referencedEntities();
+
+    foreach($boxes as $box){
+      if($parent->id() == $box->get('field_parent_node')->entity->id()){
+
+        $query = \Drupal::entityQuery('node')
+          ->condition('type', 'guide_page')
+          ->condition('field_child_boxes', $box->id())
+          ->accessCheck(TRUE);
+        $result = $query->execute();
+
+        foreach ($result as $page){
+          $page = Node::load($page);
+          $child_boxes = $page->get('field_child_boxes')->getValue();
+
+          $child_boxes = array_filter($child_boxes, function ($box_new) use ($box) {
+            return $box_new['target_id'] != $box->id();
+          });
+
+          $page->set('field_child_boxes', $child_boxes);
+          $page->save();
+        }
+
+        $box?->delete();
+      }
+    }
+  }
 }

@@ -910,7 +910,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       '#attributes' => ['class' => ['icons-container']],
     ];
 
-    if (\Drupal::currentUser()->isAuthenticated()) {
+    if (\Drupal::currentUser()->isAuthenticated() && $entity->bundle() == 'guide') {
       $icons['print_icon'] = [
         '#type' => 'link',
         '#title' => [
@@ -937,17 +937,16 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
           '#attributes' => [
             'class' => ['fa', 'fa-trash'],
             'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
-
           ],
         ],
-        '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['node' => $entity->id()]),
+        '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['node_id' => $entity->id()]),
         '#attributes' => [
-          'class' => 'use-ajax',
+          'class' => ['use-ajax'],
           'data-dialog-type' => 'modal',
-          'title' => 'Delete Guide',
-          'style' => 'text-decoration: none;',
+          'data-dialog-options' => json_encode(['width' => 700]),
         ],
       ];
+
     }
 
     $build['guide_print'][] = [
