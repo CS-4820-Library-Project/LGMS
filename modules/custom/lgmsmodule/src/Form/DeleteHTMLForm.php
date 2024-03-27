@@ -6,6 +6,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class DeleteHTMLForm extends FormBase {
 
@@ -14,40 +15,40 @@ class DeleteHTMLForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['#prefix'] = '<div id="modal-form">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
+    $form_helper = new FormHelper();
+    $form_helper->set_prefix($form);
 
+    $current_node = \Drupal::request()->query->get('current_node');
     $current_box = \Drupal::request()->query->get('current_box');
+    $current_item = \Drupal::request()->query->get('current_item');
+
+    if (empty($current_box) || empty($current_node) || empty($current_item)){
+      throw new AccessDeniedHttpException();
+    }
+
     $form['current_box'] = [
       '#type' => 'hidden',
       '#value' => $current_box,
     ];
 
-    $current_node = \Drupal::request()->query->get('current_node');
     $form['current_node'] = [
       '#type' => 'hidden',
       '#value' => $current_node,
     ];
 
-    $current_item = \Drupal::request()->query->get('current_item');
     $form['current_item'] = [
       '#type' => 'hidden',
       '#value' => $current_item,
     ];
-    $current_item = Node::load($current_item);
 
+    $current_item = Node::load($current_item);
+    $field_to_delete = '';
     $possible_fields = [
       'field_database_item',
       'field_html_item',
       'field_book_item',
       'field_media_image'
     ];
-
-    $field_to_delete = '';
 
     foreach ($possible_fields as $field_name) {
       if (!$current_item->get($field_name)->isEmpty()) {
