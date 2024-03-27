@@ -16,13 +16,13 @@ class FormHelper {
   /**
    * @throws EntityMalformedException
    */
-  public function submitModalAjax(array &$form, FormStateInterface $form_state, String $message): AjaxResponse
+  public function submitModalAjax(array &$form, FormStateInterface $form_state, String $message, $form_id = '#modal-form'): AjaxResponse
   {
     // Create an array of AJAX commands.
     $response = new AjaxResponse();
 
     if ($form_state->hasAnyErrors()) {
-      $response->addCommand(new ReplaceCommand('#modal-form', $form));
+      $response->addCommand(new ReplaceCommand($form_id, $form));
       return $response;
     }
 
@@ -64,8 +64,8 @@ class FormHelper {
     $current_node->save();
   }
 
-  public function set_form_data(array &$form, $ids){
-    $this->set_prefix($form);
+  public function set_form_data(array &$form, $ids, string $form_id){
+    $this->set_prefix($form,$form_id);
 
     $form['current_node'] = [
       '#type' => 'hidden',
@@ -83,8 +83,8 @@ class FormHelper {
     ];
   }
 
-  public function set_prefix(array &$form){
-    $form['#prefix'] = '<div id="modal-form">';
+  public function set_prefix(array &$form, string $id){
+    $form['#prefix'] = '<div id="'. $id .'">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
       '#weight' => -9999,
