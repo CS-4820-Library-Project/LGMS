@@ -215,6 +215,20 @@ lgmsmodule.download_guide:
     _permission: 'access content'
     node: '\d+'
 
+lgmsmodule.delete_guide:
+  path: '/lgms/delete-guide/{node}'
+  defaults:
+    _controller: '\Drupal\lgmsmodule\Controller\DeleteGuide::handleDelete'
+    _title: 'Handle Delete'
+  requirements:
+    _permission: 'delete any content'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+
+
 add_book.form:
   path: '/add_book'
   defaults:

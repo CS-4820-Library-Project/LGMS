@@ -905,57 +905,76 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
     if($entity->get('field_hide_description')->value){
       $description = '';
     }
+    $icons = [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['icons-container']],
+    ];
 
-    // Concatenate the title, a horizontal divider, and the description.
-    // The <hr> tag is used as the divider between the title and description.
+    if (\Drupal::currentUser()->isAuthenticated()) {
+      $icons['print_icon'] = [
+        '#type' => 'link',
+        '#title' => [
+          '#type' => 'html_tag',
+          '#tag' => 'i',
+          '#attributes' => [
+            'class' => ['fa', 'fa-print'],
+            'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 12px; margin-top: 11px;' : 'margin: 32px;',
+
+          ],
+        ],
+        '#url' => Url::fromRoute('lgmsmodule.download_guide', ['node' => $entity->id()]),
+        '#attributes' => [
+          'title' => 'Print Guide',
+          'style' => 'text-decoration: none;',
+        ],
+      ];
+
+      $icons['delete_icon'] = [
+        '#type' => 'link',
+        '#title' => [
+          '#type' => 'html_tag',
+          '#tag' => 'i',
+          '#attributes' => [
+            'class' => ['fa', 'fa-trash'],
+            'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
+
+          ],
+        ],
+        '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['node' => $entity->id()]),
+        '#attributes' => [
+          'class' => 'use-ajax',
+          'data-dialog-type' => 'modal',
+          'title' => 'Delete Guide',
+          'style' => 'text-decoration: none;',
+        ],
+      ];
+    }
+
     $build['guide_print'][] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['guide-box-2container']],
       'title_wrapper' => [
         '#type' => 'html_tag',
         '#tag' => 'div',
-        '#attributes' => [
-          'class' => ['title-edit2-wrapper'],
-        ],
+        '#attributes' => ['class' => ['title-edit2-wrapper']],
         'title' => [
           '#type' => 'html_tag',
           '#tag' => 'h3',
-          '#value' => '<h1>'.$title . '</h1>',
+          '#value' => '<h1>'.$title.'</h1>',
           '#attributes' => ['class' => ['guide-box-title']],
         ],
-        'icons' => $entity->getType() == 'guide' ? [
-          '#type' => 'html_tag',
-          '#tag' => 'div',
-          '#attributes' => [
-            'class' => ['icons-container'],
-          ],
-          'print_icon' => [
-            '#type' => 'link',
-            '#title' => [
-              '#type' => 'html_tag',
-              '#tag' => 'i',
-              '#attributes' => [
-                'class' => ['fa', 'fa-print'],
-                'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
-
-              ],
-            ],
-            '#url' => Url::fromRoute('lgmsmodule.download_guide', ['node' => $entity->id()]),
-            '#attributes' => [
-              'title' => 'Print Guide',
-              'style' => 'text-decoration: none;',
-            ],
-          ],
-        ] : [],
+        'icons' => $icons,
       ],
       'body' => [
         '#type' => 'markup',
-        '#markup' => $description, // Ensure $description is properly sanitized and safe HTML
+        '#markup' => $description,
       ],
     ];
 
 
+
     $build['boxes']['#attached']['library'][] = 'lgmsmodule/fontawesome';
+    $build['guide_print']['#attached']['library'][] = 'core/drupal.dialog.ajax';
 
     $boxes = $entity->get('field_child_boxes')->referencedEntities();
 
