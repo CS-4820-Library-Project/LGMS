@@ -68,7 +68,7 @@ class AddDatabaseForm extends FormBase {
     ];
 
 
-    // Body field
+    // Description field
     $form['description'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Description'),
