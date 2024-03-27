@@ -32,6 +32,12 @@ class FormHelper {
     $curr_node = $form_state->getValue('current_node');
     $curr_node = Node::load($curr_node);
 
+    if ($curr_node == NULL) {
+      $dashboardUrl = Url::fromRoute('lgmsmodule.dashboard_overview')->toString();
+      $response->addCommand(new RedirectCommand($dashboardUrl));
+      return $response;
+    }
+
     $curr_node_url = $curr_node->toUrl()->toString();
     $curr_node_url = str_ireplace('LGMS/', '', $curr_node_url);
 
