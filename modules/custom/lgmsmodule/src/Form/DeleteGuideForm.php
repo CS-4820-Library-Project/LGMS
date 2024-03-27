@@ -78,10 +78,13 @@ class DeleteGuideForm extends FormBase {
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $node_id = $form_state->getValue('current_node');
+    $helper = new FormHelper();
     if ($node = Node::load($node_id)) {
+      $helper->deletePages($node, True);
       $node->delete();
       \Drupal::messenger()->addMessage($this->t('Guide has been deleted.'));
     }
+
     \Drupal::logger('lgmsmodule')->notice('Node ID: @id, Type: @type');
     $form_state->setRedirect('lgmsmodule.dashboard_overview');
   }
