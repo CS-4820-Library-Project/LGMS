@@ -25,7 +25,7 @@ class DeleteGuideForm extends FormBase {
     }
 
     if ($current_guide) {
-      $form['#prefix'] = '<div id="modal-form">';
+      $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
       $form['#suffix'] = '</div>';
 
       // Warning message

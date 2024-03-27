@@ -16,7 +16,7 @@ class AddMediaForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['#prefix'] = '<div id="modal-form">';
+    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
       '#weight' => -9999,
@@ -105,7 +105,7 @@ class AddMediaForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'an HTML field has been added.');
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'an HTML field has been added.', '#'.$this->getFormId());
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {

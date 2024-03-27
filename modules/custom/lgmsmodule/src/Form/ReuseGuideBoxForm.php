@@ -17,7 +17,7 @@ class ReuseGuideBoxForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
-    $form['#prefix'] = '<div id="modal-form">';
+    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
       '#weight' => -9999,
@@ -86,7 +86,7 @@ class ReuseGuideBoxForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.');
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.', '#'.$this->getFormId());
   }
 
 

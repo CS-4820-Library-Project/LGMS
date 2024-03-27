@@ -15,7 +15,7 @@ class ReuseDatabaseForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
-    $form['#prefix'] = '<div id="modal-form">';
+    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
       '#weight' => -9999,
@@ -56,6 +56,9 @@ class ReuseDatabaseForm extends FormBase {
         'invisible' => [
           ':input[name="reference"]' => ['checked' => TRUE],
         ],
+        'required' => [
+          ':input[name="reference"]' => ['checked' => False],
+        ],
       ],
     ];
 
@@ -89,7 +92,7 @@ class ReuseDatabaseForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'Database created successfully.');
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'Database created successfully.', '#'.$this->getFormId());
   }
 
 

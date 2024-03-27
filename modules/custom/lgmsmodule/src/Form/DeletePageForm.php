@@ -21,7 +21,7 @@ class DeletePageForm extends FormBase
 
   public function buildForm(array $form, FormStateInterface $form_state)
   {
-    $form['#prefix'] = '<div id="modal-form">';
+    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
       '#weight' => -9999,
@@ -39,12 +39,10 @@ class DeletePageForm extends FormBase
         '#value' => $current_guide->id(),
       ];
 
-      $options = $this->getPageList($current_guide->id());
-
       $form['select_page'] = [
         '#type' => 'select',
         '#title' => $this->t('Select Page'),
-        '#options' => $options,
+        '#options' => $this->getPageList($current_guide->id()),
         '#empty_option' => $this->t('- Select a Page -'),
         '#validated' => TRUE,
         '#required' => TRUE,
@@ -65,14 +63,12 @@ class DeletePageForm extends FormBase
         '#title' => $this->t('Delete All it\'s subPages as well.'),
       ];
 
+      $title = $this->t('<strong>Are you sure you want to delete this page?</strong>
+                                Deleting this page will remove it permanently from the system!');
       $form['include_sub_wrapper']['confirm_delete'] = [
         '#type' => 'checkbox',
+        '#title' => $title,
         '#required' => true,
-        '#states' => [
-          'visible' => [
-            ':input[name="select_page"]' => ['!value' => ''],
-          ],
-        ],
       ];
 
 
@@ -101,20 +97,14 @@ class DeletePageForm extends FormBase
     // Create an array of AJAX commands.
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'Page deleted successfully.');
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.', '#'.$this->getFormId());
   }
 
   public function IncludeSubCallBack(array &$form, FormStateInterface $form_state) {
     $selected_page = $form_state->getValue('select_page');
+
     // Check if a page is selected and it's not the empty option.
     if (!empty($selected_page)) {
-      $pageTitle = Node::load($selected_page);
-      if ($pageTitle->bundle() != 'guide'){
-        $form['include_sub_wrapper']['confirm_delete']['#title'] = t('<strong>Are you sure you want to delete the page @page_title?</strong> Deleting this page will remove it and its references permanently from the system!', ['@page_title' => $pageTitle->label()]);
-      } else {
-        $form['include_sub_wrapper']['confirm_delete']['#title'] = t('<strong>Are you sure you want to delete the guide @page_title?</strong> Deleting this guide will remove it permanently from the system!', ['@page_title' => $pageTitle->label()]);
-      }
-
       // Load the selected page node to check its field_child_pages.
       if ($selected_page == 'top_level')
         $selected_page = $form_state->getValue('current_node');
@@ -161,7 +151,7 @@ class DeletePageForm extends FormBase
 
     $selected_page = Node::load($selected_page);
 
-    $helper->deletePages($selected_page, $delete_sub);
+    $this->$helper->deletePages($selected_page, $delete_sub);
   }
 
 //  public function deleteItems($parent){
@@ -200,7 +190,7 @@ class DeletePageForm extends FormBase
   public function getPageList($guide_id) {
     $options = [];
 
-    $options['Guide'][$guide_id] = t('Entire Guide');
+    $options['Guide']['top_level'] = t('Entire Guide');
 
     // Load the guide entity.
     $guide = Node::load($guide_id);

@@ -16,7 +16,7 @@ class DeleteHTMLForm extends FormBase {
 
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_helper = new FormHelper();
-    $form_helper->set_prefix($form);
+    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
 
     $current_node = \Drupal::request()->query->get('current_node');
     $current_box = \Drupal::request()->query->get('current_box');
@@ -87,7 +87,7 @@ class DeleteHTMLForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'Item was deleted Successfully.');
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'Item was deleted Successfully.', '#'.$this->getFormId());
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
