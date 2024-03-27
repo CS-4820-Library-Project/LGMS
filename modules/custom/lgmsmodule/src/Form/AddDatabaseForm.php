@@ -16,52 +16,33 @@ class AddDatabaseForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
-    $form['#prefix'] = '<div id="modal-form">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
+    // Set the prefix, suffix, and hidden fields
+    $form_helper = new FormHelper();
+    $form_helper->set_form_data($form,$ids);
 
-    $current_box = $ids->current_box;
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $current_box,
-    ];
-
-    $current_node = $ids->current_node;
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $current_node,
-    ];
-
+    // In the case of editing an HTML, get the item
     $current_item = Node::load($ids->current_item);
-    $form['current_item'] = [
-      '#type' => 'hidden',
-      '#value' => $current_item?->id(),
-    ];
-
-    $database = $current_item?->get('field_database_item')->entity;
+    $current_database = $current_item?->get('field_database_item')->entity;
     $edit = $current_item != null;
 
     $form['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Database Title:'),
       '#required' => TRUE,
-      '#default_value' => $edit? $database->getTitle(): '',
+      '#default_value' => $edit? $current_database->getTitle(): '',
     ];
 
     $form['link_text'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Link Text:'),
       '#required' => TRUE,
-      '#default_value' => $edit? $database->get('field_database_link')->title: '',
+      '#default_value' => $edit? $current_database->get('field_database_link')->title: '',
     ];
 
     $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
-    $current_value = $database?->get('field_database_link')->uri;
+    $current_value = $current_database?->get('field_database_link')->uri;
 
-    if ($edit && $database->get('field_make_proxy')->value){
+    if ($edit && $current_database->get('field_make_proxy')->value){
       $current_value = substr($current_value, strlen($proxy_prefix));
     }
 
@@ -77,15 +58,7 @@ class AddDatabaseForm extends FormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Include Proxy'),
       '#description' => $this->t('Check this box if the link should include a proxy prefix.'),
-      '#default_value' => $edit? $database->get('field_make_proxy')->value: 0,
-    ];
-
-    $form['field_database_body'] = [
-      '#type' => 'text_format',
-      '#title' => $this->t('Database Body'),
-      '#description' => $this->t('Enter the body content for the database.'),
-      '#default_value' => $edit? $database->get('field_database_body')->value: '',
-      '#format' => $edit ? $database->get('field_database_body')->format : 'basic_html',
+      '#default_value' => $edit? $current_database->get('field_make_proxy')->value: 0,
     ];
 
     $form['include_desc'] = [
@@ -98,7 +71,7 @@ class AddDatabaseForm extends FormBase {
     // Body field
     $form['description'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Body'),
+      '#title' => $this->t('Description'),
       '#default_value' => $edit? $current_item->get('field_description')->value: '',
       '#format' => $edit ? $current_item->get('field_description')->format : 'basic_html',
       '#states' => [
@@ -108,31 +81,23 @@ class AddDatabaseForm extends FormBase {
       ],
     ];
 
-    $vocabulary = 'LGMS_Guide_Subject';
-    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vocabulary);
+    $form['include_body'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Include Body'),
+      '#default_value' => !$edit || !empty($current_database->get('field_database_body')->value),
+    ];
 
-// Prepare an options array
-    $options = [];
-    foreach ($terms as $term) {
-      // Use term ID as key and term name as value
-      $options[$term->tid] = $term->name;
-    }
-
-    $default_values = [];
-    if ($edit && $database->hasField('field_db_guide_subject') && !$database->get('field_db_guide_subject')->isEmpty()) {
-      foreach ($database->get('field_db_guide_subject')->getValue() as $item) {
-        $default_values[$item['target_id']] = $item['target_id'];
-      }
-    }
-
-
-    $form['field_db_guide_subject'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('Guide Subject'),
-      '#options' => $options,
-      '#default_value' => $default_values,
-      '#description' => $this->t('Select the subject related to this database.'),
-      '#required' => FALSE,
+    $form['field_database_body'] = [
+      '#type' => 'text_format',
+      '#title' => $this->t('Database Body'),
+      '#description' => $this->t('Enter the body content for the database.'),
+      '#default_value' => $edit? $current_database->get('field_database_body')->value: '',
+      '#format' => $edit ? $current_database->get('field_database_body')->format : 'basic_html',
+      '#states' => [
+        'invisible' => [
+          ':input[name="include_body"]' => ['checked' => False],
+        ],
+      ],
     ];
 
     $form['published'] = [
@@ -176,35 +141,17 @@ class AddDatabaseForm extends FormBase {
     return $ajaxHelper->submitModalAjax($form, $form_state, 'an HTML field has been added.');
   }
 
-  public static function hideTextFormatHelpText(array $element, FormStateInterface $form_state) {
-    if (isset($element['format']['help'])) {
-      $element['format']['help']['#access'] = FALSE;
-    }
-    if (isset($element['format']['guidelines'])) {
-      $element['format']['guidelines']['#access'] = FALSE;
-    }
-    if (isset($element['format']['#attributes']['class'])) {
-      unset($element['format']['#attributes']['class']);
-    }
-    return $element;
-  }
-
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
     if(empty($form_state->getValue('current_item'))){
       $current_box = $form_state->getValue('current_box');
       $current_box = Node::load($current_box);
 
-      $selected_term_ids = array_filter($form_state->getValue('field_db_guide_subject'), function($value) {
-        return $value !== 0;
-      });
-
       $database = Node::create([
         'type' => 'guide_database_item',
         'title' => $form_state->getValue('title'),
         'field_database_link' => ['uri' => $form_state->getValue('field_database_link'), 'title' => $form_state->getValue('link_text')],
-        'field_database_body' => $form_state->getValue('field_database_body'),
-        'field_db_guide_subject' => array_values($selected_term_ids),
+        'field_database_body' =>  $form_state->getValue('include_body') == '0'? '' : $form_state->getValue('field_database_body'),
         'field_make_proxy' => $form_state->getValue('field_make_proxy') != '0',
         'status' => $form_state->getValue('published') == '0',
       ]);
@@ -229,20 +176,14 @@ class AddDatabaseForm extends FormBase {
       $current_box->set('field_box_items', $boxList);
       $current_box->save();
     } else {
-      \Drupal::logger('my_module')->notice('<pre>' . print_r('here!!!!!!!', TRUE) . '</pre>');
       $current_item = $form_state->getValue('current_item');
       $current_item = Node::load($current_item);
 
       $database = $current_item->get('field_database_item')->entity;
 
-      $selected_term_ids = array_filter($form_state->getValue('field_db_guide_subject'), function($value) {
-        return $value !== 0;
-      });
-
       $database->set('title', $form_state->getValue('title'));
       $database->set('field_database_link', ['uri' => $form_state->getValue('field_database_link'), 'title' => $form_state->getValue('link_text')]);
-      $database->set('field_database_body', $form_state->getValue('field_database_body'));
-      $database->set('field_db_guide_subject', array_values($selected_term_ids));
+      $database->set('field_database_body', $form_state->getValue('include_body') == '0'? '' : $form_state->getValue('field_database_body'));
       $database->set('field_make_proxy', $form_state->getValue('field_make_proxy') != '0');
       $database->save();
 
@@ -252,7 +193,6 @@ class AddDatabaseForm extends FormBase {
       $current_item->set('changed', \Drupal::time()->getRequestTime());
       $current_item->save();
     }
-    \Drupal::logger('my_module')->notice('<pre>' . print_r('here2!!!!!!!', TRUE) . '</pre>');
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);

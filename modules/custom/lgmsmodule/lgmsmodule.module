@@ -378,6 +378,13 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       ];
     }
 
+    if(!empty($database->get('field_database_body')->value)){
+      $item_container['content'][] = [
+        '#type' => 'markup',
+        '#markup' => $database->get('field_database_body')->value,
+      ];
+    }
+
     $edit_route = 'AddDatabaseForm';
     $delete_route = 'delete_html.form';
   } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
@@ -1789,28 +1796,6 @@ function lgmsModule_install(): void
     TRUE,
     FALSE,
     1,
-    ''
-  );
-
-  createField(
-    'field_db_guide_subject',
-    'node',
-    'guide_database_item',
-    'Subject',
-    'entity_reference',
-    ['target_type' => 'taxonomy_term',],
-    ['handler' => 'default:taxonomy_term',
-      'handler_settings' => [
-        'target_bundles' => [
-          'LGMS_Guide_Subject' => 'LGMS_Guide_Subject',
-        ],
-      ],
-    ],
-    'options_buttons',
-    [],
-    False,
-    True,
-    3,
     ''
   );
 
