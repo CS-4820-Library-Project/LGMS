@@ -71,7 +71,7 @@ class AddDatabaseForm extends FormBase {
     // Description field
     $form['description'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Description'),
+      '#title' => $this->t('Brief Description'),
       '#default_value' => $edit? $current_item->get('field_description')->value: '',
       '#format' => $edit ? $current_item->get('field_description')->format : 'basic_html',
       '#states' => [
