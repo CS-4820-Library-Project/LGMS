@@ -78,7 +78,6 @@ class AddBookForm extends FormBase {
     $form['description'] = [
       '#type' => 'text_format',
       '#title' => $this->t('Description'),
-      '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
       '#required' => TRUE,
       '#default_value' => $edit? $current_book->get('field_book_description')->value: '',
       '#format' => $edit ? $current_book->get('field_book_description')->format : 'basic_html',
@@ -282,20 +281,6 @@ class AddBookForm extends FormBase {
         $form_state->setErrorByName('pub_finder_group][label', t('Pub Finder\'s label is required.'));
       }
     }
-  }
-
-
-  public static function hideTextFormatHelpText(array $element, FormStateInterface $form_state) {
-    if (isset($element['format']['help'])) {
-      $element['format']['help']['#access'] = FALSE;
-    }
-    if (isset($element['format']['guidelines'])) {
-      $element['format']['guidelines']['#access'] = FALSE;
-    }
-    if (isset($element['format']['#attributes']['class'])) {
-      unset($element['format']['#attributes']['class']);
-    }
-    return $element;
   }
 
   /**

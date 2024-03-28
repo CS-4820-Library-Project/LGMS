@@ -571,9 +571,22 @@ function html_display(EntityInterface $entity, bool $include_title = true){
   }
 
   if (!$entity->get('field_text_box_item2')->isEmpty()) {
+    $fullText = $entity->get('field_text_box_item2')->value;
+
+    $breakPoint = $include_title? 150 : 105; // The point at which to insert the line break
+
+    // Check if the text is longer than your breakpoint
+    if (strlen($fullText) > $breakPoint) {
+      // Insert a line break at the specified breakpoint
+      $textWithBreak = wordwrap($fullText, $breakPoint, "\n", true);
+    } else {
+      // If not longer, use the text as is
+      $textWithBreak = $fullText;
+    }
+
     $build['html_body'][] = [
       '#type' => 'processed_text',
-      '#text' => $entity->get('field_text_box_item2')->value,
+      '#text' => $textWithBreak,
       '#format' => $entity->get('field_text_box_item2')->format,
     ];
   }
