@@ -55,12 +55,12 @@ class ReuseGuidePageForm extends FormBase {
       ],
     ];
 
-    $form['reference'] = [
+    $form['include_sub_wrapper']['reference'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('<Strong>Link:</Strong> By selecting this, a link to the HTML item will be created. it will be un-editable from this box'),
     ];
 
-    $form['title'] = [
+    $form['include_sub_wrapper']['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Title'),
       '#states' => [
@@ -70,12 +70,12 @@ class ReuseGuidePageForm extends FormBase {
       ],
     ];
 
-    $form['position_wrapper'] = [
+    $form['include_sub_wrapper']['position_wrapper'] = [
       '#type' => 'container',
       '#attributes' => ['id' => 'position-wrapper'],
     ];
 
-    $form['position_wrapper']['position'] = [
+    $form['include_sub_wrapper']['position_wrapper']['position'] = [
       '#type' => 'select',
       '#title' => $this->t('Position'),
       '#options' => $this->getPageList($ids->current_guide_id),
@@ -111,12 +111,16 @@ class ReuseGuidePageForm extends FormBase {
       $include_sub = $form_state->getValue('include_sub');
 
     if ($include_sub == '0') {
-      unset($form['position_wrapper']['position']['#attributes']['disabled']);
+      \Drupal::logger('my_module')->notice('<pre>' . print_r('here but nothing is happening', TRUE) . '</pre>');
+
+      $form['include_sub_wrapper']['position_wrapper']['position']['#options'] = $this->getPageList($form_state->getValue('current_guide'));
+      unset($form['include_sub_wrapper']['position_wrapper']['position']['#attributes']['disabled']);
     } else {
-      $form['position_wrapper']['position']['#options'] = ['Page Level' => ['top_level' => $this->t('Page Level')]];
+      $form['include_sub_wrapper']['position_wrapper']['position']['#options'] = ['Page Level' => ['top_level' => $this->t('Page Level')]];
+      $form['include_sub_wrapper']['position_wrapper']['position']['#attributes']['disabled'] = 'disabled';
     }
 
-    return $form['position_wrapper'];
+    return $form['include_sub_wrapper']['position_wrapper'];
   }
 
   public function IncludeSubCallBack(array &$form, FormStateInterface $form_state) {
@@ -130,17 +134,18 @@ class ReuseGuidePageForm extends FormBase {
         $child_pages = $page_node->get('field_child_pages')->getValue();
         // If there are no child pages, disable the "Include Subpages" checkbox.
         if (empty($child_pages)) {
+          \Drupal::logger('my_module')->notice('<pre>' . print_r('here but nothing is happening2', TRUE) . '</pre>');
+          $form['include_sub_wrapper']['position_wrapper']['position']['#options'] = $this->getPageList($form_state->getValue('current_guide'));
+          unset($form['include_sub_wrapper']['position_wrapper']['position']['#attributes']['disabled']);
           $form['include_sub_wrapper']['include_sub']['#checked'] = FALSE;
           $form['include_sub_wrapper']['include_sub']['#attributes']['disabled'] = 'disabled';
 
           //unset($form['position_wrapper']['position']['#attributes']['disabled']);
         } else {
+          \Drupal::logger('my_module')->notice('<pre>' . print_r('here but nothing is happening3', TRUE) . '</pre>');
           // Ensure it is not disabled if there are child pages.
+          unset($form['include_sub_wrapper']['include_sub']['#checked']);
           unset($form['include_sub_wrapper']['include_sub']['#attributes']['disabled']);
-
-          if($form_state->getValue('include_sub') != '0'){
-            //$form['position_wrapper']['position']['#attributes']['disabled'] = 'disabled';
-          }
         }
       }
     } else {
