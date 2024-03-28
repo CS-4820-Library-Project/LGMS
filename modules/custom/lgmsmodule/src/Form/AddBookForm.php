@@ -19,76 +19,48 @@ class AddBookForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
     $form["#tree"] = TRUE;
 
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
+    // Set the prefix, suffix, and hidden fields
+    $form_helper = new FormHelper();
+    $form_helper->set_form_data($form,$ids, $this->getFormId());
 
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_box,
-    ];
-
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_node,
-    ];
-
-    $current_item = null;
-    $edit = false;
-
-    if(property_exists($ids, 'current_item')){
-      $current_item = $ids->current_item;
-      $form['current_item'] = [
-        '#type' => 'hidden',
-        '#value' => $current_item,
-      ];
-
-      $edit = true;
-      $current_item = Node::load($current_item);
-      $current_item = $current_item->get('field_book_item')->entity;
-    }
-
-    $form['edit'] = [
-      '#type' => 'hidden',
-      '#value' => $edit,
-    ];
+    // In the case of editing an HTML, get the item
+    $current_item = Node::load($ids->current_item);
+    $current_book = $current_item?->get('field_book_item')->entity;
+    $edit = $current_item != null;
 
     $form['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Item Title'),
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->getTitle(): '',
+      '#default_value' => $edit? $current_book->getTitle(): '',
     ];
 
     $form['author/editor'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Author/Editor'),
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->get('field_book_author_or_editor')->value: '',
+      '#default_value' => $edit? $current_book->get('field_book_author_or_editor')->value: '',
     ];
 
     $form['publisher'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Publisher'),
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->get('field_book_publisher')->value: '',
+      '#default_value' => $edit? $current_book->get('field_book_publisher')->value: '',
     ];
 
     $form['year'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Year'),
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->get('field_book_year')->value: '',
+      '#default_value' => $edit? $current_book->get('field_book_year')->value: '',
     ];
 
     $form['edition'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Edition'),
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->get('field_book_edition')->value: '',
+      '#default_value' => $edit? $current_book->get('field_book_edition')->value: '',
     ];
 
     $form['cover_picture'] = [
@@ -98,7 +70,7 @@ class AddBookForm extends FormBase {
       '#upload_validators' => [
         'file_validate_extensions' => ['png jpg jpeg'],
       ],
-      '#default_value' => $current_item->field_book_cover_picture->target_id ? [$current_item->field_book_cover_picture->target_id] : NULL,
+      '#default_value' => $current_book->field_book_cover_picture->target_id ? [$current_book->field_book_cover_picture->target_id] : NULL,
       '#required' => FALSE,
       '#description' => $this->t('Allowed extensions: png jpg jpeg'),
     ];
@@ -108,8 +80,8 @@ class AddBookForm extends FormBase {
       '#title' => $this->t('Description'),
       '#after_build' => [[get_class($this), 'hideTextFormatHelpText'],],
       '#required' => TRUE,
-      '#default_value' => $edit? $current_item->get('field_book_description')->value: '',
-      '#format' => $edit ? $current_item->get('field_book_description')->format : 'basic_html',
+      '#default_value' => $edit? $current_book->get('field_book_description')->value: '',
+      '#format' => $edit ? $current_book->get('field_book_description')->format : 'basic_html',
     ];
 
     $term_ids = [];
@@ -141,13 +113,13 @@ class AddBookForm extends FormBase {
           ->t('eBook'),
       ],
       '#required' => FALSE,
-      '#default_value' => $edit? $current_item->get('field_book_type')->target_id: $term_ids['print'],
+      '#default_value' => $edit? $current_book->get('field_book_type')->target_id: $term_ids['print'],
     ];
 
     $form['call_number'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Call Number'),
-      '#default_value' => $edit? $current_item->get('field_book_call_number')->value: '',
+      '#default_value' => $edit? $current_book->get('field_book_call_number')->value: '',
       '#states' => [
         'visible' => [
           ':input[name="type"]' => ['value' => $term_ids['print']],
@@ -164,7 +136,7 @@ class AddBookForm extends FormBase {
     $form['location'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Location'),
-      '#default_value' => $edit? $current_item->get('field_book_location')->value: '',
+      '#default_value' => $edit? $current_book->get('field_book_location')->value: '',
       '#states' => [
         'visible' => [
           ':input[name="type"]' => ['value' => $term_ids['print']],
@@ -201,13 +173,13 @@ class AddBookForm extends FormBase {
           ':input[name="type"]' => ['value' => $term_ids['print']],
         ],
       ],
-      '#default_value' => $edit? $current_item->get('field_book_cat_record')->title: '',
+      '#default_value' => $edit? $current_book->get('field_book_cat_record')->title: '',
     );
 
     $form['cat_record_group']['url'] = array(
       '#type' => 'url',
       '#title' => $this->t('URL'),
-      '#default_value' => $edit? $current_item->get('field_book_cat_record')->uri: '',
+      '#default_value' => $edit? $current_book->get('field_book_cat_record')->uri: '',
       '#states' => [
         'required' => [
           ':input[name="type"]' => ['value' => $term_ids['print']],
@@ -238,13 +210,13 @@ class AddBookForm extends FormBase {
           ':input[name="type"]' => ['value' => $term_ids['eBook']],
         ],
       ],
-      '#default_value' => $edit? $current_item->get('field_book_pub_finder')->title: '',
+      '#default_value' => $edit? $current_book->get('field_book_pub_finder')->title: '',
     );
 
     $form['pub_finder_group']['url'] = array(
       '#type' => 'url',
       '#title' => $this->t('URL'),
-      '#default_value' => $edit? $current_item->get('field_book_pub_finder')->uri: '',
+      '#default_value' => $edit? $current_book->get('field_book_pub_finder')->uri: '',
       '#states' => [
         'required' => [
           ':input[name="type"]' => ['value' => $term_ids['eBook']],
@@ -255,8 +227,9 @@ class AddBookForm extends FormBase {
     $form['published'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Draft mode'),
-      '#description' => $this->t('Un-check this box to publish.'),
+      '#description' => $edit && !$current_book->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
       '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
+      '#disabled' => $edit && !$current_book->isPublished(),
     ];
 
     $form['#validate'][] = '::validateFields';
@@ -329,8 +302,6 @@ class AddBookForm extends FormBase {
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $edit = $form_state->getValue('edit');
-
     $form_field_values = [
       'title' => $form_state->getValue('title'),
       'field_book_author_or_editor' => $form_state->getValue('author/editor'),
@@ -359,7 +330,7 @@ class AddBookForm extends FormBase {
       'status' => $form_state->getValue('published') == '0',
     ];
 
-    if($edit == '0'){
+    if($form_state->getValue('current_item') == null){
       $current_box = $form_state->getValue('current_box');
       $current_box = Node::load($current_box);
 
@@ -395,6 +366,9 @@ class AddBookForm extends FormBase {
       $book = $current_item->get('field_book_item')->entity;
 
       foreach ($form_field_values as $key => $value) {
+        if ($key == 'status'){
+          continue;
+        }
         $book->set($key, $value);
       }
 

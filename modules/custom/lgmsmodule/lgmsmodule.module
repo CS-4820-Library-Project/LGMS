@@ -356,7 +356,16 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $edit_route = 'AddHTMLForm';
     $delete_route = 'delete_html.form';
   } elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
-    $item_container['content'][] = book_display($item->get('field_book_item')->entity, false);
+    $book_item = $item->get('field_book_item')->entity;
+
+    $html_unpublished_class = unpublished_status($book_item);
+    if($html_unpublished_class != '' && !\Drupal::currentUser()->isAuthenticated()){
+      return [];
+    }
+
+    $item_container['#attributes']['class'][] = $html_unpublished_class;
+
+    $item_container['content'][] = book_display($book_item, false);
 
     $edit_route = 'AddBookForm';
     $delete_route = 'delete_book.form';
