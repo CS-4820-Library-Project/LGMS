@@ -439,7 +439,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $delete_route = 'delete_media.form';
   }
 
-  if(($item->access('update') && (!$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()) && $entity->id() === $box->get('field_parent_node')->entity->id()) || ($entity->id() == $box->id())) {
+  if(!empty($edit_route) && !empty($delete_route) && (($item->access('update') && (!$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()) && $entity->id() === $box->get('field_parent_node')->entity->id()) || ($entity->id() == $box->id()))) {
     if ($box->id() === $item->get('field_parent_box')->entity->id()){
       $ids = [ 'current_node' => $entity->id(), 'current_box' => $box->id(), 'current_item' => $item->id()];
       $json_data = json_encode($ids);
