@@ -137,16 +137,32 @@ reuse_html.form:
 delete_html.form:
   path: '/delete_html'
   defaults:
-    _form: '\Drupal\lgmsmodule\Form\DeleteHTMLForm'
-    _title: 'Delete HTML Box Items'
+    _form: '\Drupal\lgmsmodule\Form\DeleteContentItemsForm'
+    _title: 'Delete HTML Item'
   requirements:
     _permission: 'create guide_item content'
 
 delete_book.form:
   path: '/delete_book'
   defaults:
-    _form: '\Drupal\lgmsmodule\Form\DeleteBookForm'
-    _title: 'Delete Book Box Items'
+    _form: '\Drupal\lgmsmodule\Form\DeleteContentItemsForm'
+    _title: 'Delete Book Item'
+  requirements:
+    _permission: 'create guide_item content'
+
+delete_database.form:
+  path: '/delete_database'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\DeleteContentItemsForm'
+    _title: 'Delete Database Item'
+  requirements:
+    _permission: 'create guide_item content'
+
+delete_media.form:
+  path: '/delete_media'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\DeleteContentItemsForm'
+    _title: 'Delete Media Item'
   requirements:
     _permission: 'create guide_item content'
 
@@ -190,19 +206,11 @@ add_database.form:
   requirements:
     _permission: 'create guide_item content'
 
-delete_database.form:
-  path: '/delete_database'
-  defaults:
-    _form: '\Drupal\lgmsmodule\Form\DeleteDatabaseForm'
-    _title: 'Delete Database Box Items'
-  requirements:
-    _permission: 'create guide_item content'
-
 add_media.form:
   path: '/add_media'
   defaults:
     _form: '\Drupal\lgmsmodule\Form\AddMediaForm'
-    _title: 'Add Media Box Items'
+    _title: 'Add Media Item'
   requirements:
     _permission: 'create guide_item content'
 

@@ -1,14 +1,16 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class DeleteHTMLForm extends FormBase {
+class DeleteContentItemsForm extends FormBase {
 
   public function getFormId() {
     return 'delete_html_form';
@@ -44,6 +46,7 @@ class DeleteHTMLForm extends FormBase {
     $current_item = Node::load($current_item);
     $field_to_delete = '';
     $possible_fields = $form_helper->get_fields();
+    $mediaTitle = '';
 
     foreach ($possible_fields as $field_name) {
       if (!$current_item->get($field_name)->isEmpty()) {
@@ -52,13 +55,55 @@ class DeleteHTMLForm extends FormBase {
       }
     }
 
+    if ($current_item->hasField($field_to_delete) && !$current_item->get($field_to_delete)->isEmpty()) {
+
+      $mediaItem = $current_item->get($field_to_delete)->entity;
+
+      if ($mediaItem && $mediaItem->hasField('field_media_audio_file') && !$mediaItem->get('field_media_audio_file')->isEmpty()) {
+        $fileEntity = $mediaItem->get('field_media_audio_file')->entity;
+
+        if ($fileEntity) {
+          $mediaTitle = $fileEntity->getFilename();
+        }
+      } elseif ($mediaItem && $mediaItem->hasField('field_media_document') && !$mediaItem->get('field_media_document')->isEmpty()){
+        $fileEntity = $mediaItem->get('field_media_document')->entity;
+
+        if ($fileEntity) {
+          $mediaTitle = $fileEntity->getFilename();
+        }
+      } elseif ($mediaItem && $mediaItem->hasField('field_media_image') && !$mediaItem->get('field_media_image')->isEmpty()){
+        $fileEntity = $mediaItem->get('field_media_image')->entity;
+
+        if ($fileEntity) {
+          $mediaTitle = $fileEntity->getFilename();
+        }
+      } elseif ($mediaItem && $mediaItem->hasField('field_media_oembed_video') && !$mediaItem->get('field_media_oembed_video')->isEmpty()){
+        $mediaTitle = $mediaItem->get('field_media_oembed_video')->value;
+
+      } elseif ($mediaItem && $mediaItem->hasField('field_media_video_file') && !$mediaItem->get('field_media_video_file')->isEmpty()){
+        $fileEntity = $mediaItem->get('field_media_video_file')->entity;
+
+        if ($fileEntity) {
+          $mediaTitle = $fileEntity->getFilename();
+        }
+      }
+    }
+
     $form['field_name'] = [
       '#type' => 'hidden',
       '#value' => $field_to_delete,
     ];
 
-
-    $title = $this->t('<Strong>Are you Sure you want to Delete This Item?</Strong>');
+    $title = '';
+    if ($field_to_delete == 'field_html_item'){
+      $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this HTML Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
+    } elseif ($field_to_delete == 'field_book_item'){
+      $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this Book Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
+    } elseif ($field_to_delete == 'field_database_item'){
+      $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this Database Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
+    } elseif ($field_to_delete == 'field_media_image'){
+      $title = $this->t('<Strong>Are you sure you want to Delete @item_title Media Item?</Strong>', ['@item_title' => $mediaTitle]);
+    }
 
     $form['Delete'] = [
       '#type' => 'checkbox',
@@ -66,6 +111,7 @@ class DeleteHTMLForm extends FormBase {
       '#required' => True
     ];
 
+    $form['#validate'][] = '::validateCheckbox';
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
@@ -80,6 +126,16 @@ class DeleteHTMLForm extends FormBase {
 
     return $form;
   }
+
+  public function validateCheckbox(array &$form, FormStateInterface $form_state): void
+  {
+    // Check if the 'Delete' checkbox is not checked.
+    if (empty($form_state->getValue('Delete'))) {
+      // Set an error on the 'Delete' form element if the checkbox is not checked.
+      $form_state->setErrorByName('Delete', t('You must agree to the deletion by checking the checkbox.'));
+    }
+  }
+
 
   /**
    * @throws EntityMalformedException
