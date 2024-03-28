@@ -2332,6 +2332,41 @@ function lgmsmodule_page_form_validate($form, \Drupal\Core\Form\FormStateInterfa
  */
 function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   /** @var \Drupal\node\NodeInterface $node */
+  if ($form_id === 'node_guide_item_edit_form') {
+    // Get the node entity being edited.
+    $node = $form_state->getFormObject()->getEntity();
+
+    // List of field machine names.
+    $fields = [
+      'field_database_item',
+      'field_html_item',
+      'field_book_item',
+      'field_media_image',
+      'field_description'
+    ];
+
+    // Track if any field is filled.
+    $any_field_filled = FALSE;
+
+    foreach ($fields as $field_name) {
+      // Check if the field is filled.
+      if (!$node->$field_name->isEmpty()) {
+        $any_field_filled = TRUE;
+      } else {
+        // Hide empty fields.
+        $form[$field_name]['#access'] = FALSE;
+      }
+    }
+
+    // Optional: if no fields are filled, decide on the default behavior.
+    if (!$any_field_filled) {
+      // Example: Show the first field if none are filled.
+      foreach ($fields as $field_name) {
+        $form[$field_name]['#access'] = TRUE;
+      }
+    }
+  }
+
   $node = $form_state->getFormObject()->getEntity();
 
   if ($node instanceof NodeInterface && $node->bundle() === 'guide_page'){
