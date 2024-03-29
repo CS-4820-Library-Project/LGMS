@@ -138,6 +138,7 @@ class DeleteContentItemsForm extends FormBase {
     // Check if the 'Delete' checkbox is not checked.
     if (empty($form_state->getValue('Delete'))) {
       // Set an error on the 'Delete' form element if the checkbox is not checked.
+
       $form_state->setErrorByName('Delete', t('You must agree to the deletion by checking the checkbox.'));
     }
   }
