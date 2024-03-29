@@ -125,7 +125,7 @@ class AddMediaForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'an HTML field has been added.', '#'.$this->getFormId());
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'A Media item has been added.', '#'.$this->getFormId());
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
