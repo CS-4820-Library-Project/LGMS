@@ -57,7 +57,7 @@ class AddMediaForm extends FormBase {
     ];
 
     $add_media_link = Link::fromTextAndUrl(
-      $this->t('Add new Media'),
+      $this->t('Create new Media'),
       Url::fromRoute('entity.media.collection')
     )->toRenderable();
 
@@ -73,6 +73,26 @@ class AddMediaForm extends FormBase {
       '#required' => TRUE,
       '#description' => $add_media_link_html,
       '#default_value' => $edit? $media->id(): null,
+    ];
+
+    $form['include_title'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use Media Default name'),
+      '#default_value' => $edit? $current_item->label() == 'Media Item': true,
+    ];
+
+    $form['title'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Media Title:'),
+      '#states' => [
+        'invisible' => [
+          ':input[name="include_title"]' => ['checked' => TRUE],
+        ],
+        'required' => [
+          ':input[name="include_title"]' => ['checked' => False],
+        ],
+      ],
+      '#default_value' => $edit? $current_item->label() != 'Media Item'? $current_item->label(): '' : '',
     ];
 
 
@@ -120,7 +140,7 @@ class AddMediaForm extends FormBase {
 
       $new_item = Node::create([
         'type' => 'guide_item',
-        'title' => 'Media Item',
+        'title' => $form_state->getValue('include_title') != '0'? 'Media Item' : $form_state->getValue('title'),
         'field_media_image' => $media,
         'field_parent_box' => $current_box,
         'status' => $form_state->getValue('published') == '0',
@@ -140,7 +160,7 @@ class AddMediaForm extends FormBase {
       $media = $form_state->getValue('media');
       $media = Media::load($media);
 
-
+      $current_item->set('title', $form_state->getValue('include_title') != '0'? 'Media Item' : $form_state->getValue('title'));
       $current_item->set('field_media_image', $media);
       $current_item->set('status', $form_state->getValue('published') == '0');
       $current_item->set('changed', \Drupal::time()->getRequestTime());

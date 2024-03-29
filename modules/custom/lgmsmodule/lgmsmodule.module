@@ -399,27 +399,48 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
     $media = $item->get('field_media_image')->entity;
     $media_type = $media->bundle();
-    $media_item = \Drupal::entityTypeManager()->getViewBuilder('media')->view($media, 'full');
+    //$media_item = \Drupal::entityTypeManager()->getViewBuilder('media')->view($media, 'full');
 
-    if ($media_type == 'remote_video'){
-      $standard_video_url = $media->get('field_media_oembed_video')->value;
-      $parsed_url = parse_url($standard_video_url);
-
-      if (isset($parsed_url['host']) &&
-        (str_contains($parsed_url['host'], 'youtube.com') || str_contains($parsed_url['host'], 'youtu.be'))) {
-
-        // Extract the video ID if it is a YouTube URL.
-        parse_str($parsed_url['query'], $query);
-        if (isset($query['v'])) {
-          $video_id = $query['v'];
-        } else {
-          // This is for the youtu.be short URL which doesn't have a query parameter.
-          $video_id = ltrim($parsed_url['path'], '/');
+    switch ($media_type) {
+      case 'image':
+        $file = $media->get('field_media_image')->entity;
+        if ($file) {
+          $image_url = \Drupal\image\Entity\ImageStyle::load('thumbnail')->buildUrl($file->getFileUri());
+          $item_container['content'][] = [
+            '#type' => 'html_tag',
+            '#tag' => 'img',
+            '#attributes' => ['src' => $image_url],
+          ];
         }
-
+        break;
+      case 'video':
+        $video_file = $media->get('field_media_video_file')->entity;
+        if ($video_file) {
+          // Get the URI of the video file
+          $video_uri = $video_file->getFileUri();
+          // Convert the URI to a URL
+          $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
+          $video_url = $stream_wrapper_manager->getViaUri($video_uri)->getExternalUrl();
+          // Add video rendering logic here
+          $item_container['content'][] = [
+            '#type' => 'html_tag',
+            '#tag' => 'video',
+            '#attributes' => [
+              'src' => $video_url,
+              'controls' => true,
+              'width' => '640', // Adjust the width as necessary
+              'height' => '360', // Adjust the height as necessary
+            ],
+            '#value' => t('Your browser does not support the video tag.'),
+          ];
+        }
+        break;
+      case 'remote_video':
+        $standard_video_url = $media->get('field_media_oembed_video')->value;
+        parse_str(parse_url($standard_video_url, PHP_URL_QUERY), $query);
+        $video_id = $query['v'];
         $embed_url = "https://www.youtube.com/embed/{$video_id}";
-
-        $media_item = [
+        $item_container['content'][] = [
           '#type' => 'html_tag',
           '#tag' => 'iframe',
           '#attributes' => [
@@ -430,10 +451,53 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
             'height' => '360',
           ],
         ];
-      }
+        break;
+      case 'audio':
+        // Similar handling for audio files
+        $audio_file = $media->get('field_media_audio_file')->entity;
+        if ($audio_file) {
+          // Get the URI of the audio file
+          $audio_uri = $audio_file->getFileUri();
+          // Convert the URI to a URL
+          $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
+          $audio_url = $stream_wrapper_manager->getViaUri($audio_uri)->getExternalUrl();
+          // Add audio rendering logic here
+          $item_container['content'][] = [
+            '#type' => 'html_tag',
+            '#tag' => 'audio',
+            '#attributes' => [
+              'src' => $audio_url,
+              'controls' => 'controls',
+            ],
+            '#attached' => [
+              'library' => [
+                'core/html5shiv',
+              ],
+            ],
+          ];
+        }
+        break;
+      case 'document':
+        // Handling for generic file downloads
+        $file = $media->get('field_media_document')->entity;
+        if ($file) {
+          $file_uri = $file->getFileUri();
+          $file_url = \Drupal::service('stream_wrapper_manager')->getViaUri($file_uri)->getExternalUrl();
+          $item_container['content'][] = [
+            '#type' => 'link',
+            '#title' => $item->label() != 'Media Item'? $item->label(): $file->label(),
+            '#url' => Url::fromUri($file_url),
+            '#attributes' => ['target' => '_blank'],
+          ];
+        }
+        break;
+      default:
+        // Default case to handle any other media types not explicitly covered above
+        // For example, you might simply display the media name or a generic icon
+        $item_container['content'][] = ['#markup' => $media->label()];
+        print_r('url ');
+        break;
     }
-
-    $item_container['content'][] = $media_item;
 
     $edit_route = 'add_media.form';
     $delete_route = 'delete_media.form';
