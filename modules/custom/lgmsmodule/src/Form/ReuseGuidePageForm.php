@@ -312,7 +312,7 @@ class ReuseGuidePageForm extends FormBase {
     // Create an array of AJAX commands.
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.', '#'.$this->getFormId());
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'Page created successfully.', '#'.$this->getFormId());
   }
 
   private function getGuidePageOptions($guide_id) {
