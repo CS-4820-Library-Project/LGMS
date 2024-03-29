@@ -61,7 +61,7 @@ class EditPageForm extends FormBase {
         $form['update_wrapper']['title'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Page Title'),
-          '#value' => $reference? t('This is Just a Reference and can not be Edited') : $selected_node->label(),
+          '#default_value' => $reference? t('This is Just a Reference and can not be Edited') : $selected_node->label(),
           '#required' => !$reference,
           '#disabled' => $reference,
         ];
