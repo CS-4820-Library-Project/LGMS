@@ -47,7 +47,6 @@ class EditPageForm extends FormBase {
 
       $selected = !empty($form_state->getValue('select_page')) ? $form_state->getValue('select_page') : '';
 
-
       if($selected != '') {
         $selected_node = Node::load($selected);
         $reference = !$selected_node->get('field_reference_node')->isEmpty();
