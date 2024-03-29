@@ -75,8 +75,23 @@ class ReuseGuideBoxForm extends FormBase {
   public function validateFields(array &$form, FormStateInterface $form_state) {
     $reference = $form_state->getValue('reference');
     $title = $form_state->getValue('title');
+    $curr_node = $form_state->getValue('current_node');
+    $curr_node = Node::load($curr_node);
+    $nid = $curr_node->id();
+    $bundle = $curr_node->bundle();
+    $box = Node::load($form_state->getValue('box'));
+    $box_parent = $box->get('field_parent_node')->target_id;
+
     if (!$reference && empty($title)) {
       $form_state->setErrorByName('title', $this->t('Box Title: field is required.'));
+    }
+
+    if ($reference && $nid == $box_parent){
+      if ($bundle == 'guide'){
+        $form_state->setErrorByName('reference', $this->t('This box cannot be created with the same guide as its reference. Please select a different guide or remove the reference to proceed.'));
+      }else {
+        $form_state->setErrorByName('reference', $this->t('This box cannot be created with the same page as its reference. Please select a different page or remove the reference to proceed.'));
+      }
     }
   }
 
@@ -110,8 +125,9 @@ class ReuseGuideBoxForm extends FormBase {
     $nid = $curr_node->id();
 
     $box = Node::load($form_state->getValue('box'));
+    $box_parent = $box->get('field_parent_node')->target_id;
 
-    if(!$form_state->getValue('reference')){
+    if(!$form_state->getValue('reference') && $box_parent !== $nid){
       $new_box = $box->createDuplicate();
       $new_box->set('field_parent_node', $nid);
       $new_box->set('title', $form_state->getValue('title'));
