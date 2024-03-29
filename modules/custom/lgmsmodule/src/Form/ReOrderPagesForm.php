@@ -15,12 +15,8 @@ class ReOrderPagesForm extends FormBase {
 
   public function buildForm(array $form, FormStateInterface $form_state)
   {
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
+    $form_helper = new FormHelper();
+    $form_helper->set_prefix($form,  $this->getFormId());
 
     $current_guide = \Drupal::request()->query->get('guide_id');
     $form['guide_id'] = [
@@ -48,7 +44,7 @@ class ReOrderPagesForm extends FormBase {
 
     $form['current_page'] = [
       '#type' => 'hidden',
-      '#value' => 'top_level',
+      '#value' => $current_guide,
     ];
 
     $form['pages_table_wrapper'] = [
@@ -67,24 +63,26 @@ class ReOrderPagesForm extends FormBase {
     ];
 
     $guide = $form_state->getValue('page_to_sort') != null ? Node::load($form_state->getValue('page_to_sort')): null;
+    \Drupal::logger('my_module')->notice('<pre>' . print_r($guide?->id(), TRUE) . '</pre>');
 
     if($guide && !$guide->get('field_child_pages')->isEmpty()){
       $page_list = $guide->get('field_child_pages');
       foreach ($page_list as $weight => $page) {
         $loaded_item = Node::load($page->target_id);
+        if($loaded_item){
+          $form['pages_table_wrapper']['pages_table'][$weight]['#attributes']['class'][] = 'draggable';
+          $form['pages_table_wrapper']['pages_table'][$weight]['title'] = [
+            '#markup' => $loaded_item->label(),
+          ];
 
-        $form['pages_table_wrapper']['pages_table'][$weight]['#attributes']['class'][] = 'draggable';
-        $form['pages_table_wrapper']['pages_table'][$weight]['title'] = [
-          '#markup' => $loaded_item->label(),
-        ];
-
-        $form['pages_table_wrapper']['pages_table'][$weight]['weight'] = [
-          '#type' => 'weight',
-          '#title' => t('Weight'),
-          '#title_display' => 'invisible',
-          '#default_value' => $weight,
-          '#attributes' => ['class' => ['pages-order-weight']],
-        ];
+          $form['pages_table_wrapper']['pages_table'][$weight]['weight'] = [
+            '#type' => 'weight',
+            '#title' => t('Weight'),
+            '#title_display' => 'invisible',
+            '#default_value' => $weight,
+            '#attributes' => ['class' => ['pages-order-weight']],
+          ];
+        }
       }
     }
 
@@ -181,5 +179,3 @@ class ReOrderPagesForm extends FormBase {
     return $options;
   }
 }
-
-//'#access' => $id == 'Top Level',
