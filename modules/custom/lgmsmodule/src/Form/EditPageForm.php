@@ -237,10 +237,6 @@ class EditPageForm extends FormBase {
     $options = [];
     $guide = Node::load($guide_id);
 
-    $label = $include_sub? 'Guide' : 'Page Level';
-
-    $options[$label][$guide->id()] = $label;
-
 
     // Check if the guide has been loaded and has the field_child_pages field.
     if ($guide && $guide->hasField('field_child_pages')) {
