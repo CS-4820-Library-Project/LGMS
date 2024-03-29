@@ -2487,8 +2487,11 @@ function update_referencing_guide_pages($updated_guide_page) {
       $guide_page->set('title', $updated_guide_page->label());
       $guide_page->set('field_description', $updated_guide_page->get('field_description')->value);
       $guide_page->set('field_child_boxes', $updated_guide_page->get('field_child_boxes')->referencedEntities());
-      $guide_page->set('field_hide_description', $updated_guide_page->get('field_hide_description')->value == '0');
-      $guide_page->set('status', $updated_guide_page->isPublished());
+      $guide_page->set('field_hide_description', $updated_guide_page->get('field_hide_description')->value);
+
+      if (!$updated_guide_page->isPublished()){
+        $guide_page->set('status', $updated_guide_page->isPublished());
+      }
 
       $guide_page->save();
     }
