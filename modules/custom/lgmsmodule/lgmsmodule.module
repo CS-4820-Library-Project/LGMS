@@ -2431,6 +2431,15 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
     }
   }
 
+  if ($form_id === 'node_guide_page_edit_form') {
+    // Get the node entity being edited.
+    $node = $form_state->getFormObject()->getEntity();
+
+    if ($node->hasField('field_reference_node') && $node->get('field_reference_node')->isEmpty()) {
+      $form['field_reference_node']['#access'] = FALSE;
+    }
+  }
+
   $node = $form_state->getFormObject()->getEntity();
 
   if ($node instanceof NodeInterface && $node->bundle() === 'guide_page'){
