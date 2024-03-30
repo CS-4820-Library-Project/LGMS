@@ -31,7 +31,6 @@ class ReuseGuidePageForm extends FormBase {
       '#title' => $this->t('Select Page'),
       '#options' => $this->getGuidePageOptions($ids->current_guide_id),
       '#empty_option' => $this->t('- Select a Page -'),
-      '#validated' => TRUE,
       '#required' => TRUE,
       '#ajax' => [
         'callback' => '::IncludeSubCallBack',
@@ -67,6 +66,9 @@ class ReuseGuidePageForm extends FormBase {
         'visible' => [
           ':input[name="reference"]' => ['checked' => False],
         ],
+        'required' => [
+          ':input[name="reference"]' => ['checked' => False],
+        ],
       ],
     ];
 
@@ -75,11 +77,15 @@ class ReuseGuidePageForm extends FormBase {
       '#attributes' => ['id' => 'position-wrapper'],
     ];
 
+    $include_sub = $form_state->getValue('include_sub') == '1';
+
     $form['include_sub_wrapper']['position_wrapper']['position'] = [
       '#type' => 'select',
       '#title' => $this->t('Position'),
       '#options' => $this->getPageList($ids->current_guide_id),
-      '#required' => TRUE,
+      '#required' => !$include_sub,
+      '#default_value' => $include_sub? $form_state->getValue('current_guide'): null,
+      '#disabled' => $include_sub
     ];
 
     $form['current_guide'] = [
@@ -108,18 +114,6 @@ class ReuseGuidePageForm extends FormBase {
   }
 
   public function position_callback(array &$form, FormStateInterface $form_state) {
-      $include_sub = $form_state->getValue('include_sub');
-
-    if ($include_sub == '0') {
-      \Drupal::logger('my_module')->notice('<pre>' . print_r('here but nothing is happening', TRUE) . '</pre>');
-
-      $form['include_sub_wrapper']['position_wrapper']['position']['#options'] = $this->getPageList($form_state->getValue('current_guide'));
-      unset($form['include_sub_wrapper']['position_wrapper']['position']['#attributes']['disabled']);
-    } else {
-      $form['include_sub_wrapper']['position_wrapper']['position']['#options'] = ['Page Level' => ['top_level' => $this->t('Page Level')]];
-      $form['include_sub_wrapper']['position_wrapper']['position']['#attributes']['disabled'] = 'disabled';
-    }
-
     return $form['include_sub_wrapper']['position_wrapper'];
   }
 
@@ -134,9 +128,6 @@ class ReuseGuidePageForm extends FormBase {
         $child_pages = $page_node->get('field_child_pages')->getValue();
         // If there are no child pages, disable the "Include Subpages" checkbox.
         if (empty($child_pages)) {
-          \Drupal::logger('my_module')->notice('<pre>' . print_r('here but nothing is happening2', TRUE) . '</pre>');
-          $form['include_sub_wrapper']['position_wrapper']['position']['#options'] = $this->getPageList($form_state->getValue('current_guide'));
-          unset($form['include_sub_wrapper']['position_wrapper']['position']['#attributes']['disabled']);
           $form['include_sub_wrapper']['include_sub']['#checked'] = FALSE;
           $form['include_sub_wrapper']['include_sub']['#attributes']['disabled'] = 'disabled';
 
@@ -160,12 +151,9 @@ class ReuseGuidePageForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $guide = Node::load($form_state->getValue('current_guide'));
     $page = Node::load($form_state->getValue('select_page'));
     $parent = Node::load($form_state->getValue('position'));
 
-    if($form_state->getValue('position')  == 'top_level')
-      $parent = $guide;
 
     if(!$form_state->getValue('reference')){
       $new_page = $this->copyPage($page, $parent, $form_state->getValue('title'));
@@ -182,6 +170,9 @@ class ReuseGuidePageForm extends FormBase {
         $new_page->setOwnerId(\Drupal::currentUser()->id());
         $new_page->save();
 
+      } else {
+        $new_page->set('field_child_pages', []);
+        $new_page->save();
       }
 
       $page = $new_page;
@@ -360,7 +351,7 @@ class ReuseGuidePageForm extends FormBase {
   public function getPageList($guide_id) {
     $options = [];
 
-    $options['Page Level']['top_level'] = t('Page Level');
+    $options['Page Level'][$guide_id] = t('Page Level');
 
     // Load the guide entity.
     $guide = Node::load($guide_id);

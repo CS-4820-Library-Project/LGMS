@@ -45,9 +45,9 @@ class EditPageForm extends FormBase {
         '#attributes' => ['id' => 'update-wrapper'],
       ];
 
-      $selected = !empty($form_state->getValue('select_page')) ? $form_state->getValue('select_page') : '';
+      $selected = $form_state->getValue('select_page', '');
 
-      if($selected != '') {
+      if(!empty($selected)) {
         $selected_node = Node::load($selected);
         $reference = !$selected_node->get('field_reference_node')->isEmpty();
 
@@ -98,7 +98,7 @@ class EditPageForm extends FormBase {
           '#type' => 'select',
           '#title' => $this->t('Position'),
           '#options' => $this->getPageList($form_state, $current_guide->id(), false),
-          '#value' => !$selected_node->get('field_child_pages')->isEmpty()? $current_guide->id() : $selected_node->get('field_parent_guide')->entity->id(),
+          '#default_value' => !$selected_node->get('field_child_pages')->isEmpty()? $current_guide->id() : $selected_node->get('field_parent_guide')->entity->id(),
           '#disabled' => !$selected_node->get('field_child_pages')->isEmpty(),
           '#required' => TRUE,
         ];
