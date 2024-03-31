@@ -131,8 +131,9 @@ class ReuseHTMLItemForm extends FormBase {
         ];
         $form['update_wrapper']['body'] = [
           '#type' => 'text_format',
-          '#title' => $this->t('Body'),
+          '#title' => $this->t('HTML Body'),
           '#default_value' => $selected_node->get('field_text_box_item2')->value,
+          '#format' => $selected_node->get('field_text_box_item2')->format,
           '#disabled' => $reference,
           '#states' => [
             'invisible' => [':input[name="reference"]' => ['checked' => TRUE]],
@@ -152,6 +153,14 @@ class ReuseHTMLItemForm extends FormBase {
   }
 
   public function htmlItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
+
+    $selected = $form_state->getValue('box');
+    $selected_node = Node::load($selected);
+    if ($selected_node){
+      $form['update_wrapper']['title']['#value'] = $selected_node->label();
+      $form['update_wrapper']['body']['value']['#value'] = $selected_node->get('field_text_box_item2')->value;
+    }
+
     return $form['update_wrapper'];
   }
 
