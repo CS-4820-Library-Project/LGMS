@@ -305,10 +305,6 @@ class AddBookForm extends FormBase {
         'title' => $form_state->getValue(['pub_finder_group', 'label']),
         'uri' => $form_state->getValue(['pub_finder_group', 'url']),
       ],
-      'field_book_url' => [
-        'title' => $form_state->getValue(['url_group', 'label']),
-        'uri' => $form_state->getValue(['url_group', 'url']),
-      ],
       'field_book_type' => $form_state->getValue('type'),
       'field_book_location' => $form_state->getValue('location'),
       'field_book_call_number' => $form_state->getValue('call_number'),
