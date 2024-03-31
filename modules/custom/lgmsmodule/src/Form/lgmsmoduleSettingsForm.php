@@ -68,7 +68,7 @@ class lgmsmoduleSettingsForm extends ConfigFormBase {
         }
 
         $new_value = $proxy_prefix . $current_value;
-        $node->set('field_database_link', $new_value);
+        $node->set('field_database_link', ['uri' => $new_value, 'title' => $node->get('field_database_link')->title]);
         $node->save();
       }
     }
