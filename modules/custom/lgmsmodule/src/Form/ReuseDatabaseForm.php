@@ -77,10 +77,10 @@ class ReuseDatabaseForm extends FormBase {
   private function prefillSelectedDatabaseItem(array &$form, FormStateInterface $form_state): void
   {
     $selected = $form_state->getValue('box');
-
     if (!empty($selected)) {
       $selected_node = Node::load($selected);
       if ($selected_node) {
+        \Drupal::logger('Im first 1')->notice('<pre>' . print_r('hello 1', TRUE) . '</pre>');
         $parent_db = $selected_node->get('field_parent_item')->entity;
         $reference = $form_state->getValue('reference');
 
@@ -186,13 +186,11 @@ class ReuseDatabaseForm extends FormBase {
           ],
         ];
 
-
         $form['update_wrapper']['published'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Draft mode:'),
           '#description' => $this->t('Un-check this box to publish.'),
           '#default_value' => $parent_db->isPublished() == '0',
-
         ];
       }
     }
@@ -208,6 +206,30 @@ class ReuseDatabaseForm extends FormBase {
   }
 
   public function databaseItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
+    \Drupal::logger('Im first 2')->notice('<pre>' . print_r('hello 2', TRUE) . '</pre>');
+    $selected = $form_state->getValue('box');
+    $selected_node = Node::load($selected);
+    $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
+    $current_value = $selected_node?->get('field_database_link')->uri;
+
+    if ($selected_node->get('field_make_proxy')->value){
+      $current_value = substr($current_value, strlen($proxy_prefix));
+    }
+    if ($selected_node){
+      $parent_db = $selected_node->get('field_parent_item')->entity;
+      $form['update_wrapper']['title']['#value'] = $selected_node->label();
+      $form['update_wrapper']['link_text']['#value'] = $selected_node->get('field_database_link')->title;
+      $form['update_wrapper']['field_database_link']['#value'] = $current_value;
+      $form['update_wrapper']['field_make_proxy']['#value'] = $selected_node->get('field_make_proxy')->value;
+      $form['update_wrapper']['includedesc']['#checked'] = !empty($parent_db->get('field_description')->value);
+      $form['update_wrapper']['description']['#value'] = $parent_db->get('field_description')->value;
+      $form['update_wrapper']['includebody']['#checked'] = !empty($selected_node->get('field_database_body')->value);
+      $form['update_wrapper']['field_database_body']['value']['#value'] = $selected_node->get('field_database_body')->value;
+      $form['update_wrapper']['published']['#checked'] = $parent_db->isPublished() == '0';
+    }
+
+    $form_state->setValue('desired_text_format', 'restricted_html');
+
     return $form['update_wrapper'];
   }
 
