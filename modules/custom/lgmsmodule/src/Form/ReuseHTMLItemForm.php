@@ -165,12 +165,13 @@ class ReuseHTMLItemForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
+
+    $current_box_id = $form_state->getValue('current_box');
+    $current_box = Node::load($current_box_id);
 
 
-    $html = $form_state->getValue('box');
-    $html = Node::load($html);
+    $html_id = $form_state->getValue('box');
+    $html = Node::load($html_id);
     $item = $html->get('field_parent_item')->entity;
 
     if(!$form_state->getValue('reference')){
