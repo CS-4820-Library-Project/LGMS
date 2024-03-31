@@ -91,6 +91,7 @@ class EditPageForm extends FormBase {
             ],
           ],
           '#default_value' => $selected_node->get('field_description')->value,
+          '#format' => $selected_node->get('field_description')->format,
           '#disabled' => $reference,
         ];
 
@@ -151,6 +152,16 @@ class EditPageForm extends FormBase {
 
 
   public function selectPageCallBack(array &$form, FormStateInterface $form_state) {
+    $selected = $form_state->getValue('select_page', '');
+    $selected_node = Node::load($selected);
+    //$reference = !$selected_node->get('field_reference_node')->isEmpty();
+    if ($selected_node){
+      $form['update_wrapper']['title']['#value'] = $selected_node->label();
+      $form['update_wrapper']['description']['value']['#value'] = $selected_node->get('field_description')->value;
+      $form['update_wrapper']['hide_description']['#checked'] = $selected_node->get('field_hide_description')->value;
+      $form['update_wrapper']['draft_mode']['#checked'] = !$selected_node->isPublished();
+    }
+
     return $form['update_wrapper'];
   }
 
