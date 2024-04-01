@@ -1,4 +1,4 @@
-# [How to Add a Page To a Guide]
+# How to Add a Page To a Guide
 
 __Creation Date:__ March 31, 2024
 __Created By:__ Mohammed Amaan
@@ -11,7 +11,7 @@ __Created By:__ Mohammed Amaan
 
 
 
-## # [Navigate to the Guide from the Dashboard or Create a new guide](http://localhost/LGMS/psychology)
+## Navigate to the Guide from the Dashboard or Create a new guide
 
 
 ### 1. Click on Create/Reuse Guide Page
