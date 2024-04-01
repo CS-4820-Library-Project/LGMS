@@ -31,14 +31,30 @@ class ReuseGuideBoxForm extends FormBase {
 
     $form['#attributes']['id'] = 'form-selector';
 
+    // Hidden fields to store current context.
+    $form['current_box'] = [
+      '#type' => 'hidden',
+      '#value' => $ids->current_box,
+    ];
+
+    // Load HTML items to populate the select options.
+    $options = $this->getBoxItemOptions();
+
     $form['box'] = [
-      '#type' => 'entity_autocomplete',
-      '#title' => $this->t('Box Title'),
+      '#type' => 'select',
+      '#title' => $this->t('Select a Box'),
+      '#options' => $options,
+      '#empty_option' => $this->t('- Select a Box Item -'),
       '#target_type' => 'node', // Adjust according to your needs
       '#selection_settings' => [
         'target_bundles' => ['guide_box'], // Adjust to your guide page bundle
       ],
       '#required' => TRUE,
+      '#ajax' => [
+        'callback' => '::boxItemSelectedAjaxCallback',
+        'wrapper' => 'update-wrapper',
+        'event' => 'change',
+      ],
     ];
 
     $form['reference'] = [
@@ -46,15 +62,14 @@ class ReuseGuideBoxForm extends FormBase {
       '#title' => $this->t('<Strong>Reference:</Strong> By selecting this, a reference of the box will be created. it will be un-editable from this guide/page'),
     ];
 
-    $form['title'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Box Title:'),
-      '#states' => [
-        'invisible' => [
-          ':input[name="reference"]' => ['checked' => TRUE],
-        ],
-      ],
+    // Container to dynamically update based on AJAX callback.
+    $form['update_wrapper'] = [
+      '#type' => 'container',
+      '#attributes' => ['id' => 'update-wrapper'],
     ];
+
+    // Pre-fill form fields if an HTML item is selected.
+    $this->prefillSelectedBoxItem($form, $form_state);
 
     $form['#validate'][] = '::validateFields';
 
@@ -93,6 +108,39 @@ class ReuseGuideBoxForm extends FormBase {
         $form_state->setErrorByName('reference', $this->t('This box cannot be created with the same page as its reference. Please select a different page or remove the reference to proceed.'));
       }
     }
+  }
+
+  private function prefillSelectedBoxItem(array &$form, FormStateInterface $form_state) {
+    $selected = $form_state->getValue('box');
+
+    if (!empty($selected)) {
+      $selected_node = Node::load($selected);
+      if ($selected_node) {
+        $reference = $form_state->getValue('reference');
+        $form['update_wrapper']['title'] = [
+          '#type' => 'textfield',
+          '#title' => $this->t('Box Title:'),
+          '#default_value' => $selected_node->label(),
+          '#states' => [
+            'invisible' => [
+              ':input[name="reference"]' => ['checked' => TRUE],
+            ],
+            'required' => [':input[name="reference"]' => ['checked' => FALSE]],
+          ],
+        ];
+      }
+    }
+  }
+
+  public function boxItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
+
+    $selected = $form_state->getValue('box');
+    $selected_node = Node::load($selected);
+    if ($selected_node){
+      $form['update_wrapper']['title']['#value'] = $selected_node->label();
+    }
+
+    return $form['update_wrapper'];
   }
 
   /**
@@ -186,4 +234,59 @@ class ReuseGuideBoxForm extends FormBase {
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);
   }
+
+  /**
+   * Queries and returns options for the Box item select field.
+   *
+   * @return array
+   *   An associative array of options for the select field.
+   */
+  private function getBoxItemOptions() {
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', 'guide_box')
+      ->sort('title', 'ASC')
+      ->accessCheck(TRUE);
+    $nids = $query->execute();
+
+    $nodes = \Drupal\node\Entity\Node::loadMultiple($nids);
+    $groupedOptions = [];
+    foreach ($nodes as $node) {
+      // Load the direct parent item.
+      $parent_item = $node->get('field_parent_node')->entity;
+
+      // Initialize parent label.
+      $parent_label = (string) t('No Parent');
+
+      if ($parent_item && $parent_item->access('view')) {
+        // Determine if the parent item is a 'guide_page'.
+        if ($parent_item->bundle() === 'guide_page') {
+          // If the parent is a 'guide_page', find the 'guide' it belongs to.
+          $ultimate_parent = $parent_item->get('field_parent_guide')->entity;
+          if ($ultimate_parent && $ultimate_parent->access('view')) {
+            $parent_label = $ultimate_parent->label();
+          } else {
+            // Handle cases where the ultimate parent is not accessible or not found.
+            $parent_label = (string) t('Unaccessible Parent Guide');
+          }
+        } else {
+          // The parent item is directly a 'guide'.
+          $parent_label = $parent_item->label();
+        }
+
+        // Initialize the parent group if it doesn't exist.
+        if (!isset($groupedOptions[$parent_label])) {
+          $groupedOptions[$parent_label] = [];
+        }
+
+        // Add the node to its parent group.
+        $groupedOptions[$parent_label][$node->id()] = $node->label();
+      }
+    }
+
+    // Sort the groups alphabetically by their label.
+    ksort($groupedOptions);
+
+    return $groupedOptions;
+  }
+
 }

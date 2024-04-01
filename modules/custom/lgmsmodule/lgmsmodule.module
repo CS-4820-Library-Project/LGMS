@@ -109,7 +109,7 @@ function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation
 
 
   // Check if the current route is for a node edit form.
-  if ($node && $node->getType() == 'guide' && in_array($current_route, $routes) && $block->id() === 'lgmsguideownerblock') {
+  if ($node && $node->getType() == 'guide' && in_array($current_route, $routes) && ($block->id() === 'lgmsguideownerblock' || $block->id() === 'pageviewblock')) {
     // Block access to the block on node edit pages.
     return \Drupal\Core\Access\AccessResult::forbidden();
   }
@@ -1074,7 +1074,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       $build['boxes'][] = box_display($entity, $box);
     }
 
-    if(\Drupal::currentUser()->isAuthenticated() && !$reference_page) {
+    if($entity->access('update') && !$reference_page) {
       // Generate the URL for the custom form route, including the query parameter for the current guide.
       $array_of_objects = [(object)['name' => 'Create Guide Box', 'form' => 'CreateGuideBoxForm'],(object) ['name' => 'Reuse Guide Box', 'form' => 'ReuseGuideBoxForm']];
       $json_data = json_encode($array_of_objects);
@@ -1356,7 +1356,7 @@ function lgmsModule_install(): void
     ''
   );
 
-// Add a reference field to Guide content type on Guide Page.
+  // Add a reference field to Guide content type on Guide Page.
   createField(
     'field_parent_guide',
     'node',
