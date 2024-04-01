@@ -270,6 +270,30 @@ function lgmsmodule_node_insert(NodeInterface $node): void
 }
 
 /**
+ * Implements hook_entity_delete().
+ */
+function lgmsmodule_entity_delete(EntityInterface $entity): void
+{
+  if ($entity->bundle() == 'guide_page' && $entity->getEntityTypeId() == 'node') {
+    $deleted_guide_page_id = $entity->id();
+
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', 'guide_page')
+      ->condition('field_reference_node', $deleted_guide_page_id)
+      ->accessCheck(false);
+    $result = $query->execute();
+
+    // Load and update the referencing guide pages.
+    if (!empty($result)) {
+      $referencing_guide_pages = Node::loadMultiple($result);
+      foreach ($referencing_guide_pages as $page) {
+        $page->delete();
+      }
+    }
+  }
+}
+
+/**
  * This is executed when a node is updated
  * Implements hook_node_update().
  */
