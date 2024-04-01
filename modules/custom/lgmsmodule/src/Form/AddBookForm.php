@@ -24,7 +24,12 @@ class AddBookForm extends FormBase {
     $form_helper->set_form_data($form,$ids, $this->getFormId());
 
     // In the case of editing an HTML, get the item
-    $current_item = Node::load($ids->current_item);
+    if (property_exists($ids, 'current_item')){
+      $current_item = Node::load($ids->current_item);
+    }
+    else {
+      $current_item = null;
+    }
     $current_book = $current_item?->get('field_book_item')->entity;
     $edit = $current_item != null;
 
@@ -70,7 +75,7 @@ class AddBookForm extends FormBase {
       '#upload_validators' => [
         'file_validate_extensions' => ['png jpg jpeg'],
       ],
-      '#default_value' => $current_book->field_book_cover_picture->target_id ? [$current_book->field_book_cover_picture->target_id] : NULL,
+      '#default_value' => $current_book?->field_book_cover_picture->target_id ? [$current_book->field_book_cover_picture->target_id] : NULL,
       '#required' => FALSE,
       '#description' => $this->t('Allowed extensions: png jpg jpeg'),
     ];
