@@ -182,7 +182,8 @@ class EditPageForm extends FormBase {
       $form_state->getValue('draft_mode') == '0'? $selected_page->setPublished(): $selected_page->setUnpublished();
 
 
-      if($selected_page->hasField('field_parent_guide')){
+      if($selected_page->hasField('field_parent_guide') && $form_state->getValue('position') != $selected_page->get('field_parent_guide')->entity->id()){
+        \Drupal::logger('my_module1')->notice('<pre>' . print_r(($form_state->getValue('position')), TRUE) . '</pre>');
         $parent = $selected_page->get('field_parent_guide')->entity;
 
         $child_pages = $parent->get('field_child_pages')->getValue();
