@@ -24,7 +24,12 @@ class AddBookForm extends FormBase {
     $form_helper->set_form_data($form,$ids, $this->getFormId());
 
     // In the case of editing an HTML, get the item
-    $current_item = Node::load($ids->current_item);
+    if (property_exists($ids, 'current_item')){
+      $current_item = Node::load($ids->current_item);
+    }
+    else {
+      $current_item = null;
+    }
     $current_book = $current_item?->get('field_book_item')->entity;
     $edit = $current_item != null;
 
@@ -70,7 +75,7 @@ class AddBookForm extends FormBase {
       '#upload_validators' => [
         'file_validate_extensions' => ['png jpg jpeg'],
       ],
-      '#default_value' => $current_book->field_book_cover_picture->target_id ? [$current_book->field_book_cover_picture->target_id] : NULL,
+      '#default_value' => $current_book?->field_book_cover_picture->target_id ? [$current_book->field_book_cover_picture->target_id] : NULL,
       '#required' => FALSE,
       '#description' => $this->t('Allowed extensions: png jpg jpeg'),
     ];
@@ -304,10 +309,6 @@ class AddBookForm extends FormBase {
       'field_book_pub_finder' => [
         'title' => $form_state->getValue(['pub_finder_group', 'label']),
         'uri' => $form_state->getValue(['pub_finder_group', 'url']),
-      ],
-      'field_book_url' => [
-        'title' => $form_state->getValue(['url_group', 'label']),
-        'uri' => $form_state->getValue(['url_group', 'url']),
       ],
       'field_book_type' => $form_state->getValue('type'),
       'field_book_location' => $form_state->getValue('location'),

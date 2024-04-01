@@ -153,8 +153,8 @@ class EditPageForm extends FormBase {
 
   public function selectPageCallBack(array &$form, FormStateInterface $form_state) {
     $selected = $form_state->getValue('select_page', '');
-    $selected_node = Node::load($selected);
-    //$reference = !$selected_node->get('field_reference_node')->isEmpty();
+    $selected_node = $selected? Node::load($selected) : null;
+
     if ($selected_node){
       $form['update_wrapper']['title']['#value'] = $selected_node->label();
       $form['update_wrapper']['description']['value']['#value'] = $selected_node->get('field_description')->value;
