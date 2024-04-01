@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Term;
 
 class ReuseBookForm extends FormBase {
 
@@ -95,7 +96,7 @@ class ReuseBookForm extends FormBase {
       $selected_node = Node::load($selected);
       if ($selected_node) {
         $reference = $form_state->getValue('reference');
-
+        $book_type = Term::load($selected_node->get('field_book_type')->target_id)?->label();
         $form['update_wrapper']['title'] = [
           '#type' => 'textfield',
           '#title' => $this->t('New Title:'),
@@ -207,12 +208,12 @@ class ReuseBookForm extends FormBase {
           '#title' => $this
             ->t('Type'),
           '#options' => [
-            $term_ids['print'] => $this
+            'print' => $this
               ->t('print'),
-            $term_ids['eBook'] => $this
+            'eBook' => $this
               ->t('eBook'),
           ],
-          '#default_value' => $selected_node->get('field_book_type')->target_id,
+          '#default_value' => Term::load($selected_node->get('field_book_type')->target_id)?->label(),
           '#states' => [
             'invisible' => [':input[name="reference"]' => ['checked' => TRUE]],
           ],
@@ -220,42 +221,149 @@ class ReuseBookForm extends FormBase {
           '#ajax' => [
             'callback' => '::bookItemSelectedAjaxCallback',
             'wrapper' => 'update-wrapper',
+            'event' => 'change',
           ],
+        ];
+
+
+        $type_check = $form_state->getValue('type');
+        $ebook = 'eBook';
+        $print = 'print';
+        $isEbookTypeSelected = ($book_type === $ebook);
+        $isPrintTypeSelected = ($book_type === $print);
+
+        if (empty($type_check) && $isEbookTypeSelected){
+          $type_check = $ebook;
+        } else if (empty($type_check) && $isPrintTypeSelected){
+          $type_check = $print;
+        }
+
+        if ($type_check === $ebook){
+          $form['update_wrapper']['pub_finder_group'] = [
+            '#type' => 'fieldset',
+            '#title' => $this->t('Publication Finder'),
+            '#description' => $this->t('Provide the text and URL for the publication finder.'),
+            '#collapsible' => FALSE,
+            '#collapsed' => FALSE,
+            '#states' => [
+              'invisible' => [
+                [':input[name="type"]' => ['value' => $print]],
+                [':input[name="reference"]' => ['checked' => TRUE]],
+              ],
+            ],
+          ];
+
+          $form['update_wrapper']['pub_finder_group']['label'] = [
+            '#type' => 'textfield',
+            '#title' => $this->t('Link Text'),
+            '#description' => $this->t('The text that will be displayed as the link.'),
+            '#default_value' => $selected_node->get('field_book_pub_finder')->title,
+            '#required' => $isEbookTypeSelected,
+            '#states' => [
+              'invisible' => [
+                [':input[name="type"]' => ['value' => $print]],
+                [':input[name="reference"]' => ['checked' => TRUE]],
+              ],
+            ],
+          ];
+
+          $form['update_wrapper']['pub_finder_group']['url'] = [
+            '#type' => 'url',
+            '#title' => $this->t('URL'),
+            '#description' => $this->t('The URL for the publication finder.'),
+            '#default_value' => $selected_node->get('field_book_pub_finder')->uri,
+            '#required' => $isEbookTypeSelected,
+            '#states' => [
+              'invisible' => [
+                [':input[name="type"]' => ['value' => $print]],
+                [':input[name="reference"]' => ['checked' => TRUE]],
+              ],
+            ]
+          ];
+        } else {
+          $form['update_wrapper']['call_number'] = [
+            '#type' => 'textfield',
+            '#title' => $this->t('Call Number'),
+            '#description' => $this->t('The library call number for the book.'),
+            '#default_value' => $selected_node->get('field_book_call_number')->value,
+            '#states' => [
+              'invisible' => [
+                [':input[name="type"]' => ['value' => $ebook]],
+                [':input[name="reference"]' => ['checked' => TRUE]]
+              ],
+            ],
+            '#required' => $isPrintTypeSelected,
+          ];
+
+          $form['update_wrapper']['location'] = [
+            '#type' => 'textfield',
+            '#title' => $this->t('Location'),
+            '#description' => $this->t('The physical location of the book in the library.'),
+            '#default_value' => $selected_node->get('field_book_location')->value,
+            '#states' => [
+              'invisible' => [
+                [':input[name="type"]' => ['value' => $ebook]],
+                [':input[name="reference"]' => ['checked' => TRUE]],
+              ],
+            ],
+            '#required' => $isPrintTypeSelected,
+          ];
+
+
+          $form['update_wrapper']['cat_record_group'] = [
+            '#type' => 'fieldset',
+            '#title' => $this->t('Catalog Record'),
+            '#description' => $this->t('Information for the catalog record.'),
+            '#collapsible' => FALSE,
+            '#collapsed' => FALSE,
+            '#states' => [
+              'invisible' => [
+                [':input[name="type"]' => ['value' => $ebook]],
+                [':input[name="reference"]' => ['checked' => TRUE]],
+              ],
+            ],
+            '#required' => $isPrintTypeSelected,
+          ];
+
+          // Add descriptive texts to the label and URL fields inside the 'Cat Record' group.
+          $form['update_wrapper']['cat_record_group']['label'] = [
+            '#type' => 'textfield',
+            '#title' => $this->t('Catalog Link Text'),
+            '#description' => $this->t('The text for the link to the catalog record.'),
+            '#default_value' => $selected_node->get('field_book_cat_record')->title,
+            '#states' => [
+              'invisible' => [
+                [':input[name="type"]' => ['value' => $ebook]],
+                [':input[name="reference"]' => ['checked' => TRUE]],
+              ],
+            ],
+            '#required' => $isPrintTypeSelected,
+          ];
+
+          $form['update_wrapper']['cat_record_group']['url'] = [
+            '#type' => 'url',
+            '#title' => $this->t('Catalog URL'),
+            '#description' => $this->t('The URL to the catalog record.'),
+            '#default_value' => $selected_node->get('field_book_cat_record')->uri,
+            '#states' => [
+              'invisible' => [
+                [':input[name="type"]' => ['value' => $ebook]],
+                [':input[name="reference"]' => ['checked' => TRUE]],
+              ],
+            ],
+            '#required' => $isPrintTypeSelected,
+          ];
+        }
+
+        $form['update_wrapper']['published'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Draft mode'),
+          '#description' => $selected_node->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
+          '#default_value' => $selected_node->isPublished() == '0',
+          '#disabled' => $selected_node->isPublished(),
         ];
       }
     }
-  }
-
-  public function validateFields(array &$form, FormStateInterface $form_state) {
-    $reference = $form_state->getValue('reference');
-    $title = $form_state->getValue('title');
-
-    if (!$reference && empty($title)) {
-      $form_state->setErrorByName('title', $this->t('Title: field is required.'));
-    }
-//    if($form_state->getValue('type') != '912'){
-//      if(empty($form_state->getValue('call_number'))){
-//        $form_state->setErrorByName('call_number', t('Call Number is required.'));
-//      }
-//      if(empty($form_state->getValue('location'))) {
-//        $form_state->setErrorByName('location', t('Location is required.'));
-//      }
-//      if(empty($form_state->getValue(['cat_record_group', 'url']))){
-//        $form_state->setErrorByName('cat_record_group][url', t('Cat Record\'s url is required.'));
-//      }
-//      if(empty($form_state->getValue(['cat_record_group', 'label']))){
-//        $form_state->setErrorByName('cat_record_group][label', t('Cat Record\'s label is required.'));
-//      }
-//
-//    } else {
-//      if(empty($form_state->getValue(['pub_finder_group', 'url']))){
-//        $form_state->setErrorByName('pub_finder_group][url', t('Pub Finder\'s URL is required.'));
-//      }
-//      if(empty($form_state->getValue(['pub_finder_group', 'label']))){
-//        $form_state->setErrorByName('pub_finder_group][label', t('Pub Finder\'s Label is required.'));
-//      }
-//    }
-
   }
 
   /**
@@ -266,153 +374,64 @@ class ReuseBookForm extends FormBase {
     $type_check = $form_state->getValue('type');
     $selected = $form_state->getValue('box');
     $selected_node = Node::load($selected);
-
-    if ($type_check){
-      $term_ids = [];
-
-      $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
-        'name' => ['eBook', 'print'],
-        'vid' => 'LGMS_Guide_Book_Type',
-      ]);
-
-      if (!empty($terms)) {
-        foreach ($terms as $term) {
-          $term_ids[$term->label()] = $term->id();
+    $ebook = 'eBook';
+    $print = 'print';
+    if ($selected_node){
+      $book_type = Term::load($selected_node->get('field_book_type')->target_id)?->label();
+      $isEbookTypeSelected = ($book_type === $ebook);
+      if ($type_check){
+        if ($type_check === $ebook) {
+          $form['update_wrapper']['pub_finder_group']['label']['#value'] = $selected_node->get('field_book_pub_finder')->title;
+          $form['update_wrapper']['pub_finder_group']['url']['#value'] = $selected_node->get('field_book_pub_finder')->uri;
+        } else {
+          $form['update_wrapper']['call_number']['#value'] = $selected_node->get('field_book_call_number')->value;
+          $form['update_wrapper']['location']['#value'] = $selected_node->get('field_book_location')->value;
+          $form['update_wrapper']['cat_record_group']['label']['#value'] = $selected_node->get('field_book_cat_record')->title;
+          $form['update_wrapper']['cat_record_group']['url']['#value'] = $selected_node->get('field_book_cat_record')->uri;
         }
       }
-
-      if ($type_check === '912') {
-        $isEbookTypeSelected = ($type_check === '912');
-
-        $form['update_wrapper']['pub_finder_group'] = [
-          '#type' => 'fieldset',
-          '#title' => $this->t('Publication Finder'),
-          '#description' => $this->t('Provide the text and URL for the publication finder.'),
-          '#collapsible' => FALSE,
-          '#collapsed' => FALSE,
-          '#states' => [
-            'invisible' => [
-              [':input[name="reference"]' => ['checked' => TRUE]],
-            ],
-          ],
-        ];
-
-        $form['update_wrapper']['pub_finder_group']['label'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('Link Text'),
-          '#description' => $this->t('The text that will be displayed as the link.'),
-          '#default_value' => $selected_node->get('field_book_pub_finder')->title,
-          '#required' => $isEbookTypeSelected,
-          '#states' => [
-            'invisible' => [
-              [':input[name="reference"]' => ['checked' => TRUE]],
-            ],
-          ],
-        ];
-
-        $form['update_wrapper']['pub_finder_group']['url'] = [
-          '#type' => 'url',
-          '#title' => $this->t('URL'),
-          '#description' => $this->t('The URL for the publication finder.'),
-          '#default_value' => $selected_node->get('field_book_pub_finder')->uri,
-          '#required' => $isEbookTypeSelected,
-          '#states' => [
-            'invisible' => [
-              [':input[name="reference"]' => ['checked' => TRUE]],
-            ],
-          ]
-        ];
-
-        $form['update_wrapper']['published'] = [
-          '#type' => 'checkbox',
-          '#title' => $this->t('Draft mode'),
-          '#description' => $selected_node->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
-          '#default_value' => $selected_node->isPublished() == '0',
-          '#disabled' => $selected_node->isPublished(),
-        ];
-
-      } else {
-        $isPrintTypeSelected = ($type_check !== '912');
-        $form['update_wrapper']['call_number'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('Call Number'),
-          '#description' => $this->t('The library call number for the book.'),
-          '#default_value' => $selected_node->get('field_book_call_number')->value,
-          '#states' => [
-            'invisible' => [
-              [':input[name="reference"]' => ['checked' => TRUE]]
-            ],
-          ],
-          '#required' => $isPrintTypeSelected,
-        ];
-
-        $form['update_wrapper']['location'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('Location'),
-          '#description' => $this->t('The physical location of the book in the library.'),
-          '#default_value' => $selected_node->get('field_book_location')->value,
-          '#states' => [
-            'invisible' => [
-              [':input[name="type"]' => ['value' => $term_ids['eBook']]],
-              [':input[name="reference"]' => ['checked' => TRUE]],
-            ],
-          ],
-          '#required' => $isPrintTypeSelected,
-        ];
+      $form['update_wrapper']['title']['#value'] = $selected_node->label();
+      $form['update_wrapper']['author/editor']['#value'] = $selected_node->get('field_book_author_or_editor')->value;
+      $form['update_wrapper']['publisher']['#value'] = $selected_node->get('field_book_publisher')->value;
+      $form['update_wrapper']['year']['#value'] = $selected_node->get('field_book_year')->value;
+      $form['update_wrapper']['edition']['#value'] = $selected_node->get('field_book_edition')->value;
+      $form['update_wrapper']['description']['value']['#value'] = $selected_node->get('field_book_description')->value;
+    }
 
 
-        $form['update_wrapper']['cat_record_group'] = [
-          '#type' => 'fieldset',
-          '#title' => $this->t('Catalog Record'),
-          '#description' => $this->t('Information for the catalog record.'),
-          '#collapsible' => FALSE,
-          '#collapsed' => FALSE,
-          '#states' => [
-            'invisible' => [
-              [':input[name="reference"]' => ['checked' => TRUE]],
-            ],
-          ],
-          '#required' => $isPrintTypeSelected,
-        ];
+    return $form['update_wrapper'];
+  }
 
-        // Add descriptive texts to the label and URL fields inside the 'Cat Record' group.
-        $form['update_wrapper']['cat_record_group']['label'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('Catalog Link Text'),
-          '#description' => $this->t('The text for the link to the catalog record.'),
-          '#default_value' => $selected_node->get('field_book_cat_record')->title,
-          '#states' => [
-            'invisible' => [
-              [':input[name="reference"]' => ['checked' => TRUE]],
-            ],
-          ],
-          '#required' => $isPrintTypeSelected,
-        ];
+  public function validateFields(array &$form, FormStateInterface $form_state) {
+    $reference = $form_state->getValue('reference');
+    $title = $form_state->getValue('title');
 
-        $form['update_wrapper']['cat_record_group']['url'] = [
-          '#type' => 'url',
-          '#title' => $this->t('Catalog URL'),
-          '#description' => $this->t('The URL to the catalog record.'),
-          '#default_value' => $selected_node->get('field_book_cat_record')->uri,
-          '#states' => [
-            'invisible' => [
-              [':input[name="reference"]' => ['checked' => TRUE]],
-            ],
-          ],
-          '#required' => $isPrintTypeSelected,
-        ];
+    if (!$reference && empty($title)) {
+      $form_state->setErrorByName('title', $this->t('Title: field is required.'));
+    }
+    if($form_state->getValue('type') != '912'){
+      if(empty($form_state->getValue('call_number'))){
+        $form_state->setErrorByName('call_number', t('Call Number is required.'));
+      }
+      if(empty($form_state->getValue('location'))) {
+        $form_state->setErrorByName('location', t('Location is required.'));
+      }
+      if(empty($form_state->getValue(['cat_record_group', 'url']))){
+        $form_state->setErrorByName('cat_record_group][url', t('Cat Record\'s url is required.'));
+      }
+      if(empty($form_state->getValue(['cat_record_group', 'label']))){
+        $form_state->setErrorByName('cat_record_group][label', t('Cat Record\'s label is required.'));
+      }
 
-        $form['update_wrapper']['published'] = [
-          '#type' => 'checkbox',
-          '#title' => $this->t('Draft mode'),
-          '#description' => $selected_node->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
-          '#default_value' => $selected_node->isPublished() == '0',
-          '#disabled' => $selected_node->isPublished(),
-        ];
+    } else {
+      if(empty($form_state->getValue(['pub_finder_group', 'url']))){
+        $form_state->setErrorByName('pub_finder_group][url', t('Pub Finder\'s URL is required.'));
+      }
+      if(empty($form_state->getValue(['pub_finder_group', 'label']))){
+        $form_state->setErrorByName('pub_finder_group][label', t('Pub Finder\'s Label is required.'));
       }
     }
 
-    return $form['update_wrapper'];
   }
 
   /**
