@@ -133,7 +133,6 @@ class ReuseGuidePageForm extends FormBase {
 
           //unset($form['position_wrapper']['position']['#attributes']['disabled']);
         } else {
-          \Drupal::logger('my_module')->notice('<pre>' . print_r('here but nothing is happening3', TRUE) . '</pre>');
           // Ensure it is not disabled if there are child pages.
           unset($form['include_sub_wrapper']['include_sub']['#checked']);
           unset($form['include_sub_wrapper']['include_sub']['#attributes']['disabled']);
