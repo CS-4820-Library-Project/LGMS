@@ -109,7 +109,7 @@ function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation
 
 
   // Check if the current route is for a node edit form.
-  if ($node && $node->getType() == 'guide' && in_array($current_route, $routes) && $block->id() === 'lgmsguideownerblock') {
+  if ($node && $node->getType() == 'guide' && in_array($current_route, $routes) && ($block->id() === 'lgmsguideownerblock' || $block->id() === 'pageviewblock')) {
     // Block access to the block on node edit pages.
     return \Drupal\Core\Access\AccessResult::forbidden();
   }
