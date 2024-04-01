@@ -270,6 +270,30 @@ function lgmsmodule_node_insert(NodeInterface $node): void
 }
 
 /**
+ * Implements hook_entity_delete().
+ */
+function lgmsmodule_entity_delete(EntityInterface $entity): void
+{
+  if ($entity->bundle() == 'guide_page' && $entity->getEntityTypeId() == 'node') {
+    $deleted_guide_page_id = $entity->id();
+
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', 'guide_page')
+      ->condition('field_reference_node', $deleted_guide_page_id)
+      ->accessCheck(false);
+    $result = $query->execute();
+
+    // Load and update the referencing guide pages.
+    if (!empty($result)) {
+      $referencing_guide_pages = Node::loadMultiple($result);
+      foreach ($referencing_guide_pages as $page) {
+        $page->delete();
+      }
+    }
+  }
+}
+
+/**
  * This is executed when a node is updated
  * Implements hook_node_update().
  */
@@ -277,15 +301,40 @@ function lgmsmodule_node_update(NodeInterface $node): void
 {
   if($node->bundle() === 'guide_page'){
     // Check if the entity is a 'guide_page' and has the field 'field_reference_node'.
-    \Drupal::logger('my_module')->notice('<pre>' . print_r($node->id(), TRUE) . '</pre>');
     if ($node->getEntityTypeId() === 'node' && $node->bundle() === 'guide_page' && $node->hasField('field_reference_node')) {
-      \Drupal::logger('my_module')->notice('<pre>' . print_r($node->id(), TRUE) . '</pre>');
       // Proceed to update referencing guide pages.
       update_referencing_guide_pages($node);
     }
   }
 
+  if (($node->bundle() === 'guide' || $node->bundle() === 'guide_page') && !$node->isPublished()){
+    unpublished_child_pages($node);
+  }
+
   lgmsmodule_refresh_cache($node);
+}
+
+function unpublished_child_pages(NodeInterface $page) {
+  unpublished_child_boxes($page);
+
+  $child_pages = $page->get('field_child_pages')->referencedEntities();
+
+  foreach ($child_pages as $child) {
+    unpublished_child_pages($child);
+    $child->setUnpublished();
+    $child->save();
+  }
+}
+
+function unpublished_child_boxes(NodeInterface $page) {
+  $child_boxes = $page->get('field_child_boxes')->referencedEntities();
+
+  foreach ($child_boxes as $box){
+    if ($box){
+      $box->setUnpublished();
+      $box->save();
+    }
+  }
 }
 
 /**
