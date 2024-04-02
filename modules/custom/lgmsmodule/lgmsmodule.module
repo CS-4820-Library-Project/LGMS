@@ -420,23 +420,21 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $delete_route = 'delete_book.form';
   } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
     $database = $item->get('field_database_item')->entity;
-    $node_id = $database->id();
-    $node_label = $database->label();
 
     $item_container['content'][] = [
       '#type' => 'link',
-      '#title' => $node_label,
-      '#url' => Url::fromRoute('entity.node.canonical', ['node' => $node_id]),
+      '#title' => $database->label(),
+      '#url' => Url::fromRoute('entity.node.canonical', ['node' => $database->id()]),
     ];
 
-    if(!empty($item->get('field_description')->value)){
+    if(!$item->get('field_hide_description')->value){
       $item_container['content'][] = [
         '#type' => 'markup',
         '#markup' => ' — ' . $item->get('field_description')->value,
       ];
     }
 
-    if(!empty($database->get('field_database_body')->value)){
+    if(!$database->get('field_hide_body')->value){
       $item_container['content'][] = [
         '#type' => 'markup',
         '#markup' => $database->get('field_database_body')->value,
@@ -1579,6 +1577,21 @@ function lgmsModule_install(): void
     ''
   );
 
+  createField(
+    'field_description',
+    'node',
+    'guide_database_item',
+    'Description',
+    'text_long',
+    [],
+    [],
+    'text_textarea',
+    ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
+    TRUE,
+    False,
+    3,
+    ''
+  );
 
 
   createField(
@@ -1887,6 +1900,46 @@ function lgmsModule_install(): void
     'node',
     'guide_page',
     'Hide Description',
+    'boolean',
+    [],
+    [
+      'default_value' => 0,
+      'on_label' => 'Yes',
+      'off_label' => 'No',
+    ],
+    'boolean_checkbox',
+    [],
+    TRUE,
+    1,
+    1,
+    ''
+  );
+
+  createField(
+    'field_hide_description',
+    'node',
+    'guide_item',
+    'Hide Description',
+    'boolean',
+    [],
+    [
+      'default_value' => 0,
+      'on_label' => 'Yes',
+      'off_label' => 'No',
+    ],
+    'boolean_checkbox',
+    [],
+    TRUE,
+    1,
+    1,
+    ''
+  );
+
+  createField(
+    'field_hide_body',
+    'node',
+    'guide_database_item',
+    'Hide Body',
     'boolean',
     [],
     [
