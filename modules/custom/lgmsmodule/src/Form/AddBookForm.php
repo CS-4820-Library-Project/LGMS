@@ -253,7 +253,7 @@ class AddBookForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'an Book item has been added.', '#'.$this->getFormId());
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'A Book item has been created.', '#'.$this->getFormId());
   }
 
   public function validateFields(array &$form, FormStateInterface $form_state) {
@@ -274,6 +274,9 @@ class AddBookForm extends FormBase {
 
     }
     else {
+      $urll = $form_state->getValue(['pub_finder_group', 'url']);
+      \Drupal::logger('lgmsmodule 3')->notice('Node ID: @id, Type: @type', ['@id' => $urll, '@type' => gettype($urll)]);
+
       if(empty($form_state->getValue(['pub_finder_group', 'url']))){
         $form_state->setErrorByName('pub_finder_group][url', t('Pub Finder\'s url is required.'));
       }

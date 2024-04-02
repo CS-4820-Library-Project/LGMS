@@ -68,7 +68,7 @@ class ReuseBookForm extends FormBase {
     $this->prefillSelectedBookItem($form, $form_state);
     $this->bookItemSelectedAjaxCallback($form,$form_state);
 
-    $form['#validate'][] = '::validateFields';
+    // $form['#validate'][] = '::validateFields';
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -97,16 +97,6 @@ class ReuseBookForm extends FormBase {
       if ($selected_node) {
         $reference = $form_state->getValue('reference');
         $book_type = Term::load($selected_node->get('field_book_type')->target_id)?->label();
-        $form['update_wrapper']['title'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('New Title:'),
-          '#default_value' => $reference ? $this->t('This is just a reference and cannot be edited.') : $selected_node->label(),
-          '#required' => !$reference,
-          '#disabled' => $reference,
-          '#states' => [
-            'invisible' => [':input[name="reference"]' => ['checked' => TRUE]],
-          ],
-        ];
 
         $form['update_wrapper']['reference'] = [
           '#type' => 'checkbox',
@@ -118,7 +108,16 @@ class ReuseBookForm extends FormBase {
           ],
         ];
 
-        $reference = $form_state->getValue('reference');
+        $form['update_wrapper']['title'] = [
+          '#type' => 'textfield',
+          '#title' => $this->t('New Title:'),
+          '#default_value' => $reference ? $this->t('This is just a reference and cannot be edited.') : $selected_node->label(),
+          '#required' => !$reference,
+          '#disabled' => $reference,
+          '#states' => [
+            'invisible' => [':input[name="reference"]' => ['checked' => TRUE]],
+          ],
+        ];
 
         $form['update_wrapper']['author/editor'] = [
           '#type' => 'textfield',
@@ -160,19 +159,19 @@ class ReuseBookForm extends FormBase {
           '#required' => !$reference,
         ];
 
-        if (!$reference){
-          $form['update_wrapper']['cover_picture'] = [
-            '#type' => 'managed_file',
-            '#title' => $this->t('Cover Picture'),
-            '#upload_location' => 'public://cover_picture/',
-            '#upload_validators' => [
-              'file_validate_extensions' => ['png jpg jpeg'],
-            ],
-            '#default_value' => $selected_node->field_book_cover_picture->target_id ? [$selected_node->field_book_cover_picture->target_id] : NULL,
-            '#description' => $this->t('Allowed extensions: png jpg jpeg'),
-            '#required' => !$reference,
-          ];
-        }
+//        if (!$reference){
+//          $form['update_wrapper']['cover_picture'] = [
+//            '#type' => 'managed_file',
+//            '#title' => $this->t('Cover Picture'),
+//            '#upload_location' => 'public://cover_picture/',
+//            '#upload_validators' => [
+//              'file_validate_extensions' => ['png jpg jpeg'],
+//            ],
+//            '#default_value' => $selected_node->field_book_cover_picture->target_id ? [$selected_node->field_book_cover_picture->target_id] : NULL,
+//            '#description' => $this->t('Allowed extensions: png jpg jpeg'),
+//            '#required' => !$reference,
+//          ];
+//        }
 
         $form['update_wrapper']['description'] = [
           '#type' => 'text_format',
@@ -208,12 +207,12 @@ class ReuseBookForm extends FormBase {
           '#title' => $this
             ->t('Type'),
           '#options' => [
-            'print' => $this
+            $term_ids['print'] => $this
               ->t('print'),
-            'eBook' => $this
+            $term_ids['eBook'] => $this
               ->t('eBook'),
           ],
-          '#default_value' => Term::load($selected_node->get('field_book_type')->target_id)?->label(),
+          '#default_value' => $selected_node->get('field_book_type')->target_id,
           '#states' => [
             'invisible' => [':input[name="reference"]' => ['checked' => TRUE]],
           ],
@@ -224,7 +223,6 @@ class ReuseBookForm extends FormBase {
             'event' => 'change',
           ],
         ];
-
 
         $type_check = $form_state->getValue('type');
         $ebook = 'eBook';
@@ -238,13 +236,14 @@ class ReuseBookForm extends FormBase {
           $type_check = $print;
         }
 
-        if ($type_check === $ebook){
+        if ($type_check === '912'){
           $form['update_wrapper']['pub_finder_group'] = [
             '#type' => 'fieldset',
             '#title' => $this->t('Publication Finder'),
             '#description' => $this->t('Provide the text and URL for the publication finder.'),
             '#collapsible' => FALSE,
             '#collapsed' => FALSE,
+            '#required' => $isEbookTypeSelected,
             '#states' => [
               'invisible' => [
                 [':input[name="type"]' => ['value' => $print]],
@@ -253,7 +252,7 @@ class ReuseBookForm extends FormBase {
             ],
           ];
 
-          $form['update_wrapper']['pub_finder_group']['label'] = [
+          $form['update_wrapper']['pub_finder_group']['label2'] = [
             '#type' => 'textfield',
             '#title' => $this->t('Link Text'),
             '#description' => $this->t('The text that will be displayed as the link.'),
@@ -267,7 +266,7 @@ class ReuseBookForm extends FormBase {
             ],
           ];
 
-          $form['update_wrapper']['pub_finder_group']['url'] = [
+          $form['update_wrapper']['pub_finder_group']['url2'] = [
             '#type' => 'url',
             '#title' => $this->t('URL'),
             '#description' => $this->t('The URL for the publication finder.'),
@@ -326,7 +325,7 @@ class ReuseBookForm extends FormBase {
           ];
 
           // Add descriptive texts to the label and URL fields inside the 'Cat Record' group.
-          $form['update_wrapper']['cat_record_group']['label'] = [
+          $form['update_wrapper']['cat_record_group']['label1'] = [
             '#type' => 'textfield',
             '#title' => $this->t('Catalog Link Text'),
             '#description' => $this->t('The text for the link to the catalog record.'),
@@ -340,7 +339,7 @@ class ReuseBookForm extends FormBase {
             '#required' => $isPrintTypeSelected,
           ];
 
-          $form['update_wrapper']['cat_record_group']['url'] = [
+          $form['update_wrapper']['cat_record_group']['url1'] = [
             '#type' => 'url',
             '#title' => $this->t('Catalog URL'),
             '#description' => $this->t('The URL to the catalog record.'),
@@ -354,13 +353,12 @@ class ReuseBookForm extends FormBase {
             '#required' => $isPrintTypeSelected,
           ];
         }
-
+        $parent_db = $selected_node->get('field_parent_item')->entity;
         $form['update_wrapper']['published'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Draft mode'),
-          '#description' => $selected_node->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
-          '#default_value' => $selected_node->isPublished() == '0',
-          '#disabled' => $selected_node->isPublished(),
+          '#description' => $this->t('Un-check this box to publish.'),
+          '#default_value' => $parent_db->isPublished() == '0',
         ];
       }
     }
@@ -376,27 +374,29 @@ class ReuseBookForm extends FormBase {
     $selected_node = Node::load($selected);
     $ebook = 'eBook';
     $print = 'print';
-    if ($selected_node){
-      $book_type = Term::load($selected_node->get('field_book_type')->target_id)?->label();
-      $isEbookTypeSelected = ($book_type === $ebook);
-      if ($type_check){
-        if ($type_check === $ebook) {
-          $form['update_wrapper']['pub_finder_group']['label']['#value'] = $selected_node->get('field_book_pub_finder')->title;
-          $form['update_wrapper']['pub_finder_group']['url']['#value'] = $selected_node->get('field_book_pub_finder')->uri;
-        } else {
-          $form['update_wrapper']['call_number']['#value'] = $selected_node->get('field_book_call_number')->value;
-          $form['update_wrapper']['location']['#value'] = $selected_node->get('field_book_location')->value;
-          $form['update_wrapper']['cat_record_group']['label']['#value'] = $selected_node->get('field_book_cat_record')->title;
-          $form['update_wrapper']['cat_record_group']['url']['#value'] = $selected_node->get('field_book_cat_record')->uri;
-        }
-      }
-      $form['update_wrapper']['title']['#value'] = $selected_node->label();
-      $form['update_wrapper']['author/editor']['#value'] = $selected_node->get('field_book_author_or_editor')->value;
-      $form['update_wrapper']['publisher']['#value'] = $selected_node->get('field_book_publisher')->value;
-      $form['update_wrapper']['year']['#value'] = $selected_node->get('field_book_year')->value;
-      $form['update_wrapper']['edition']['#value'] = $selected_node->get('field_book_edition')->value;
-      $form['update_wrapper']['description']['value']['#value'] = $selected_node->get('field_book_description')->value;
-    }
+//    if ($selected_node){
+//      $book_type = Term::load($selected_node->get('field_book_type')->target_id)?->label();
+//      $isEbookTypeSelected = ($book_type === $ebook);
+//      $isPrintTypeSelected = ($book_type === $print);
+//
+//      if ($type_check){
+//        if ($type_check === $ebook) {
+//          $form['update_wrapper']['pub_finder_group']['label']['#value'] = $selected_node->get('field_book_pub_finder')->title;
+//          $form['update_wrapper']['pub_finder_group']['url']['#value'] = $selected_node->get('field_book_pub_finder')->uri;
+//        } else {
+//          $form['update_wrapper']['call_number']['#value'] = $selected_node->get('field_book_call_number')->value;
+//          $form['update_wrapper']['location']['#value'] = $selected_node->get('field_book_location')->value;
+//          $form['update_wrapper']['cat_record_group']['label']['#value'] = $selected_node->get('field_book_cat_record')->title;
+//          $form['update_wrapper']['cat_record_group']['url']['#value'] = $selected_node->get('field_book_cat_record')->uri;
+//        }
+//      }
+//      $form['update_wrapper']['title']['#value'] = $selected_node->label();
+//      $form['update_wrapper']['author/editor']['#value'] = $selected_node->get('field_book_author_or_editor')->value;
+//      $form['update_wrapper']['publisher']['#value'] = $selected_node->get('field_book_publisher')->value;
+//      $form['update_wrapper']['year']['#value'] = $selected_node->get('field_book_year')->value;
+//      $form['update_wrapper']['edition']['#value'] = $selected_node->get('field_book_edition')->value;
+//      $form['update_wrapper']['description']['value']['#value'] = $selected_node->get('field_book_description')->value;
+//    }
 
 
     return $form['update_wrapper'];
@@ -405,11 +405,15 @@ class ReuseBookForm extends FormBase {
   public function validateFields(array &$form, FormStateInterface $form_state) {
     $reference = $form_state->getValue('reference');
     $title = $form_state->getValue('title');
+    $type_check = $form_state->getValue('type');
+    $url1 = $form_state->getValue('url1');
+    $url2 = $form_state->getValue('url2');
 
+    $print = 'print';
     if (!$reference && empty($title)) {
       $form_state->setErrorByName('title', $this->t('Title: field is required.'));
     }
-    if($form_state->getValue('type') != '912'){
+    if($type_check === '911'){
       if(empty($form_state->getValue('call_number'))){
         $form_state->setErrorByName('call_number', t('Call Number is required.'));
       }
@@ -464,16 +468,34 @@ class ReuseBookForm extends FormBase {
     $current_box_id = $form_state->getValue('current_box');
     $current_box = Node::load($current_box_id);
 
-
+    $type = $form_state->getValue('type');
     $book = Node::load($form_state->getValue('box'));
     $item = $book->get('field_parent_item')->entity;
+
+    $term_ids = [];
+
+    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
+      'name' => ['eBook', 'print'],
+      'vid' => 'LGMS_Guide_Book_Type',
+    ]);
+
+    if (!empty($terms)) {
+      foreach ($terms as $term) {
+        $term_ids[$term->label()] = $term->id();
+      }
+    }
 
     if(!$form_state->getValue('reference')){
 
       $new_book = $book->createDuplicate();
       $new_item = $item->createDuplicate();
 
+      \Drupal::logger('lgmsmodule 1')->notice('Node ID: @id, Type: @type', ['@id' => $form_state->getValue('url1'), '@type' => gettype($form_state->getValue('url1'))]);
+      \Drupal::logger('lgmsmodule 2')->notice('Node ID: @id, Type: @type', ['@id' => $form_state->getValue('url2'), '@type' => gettype($form_state->getValue('url2'))]);
+
+
       $new_book->set('field_parent_item', $new_item);
+      $new_book->set('title', $form_state->getValue('title'));
       $new_book->set('field_book_author_or_editor', $form_state->getValue('author/editor'));
       $new_book->set('field_book_publisher', $form_state->getValue('publisher'));
       $new_book->set('field_book_year', $form_state->getValue('publisher'));
@@ -482,18 +504,21 @@ class ReuseBookForm extends FormBase {
         'value' => $form_state->getValue('description')['value'],
         'format' => $form_state->getValue('description')['format']
       ]);
-      $new_book->set('field_book_cat_record', [
-        'title' => $form_state->getValue('cat_record_group')['label'],
-        'uri' => $form_state->getValue('cat_record_group')['url']
-      ]);
-      $new_book->set('field_book_pub_finder', [
-        'title' => $form_state->getValue('pub_finder_group')['label'],
-        'uri' => $form_state->getValue('pub_finder_group')['url']
-      ]);
       $new_book->set('field_book_type', $form_state->getValue('type'));
-      $new_book->set('field_book_location', $form_state->getValue('location'));
-      $new_book->set('field_book_call_number', $form_state->getValue('call_number'));
-      $new_book->set('status', $form_state->getValue('published') == '0');
+      if ($type == '911'){
+        $new_book->set('field_book_cat_record', [
+          'title' => $form_state->getValue('label1'),
+          'uri' => $form_state->getValue('url1')
+        ]);
+        $new_book->set('field_book_location', $form_state->getValue('location'));
+        $new_book->set('field_book_call_number', $form_state->getValue('call_number'));
+      }else{
+        $new_book->set('field_book_pub_finder', [
+          'title' => $form_state->getValue('label2'),
+          'uri' => $form_state->getValue('url2')
+        ]);
+      }
+
 
       $new_picture_fid = $form_state->getValue(['cover_picture', 0]);
       $old_picture_fid = $book->get('field_book_cover_picture')->target_id;
@@ -515,7 +540,7 @@ class ReuseBookForm extends FormBase {
           $this->handleUserPicture($book, $form_state);
         }
       }
-      $new_book->set('title', $form_state->getValue('title'));
+      $new_book->set('status', $form_state->getValue('published') == '0');
       $new_book->save();
 
       $new_item->set('field_parent_box', $current_box);
