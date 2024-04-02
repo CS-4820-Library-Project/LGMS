@@ -108,6 +108,8 @@ class FormHelper {
       $field_name = 'field_book_item';
     } elseif ($new_content->bundle() == 'guide_database_item'){
       $field_name = 'field_database_item';
+    } elseif ($new_content->getEntityTypeId() == 'media'){
+      $field_name = 'field_media_image';
     }
 
     // Create the item
@@ -129,8 +131,10 @@ class FormHelper {
     $current_box->set('field_box_items', $boxList);
     $current_box->save();
 
-    $new_content->set('field_parent_item',$new_item);
-    $new_content->save();
+    if ($field_name != 'field_media_image'){
+      $new_content->set('field_parent_item',$new_item);
+      $new_content->save();
+    }
 
     return $new_item;
   }

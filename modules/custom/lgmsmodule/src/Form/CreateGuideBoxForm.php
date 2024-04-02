@@ -17,17 +17,9 @@ class CreateGuideBoxForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
-
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_node,
-    ];
+    // Set the prefix, suffix, and hidden fields
+    $form_helper = new FormHelper();
+    $form_helper->set_form_data($form,$ids, $this->getFormId());
 
     $form['title'] = [
       '#type' => 'textfield',
@@ -45,11 +37,10 @@ class CreateGuideBoxForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' =>[
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;
@@ -64,41 +55,26 @@ class CreateGuideBoxForm extends FormBase {
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.', '#'.$this->getFormId());
   }
 
-
-  public static function hideTextFormatHelpText(array $element, FormStateInterface $form_state) {
-    if (isset($element['format']['help'])) {
-      $element['format']['help']['#access'] = FALSE;
-    }
-    if (isset($element['format']['guidelines'])) {
-      $element['format']['guidelines']['#access'] = FALSE;
-    }
-    if (isset($element['format']['#attributes']['class'])) {
-      unset($element['format']['#attributes']['class']);
-    }
-    return $element;
-  }
-
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $curr_node = $form_state->getValue('current_node');
-    $curr_node = Node::load($curr_node);
-    $nid = $curr_node->id();
+    // Get the current page
+    $curr_page = $form_state->getValue('current_node');
+    $curr_page = Node::load($curr_page);
 
-
-    $new_node = Node::create([
+    // Create the new Box
+    $new_box = Node::create([
       'type' => 'guide_box',
       'title' => $form_state->getValue('title'),
-      'field_parent_node' => ['target_id' => $nid],
+      'field_parent_node' => $curr_page,
       'status' => $form_state->getValue('published') == '0',
     ]);
+    $new_box->save();
 
-    $new_node->save();
+    // Add the box to the page's child boxes
+    $box_list = $curr_page->get('field_child_boxes')->getValue();
+    $box_list[] = ['target_id' => $new_box->id()];
 
-    $page = Node::load($nid);
-    $boxList = $page->get('field_child_boxes')->getValue();
-    $boxList[] = ['target_id' => $new_node->id()];
-
-    $page->set('field_child_boxes', $boxList);
-    $page->save();
+    $curr_page->set('field_child_boxes', $box_list);
+    $curr_page->save();
 
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);
