@@ -95,11 +95,17 @@ class EditGuideBoxForm extends FormBase {
     $current_box = $form_state->getValue('current_box');
     $current_box = Node::load($current_box);
 
-    $current_box->setTitle(rtrim($form_state->getValue('title')));
-    $form_state->getValue('published') == '0'? $current_box->setPublished(): $current_box->setUnpublished();
-    $current_box->save();
+    if ($current_box) {
+      $current_box->setTitle(rtrim($form_state->getValue('title')));
 
-    $ajaxHelper = new FormHelper();
-    $ajaxHelper->updateParent($form, $form_state);
+      // Check the value of the 'published' checkbox to determine the published state.
+      $form_state->getValue('published')? $current_box->setUnpublished() : $current_box->setPublished();
+
+      $current_box->save();
+
+      // Update last change date for parents.
+      $ajaxHelper = new FormHelper();
+      $ajaxHelper->updateParent($form, $form_state);
+    }
   }
 }

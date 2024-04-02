@@ -19,7 +19,7 @@ class AddHTMLForm extends FormBase {
     $form_helper->set_form_data($form,$ids, $this->getFormId());
 
     // In the case of editing an HTML, get the item
-    $current_item = Node::load($ids->current_item);
+    $current_item = property_exists($ids, 'current_item')? Node::load($ids->current_item): null;
     $current_html = $current_item?->get('field_html_item')->entity;
     $edit = $current_item != null;
 
@@ -91,10 +91,7 @@ class AddHTMLForm extends FormBase {
       $new_html->save();
 
       // Create a link to it and add it to the box
-      $new_item = $ajaxHelper->create_link($new_html, $form_state->getValue('current_box'));
-
-      $new_html->set('field_parent_item',$new_item);
-      $new_html->save();
+      $ajaxHelper->create_link($new_html, $form_state->getValue('current_box'));
     } else {
       // Load link and it's content
       $current_item = $form_state->getValue('current_item');
@@ -110,10 +107,7 @@ class AddHTMLForm extends FormBase {
       $html->save();
 
       // Update link
-      $current_item->set('title', $form_state->getValue('title'));
-      $current_item->set('status', $form_state->getValue('published') == '0');
-      $current_item->set('changed', \Drupal::time()->getRequestTime());
-      $current_item->save();
+      $ajaxHelper->update_link($form, $form_state, $current_item);
     }
 
     // Update last change date for parents.

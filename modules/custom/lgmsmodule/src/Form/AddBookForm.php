@@ -23,13 +23,8 @@ class AddBookForm extends FormBase {
     $form_helper = new FormHelper();
     $form_helper->set_form_data($form,$ids, $this->getFormId());
 
-    // In the case of editing an HTML, get the item
-    if (property_exists($ids, 'current_item')){
-      $current_item = Node::load($ids->current_item);
-    }
-    else {
-      $current_item = null;
-    }
+    // In the case of editing a Book, get the item
+    $current_item = property_exists($ids, 'current_item')? Node::load($ids->current_item): null;
     $current_book = $current_item?->get('field_book_item')->entity;
     $edit = $current_item != null;
 
@@ -242,11 +237,10 @@ class AddBookForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;
@@ -276,7 +270,6 @@ class AddBookForm extends FormBase {
       if(empty($form_state->getValue(['cat_record_group', 'label']))){
         $form_state->setErrorByName('cat_record_group][label', t('Cat Record\'s label is required.'));
       }
-
     }
     else {
       if(empty($form_state->getValue(['pub_finder_group', 'url']))){
@@ -292,6 +285,8 @@ class AddBookForm extends FormBase {
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $ajaxHelper = new FormHelper();
+
     $form_field_values = [
       'title' => $form_state->getValue('title'),
       'field_book_author_or_editor' => $form_state->getValue('author/editor'),
@@ -316,41 +311,23 @@ class AddBookForm extends FormBase {
       'status' => $form_state->getValue('published') == '0',
     ];
 
+    // Create a new book
     if($form_state->getValue('current_item') == null){
-      $current_box = $form_state->getValue('current_box');
-      $current_box = Node::load($current_box);
-
       $new_book = Node::create(['type' => 'guide_book_item', ...$form_field_values]);
-
       $new_book->save();
 
       $this->handleUserPicture($new_book, $form_state);
 
-      $new_book->save();
-
-      $new_item = Node::create([
-        'type' => 'guide_item',
-        'title' => $form_state->getValue('title'),
-        'field_book_item' => $new_book,
-        'field_parent_box' => $current_box,
-        'status' => $form_state->getValue('published') == '0',
-      ]);
-
-      $new_item->save();
-      $new_book->set('field_parent_item', $new_item);
-      $new_book->save();
-      $boxList = $current_box->get('field_box_items')->getValue();
-      $boxList[] = ['target_id' => $new_item->id()];
-
-      $current_box->set('field_box_items', $boxList);
-      $current_box->save();
+      // Create a link to the book and attach it to the box
+      $ajaxHelper->create_link($new_book, $form_state->getValue('current_box'));
     }
-    else {
+    else { // Edit a book item
+      // Load link and it's content
       $current_item = $form_state->getValue('current_item');
       $current_item = Node::load($current_item);
-
       $book = $current_item->get('field_book_item')->entity;
 
+      // Update Book content
       foreach ($form_field_values as $key => $value) {
         if ($key == 'status'){
           continue;
@@ -358,13 +335,13 @@ class AddBookForm extends FormBase {
         $book->set($key, $value);
       }
 
+      // Update Picture
       $new_picture_fid = $form_state->getValue(['cover_picture', 0]);
       $old_picture_fid = $book->get('field_book_cover_picture')->target_id;
 
       if(!($new_picture_fid &&  $old_picture_fid == $new_picture_fid)){
-
         if ($old_picture_fid) {
-          $book->set('field_book_cover_picture', NULL);
+          $book->set('field_book_cover_picture', null);
           $file = File::load($old_picture_fid);
           if ($file) {
             $file_usage = \Drupal::service('file.usage');
@@ -373,7 +350,6 @@ class AddBookForm extends FormBase {
           }
         }
 
-
         if($new_picture_fid){
           $this->handleUserPicture($book, $form_state);
         }
@@ -381,13 +357,11 @@ class AddBookForm extends FormBase {
 
       $book->save();
 
-      $current_item->set('title', $form_state->getValue('title'));
-      $current_item->set('status', $form_state->getValue('published') == '0');
-      $current_item->set('changed', \Drupal::time()->getRequestTime());
-      $current_item->save();
+      // Update link
+      $ajaxHelper->update_link($form, $form_state, $current_item);
     }
 
-    $ajaxHelper = new FormHelper();
+    // Update last change date for parents.
     $ajaxHelper->updateParent($form, $form_state);
   }
 
@@ -402,6 +376,7 @@ class AddBookForm extends FormBase {
         // Ensure file usage is recorded to prevent the file from being deleted.
         \Drupal::service('file.usage')->add($file, 'lgmsmodule', 'node', $node->id());
         $node->set('field_book_cover_picture', $picture_fid);
+        $node->save();
       }
     }
   }

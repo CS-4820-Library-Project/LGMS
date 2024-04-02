@@ -129,7 +129,17 @@ class FormHelper {
     $current_box->set('field_box_items', $boxList);
     $current_box->save();
 
+    $new_content->set('field_parent_item',$new_item);
+    $new_content->save();
+
     return $new_item;
+  }
+
+  public function update_link(array &$form, FormStateInterface $form_state, EntityInterface $current_item){
+    $current_item->set('title', $form_state->getValue('title'));
+    $current_item->set('status', $form_state->getValue('published') == '0');
+    $current_item->set('changed', \Drupal::time()->getRequestTime());
+    $current_item->save();
   }
 
   public function get_filled_field($current_item): string
