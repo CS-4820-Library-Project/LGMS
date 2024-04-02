@@ -66,7 +66,7 @@ class ReuseBookForm extends FormBase {
 
     // Pre-fill form fields if a Database item is selected.
     $this->prefillSelectedBookItem($form, $form_state);
-    $this->bookItemSelectedAjaxCallback($form,$form_state);
+//    $this->bookItemSelectedAjaxCallback($form,$form_state);
 
     // $form['#validate'][] = '::validateFields';
 
@@ -230,13 +230,16 @@ class ReuseBookForm extends FormBase {
         $isEbookTypeSelected = ($book_type === $ebook);
         $isPrintTypeSelected = ($book_type === $print);
 
-        if (empty($type_check) && $isEbookTypeSelected){
-          $type_check = $ebook;
-        } else if (empty($type_check) && $isPrintTypeSelected){
-          $type_check = $print;
-        }
+//        if (empty($type_check) && $isEbookTypeSelected){
+//          $type_check = $ebook;
+//        } else if (empty($type_check) && $isPrintTypeSelected){
+//          $type_check = $print;
+//        }
 
-        if ($type_check === '912'){
+        \Drupal::logger('type')->notice('Node ID: @id, Type: @type', ['@id' => $type_check, '@type' => gettype($type_check)]);
+
+
+        if ($type_check === '912' || (gettype($type_check) === "NULL" && $isEbookTypeSelected)){
           $form['update_wrapper']['pub_finder_group'] = [
             '#type' => 'fieldset',
             '#title' => $this->t('Publication Finder'),
@@ -390,12 +393,27 @@ class ReuseBookForm extends FormBase {
 //          $form['update_wrapper']['cat_record_group']['url']['#value'] = $selected_node->get('field_book_cat_record')->uri;
 //        }
 //      }
-//      $form['update_wrapper']['title']['#value'] = $selected_node->label();
-//      $form['update_wrapper']['author/editor']['#value'] = $selected_node->get('field_book_author_or_editor')->value;
-//      $form['update_wrapper']['publisher']['#value'] = $selected_node->get('field_book_publisher')->value;
-//      $form['update_wrapper']['year']['#value'] = $selected_node->get('field_book_year')->value;
-//      $form['update_wrapper']['edition']['#value'] = $selected_node->get('field_book_edition')->value;
-//      $form['update_wrapper']['description']['value']['#value'] = $selected_node->get('field_book_description')->value;
+      if ($selected_node){
+
+        // changing the values for the user to see them in the form
+        $form['update_wrapper']['title']['#value'] = $selected_node->label();
+        $form['update_wrapper']['author/editor']['#value'] = $selected_node->get('field_book_author_or_editor')->value;
+        $form['update_wrapper']['publisher']['#value'] = $selected_node->get('field_book_publisher')->value;
+        $form['update_wrapper']['year']['#value'] = $selected_node->get('field_book_year')->value;
+        $form['update_wrapper']['edition']['#value'] = $selected_node->get('field_book_edition')->value;
+        $form['update_wrapper']['description']['value']['#value'] = $selected_node->get('field_book_description')->value;
+       //$form['update_wrapper']['type']['#value'] = $selected_node->get('field_book_type')->target_id;
+
+        // changing the values for the user to see after submission
+        $form_state->setValue('title', $selected_node->label());
+        $form_state->setValue('author/editor', $selected_node->get('field_book_author_or_editor')->value);
+        $form_state->setValue('publisher', $selected_node->get('field_book_publisher')->value);
+        $form_state->setValue('year', $selected_node->get('field_book_year')->value);
+        $form_state->setValue('edition', $selected_node->get('field_book_edition')->value);
+        $form_state->setValue('description', ['value' => $selected_node->get('field_book_description')->value, 'format' => $selected_node->get('field_book_description')->format]);
+        //$form_state->setValue('type', $selected_node->get('field_book_type')->target_id);
+      }
+
 //    }
 
 
