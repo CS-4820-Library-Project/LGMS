@@ -29,7 +29,7 @@ class ReuseGuidePageForm extends FormBase {
     $form['select_page'] = [
       '#type' => 'select',
       '#title' => $this->t('Select Page'),
-      '#options' => $this->getGuidePageOptions($ids->current_guide_id),
+      '#options' => $this->getGuidePageOptions($ids->current_guide),
       '#empty_option' => $this->t('- Select a Page -'),
       '#required' => TRUE,
       '#ajax' => [
@@ -82,7 +82,7 @@ class ReuseGuidePageForm extends FormBase {
     $form['include_sub_wrapper']['position_wrapper']['position'] = [
       '#type' => 'select',
       '#title' => $this->t('Position'),
-      '#options' => $this->getPageList($ids->current_guide_id),
+      '#options' => $this->getPageList($ids->current_guide),
       '#required' => !$include_sub,
       '#default_value' => $include_sub? $form_state->getValue('current_guide'): null,
       '#disabled' => $include_sub
@@ -90,7 +90,7 @@ class ReuseGuidePageForm extends FormBase {
 
     $form['current_guide'] = [
       '#type' => 'hidden',
-      '#value' =>  $ids->current_guide_id,
+      '#value' =>  $ids->current_guide,
     ];
 
     $form['current_node'] = [

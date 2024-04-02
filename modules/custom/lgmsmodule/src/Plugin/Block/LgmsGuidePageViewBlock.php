@@ -110,7 +110,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $json_data = json_encode($array_of_objects);
       $query_param = urlencode($json_data);
 
-      $ids = ['current_guide_id' => $current_guide_id];
+      $ids = ['current_guide' => $current_guide_id];
       $json_data = json_encode($ids);
       $ids = urlencode($json_data);
 

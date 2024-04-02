@@ -87,6 +87,11 @@ class FormHelper {
       '#type' => 'hidden',
       '#value' => property_exists($ids, 'current_item') ? $ids->current_item : null,
     ];
+
+    $form['current_guide'] = [
+      '#type' => 'hidden',
+      '#value' => property_exists($ids, 'current_guide') ? $ids->current_guide : null,
+    ];
   }
 
   public function set_prefix(array &$form, string $id){
@@ -213,5 +218,53 @@ class FormHelper {
         $box?->delete();
       }
     }
+  }
+
+  public function update_child_pages(EntityInterface $parent, EntityInterface $page)
+  {
+    $page_list = $parent->get('field_child_pages')->getValue();
+    $page_list[] = ['target_id' => $page->id()];
+
+    $parent->set('field_child_pages', $page_list);
+    $parent->set('changed', \Drupal::time()->getRequestTime());
+    $parent->save();
+
+  }
+
+  public function get_position_options(String $guide_id): array
+  {
+    $options = [];
+
+    if (!$guide_id){
+      return $options;
+    }
+
+    $options['Page Level'][$guide_id] = t('Page Level');
+
+    // Load the guide entity.
+    $guide = Node::load($guide_id);
+
+    // Check if the guide has been loaded and has the field_child_pages field.
+    if ($guide && $guide->hasField('field_child_pages')) {
+      // Get the array of child page IDs from the guide.
+      $child_pages = $guide->get('field_child_pages')->referencedEntities();
+
+      if (!empty($child_pages)) {
+        // Group label for child pages.
+        $group_label = 'Sub-page Level';
+
+        // Initialize the group if it's not set.
+        if (!isset($options[$group_label])) {
+          $options[$group_label] = [];
+        }
+
+        // Create options array from the child pages.
+        foreach ($child_pages as $child_page) {
+          $options[$group_label][$child_page->id()] = $child_page->label(); // Use the title or label of the page.
+        }
+      }
+    }
+
+    return $options;
   }
 }
