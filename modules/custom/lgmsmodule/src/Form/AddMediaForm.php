@@ -16,45 +16,31 @@ class AddMediaForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
+    $form_helper = new FormHelper();
+    $form_helper->set_prefix($form,  $this->getFormId());
 
     $current_box = \Drupal::request()->query->get('current_box');
+    $current_node = \Drupal::request()->query->get('current_node');
+    $current_item = \Drupal::request()->query->get('current_item');
+
     $form['current_box'] = [
       '#type' => 'hidden',
       '#value' => $current_box,
     ];
 
-    $current_node = \Drupal::request()->query->get('current_node');
     $form['current_node'] = [
       '#type' => 'hidden',
       '#value' => $current_node,
     ];
 
-    $current_item = \Drupal::request()->query->get('current_item');
-    $media = '';
-    $edit = false;
-
-    if(!empty($current_item)){
-      $form['current_item'] = [
-        '#type' => 'hidden',
-        '#value' => $current_item,
-      ];
-
-      $edit = true;
-      $current_item = Node::load($current_item);
-      $media = $current_item->get('field_media_image')->entity;
-    }
-
-
-    $form['edit'] = [
+    $form['current_item'] = [
       '#type' => 'hidden',
-      '#value' => $edit,
+      '#value' => $current_item,
     ];
+
+    $current_item = Node::load($current_item);
+    $media = $current_item?->get('field_media_image')->entity;
+    $edit = $current_item != null;
 
     $add_media_link = Link::fromTextAndUrl(
       $this->t('Create new Media'),
@@ -78,7 +64,7 @@ class AddMediaForm extends FormBase {
     $form['include_title'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Use Media Default name'),
-      '#default_value' => $edit? $current_item->label() == 'Media Item': true,
+      '#default_value' => !$edit || $current_item->label() == 'Media Item',
     ];
 
     $form['title'] = [
@@ -96,24 +82,15 @@ class AddMediaForm extends FormBase {
     ];
 
 
-    $form['published'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Draft mode:'),
-      '#description' => $this->t('Un-check this box to publish.'),
-      '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
-    ];
-
-
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;
@@ -129,45 +106,34 @@ class AddMediaForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $edit = $form_state->getValue('edit');
+    $ajaxHelper = new FormHelper();
 
-    if($edit == '0'){
-      $current_box = $form_state->getValue('current_box');
-      $current_box = Node::load($current_box);
-
+    if($form_state->getValue('current_item') == null){
+      // Get the media
       $media = $form_state->getValue('media');
       $media = Media::load($media);
 
-      $new_item = Node::create([
-        'type' => 'guide_item',
-        'title' => $form_state->getValue('include_title') != '0'? 'Media Item' : $form_state->getValue('title'),
-        'field_media_image' => $media,
-        'field_parent_box' => $current_box,
-        'status' => $form_state->getValue('published') == '0',
-      ]);
+      // Create a link to it and add it to the box
+      $item = $ajaxHelper->create_link($media, $form_state->getValue('current_box'));
+      $item->set('title', $form_state->getValue('include_title') != '0'? 'Media Item' : $form_state->getValue('title'));
 
-      $new_item->save();
-
-      $boxList = $current_box->get('field_box_items')->getValue();
-      $boxList[] = ['target_id' => $new_item->id()];
-
-      $current_box->set('field_box_items', $boxList);
-      $current_box->save();
     } else {
+      // Load the Link
       $current_item = $form_state->getValue('current_item');
       $current_item = Node::load($current_item);
 
+      // Load the new Item
       $media = $form_state->getValue('media');
       $media = Media::load($media);
 
+      // Update fields
+      $ajaxHelper->update_link($form, $form_state, $current_item);
       $current_item->set('title', $form_state->getValue('include_title') != '0'? 'Media Item' : $form_state->getValue('title'));
       $current_item->set('field_media_image', $media);
-      $current_item->set('status', $form_state->getValue('published') == '0');
-      $current_item->set('changed', \Drupal::time()->getRequestTime());
       $current_item->save();
     }
 
-    $ajaxHelper = new FormHelper();
+    // Update Parents
     $ajaxHelper->updateParent($form, $form_state);
   }
 

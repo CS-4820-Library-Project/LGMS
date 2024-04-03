@@ -18,80 +18,52 @@ class DeleteContentItemsForm extends FormBase {
 
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_helper = new FormHelper();
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
+
+    $ids = [
+      'current_node' => \Drupal::request()->query->get('current_node'),
+      'current_box' => \Drupal::request()->query->get('current_box'),
+      'current_item' => \Drupal::request()->query->get('current_item'),
     ];
+    // Set the prefix, suffix, and hidden fields
+    $form_helper->set_form_fields_from_array($form, $ids, $this->getFormId());
 
-
-    $current_node = \Drupal::request()->query->get('current_node');
-    $current_box = \Drupal::request()->query->get('current_box');
-    $current_item = \Drupal::request()->query->get('current_item');
-
-    if (empty($current_box) || empty($current_node) || empty($current_item)){
-      throw new AccessDeniedHttpException();
-    }
-
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $current_box,
-    ];
-
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $current_node,
-    ];
-
-    $form['current_item'] = [
-      '#type' => 'hidden',
-      '#value' => $current_item,
-    ];
-
-    $current_item = Node::load($current_item);
+    $current_item = Node::load($ids['current_item']);
     $field_to_delete = '';
-    $possible_fields = $form_helper->get_fields();
     $mediaTitle = '';
 
-    foreach ($possible_fields as $field_name) {
+    // Get the filled field (this is the one to delete)
+    foreach ($form_helper->get_fields() as $field_name) {
       if (!$current_item->get($field_name)->isEmpty()) {
         $field_to_delete = $field_name;
         break;
       }
     }
 
-    if ($current_item->hasField($field_to_delete) && !$current_item->get($field_to_delete)->isEmpty()) {
-
+    if ($field_to_delete) {
       $mediaItem = $current_item->get($field_to_delete)->entity;
+      $fileEntity = null;
 
-      if ($mediaItem && $mediaItem->hasField('field_media_audio_file') && !$mediaItem->get('field_media_audio_file')->isEmpty()) {
-        $fileEntity = $mediaItem->get('field_media_audio_file')->entity;
+      if ($mediaItem){
+        if ($mediaItem->hasField('field_media_audio_file') && !$mediaItem->get('field_media_audio_file')->isEmpty()) {
+          $fileEntity = $mediaItem->get('field_media_audio_file')->entity;
 
-        if ($fileEntity) {
-          $mediaTitle = $fileEntity->getFilename();
+        } elseif ($mediaItem->hasField('field_media_document') && !$mediaItem->get('field_media_document')->isEmpty()){
+          $fileEntity = $mediaItem->get('field_media_document')->entity;
+
+        } elseif ($mediaItem->hasField('field_media_image') && !$mediaItem->get('field_media_image')->isEmpty()){
+          $fileEntity = $mediaItem->get('field_media_image')->entity;
+
+        } elseif ($mediaItem->hasField('field_media_oembed_video') && !$mediaItem->get('field_media_oembed_video')->isEmpty()){
+          $mediaTitle = $mediaItem->get('field_media_oembed_video')->value;
+
+        } elseif ($mediaItem->hasField('field_media_video_file') && !$mediaItem->get('field_media_video_file')->isEmpty()){
+          $fileEntity = $mediaItem->get('field_media_video_file')->entity;
+
         }
-      } elseif ($mediaItem && $mediaItem->hasField('field_media_document') && !$mediaItem->get('field_media_document')->isEmpty()){
-        $fileEntity = $mediaItem->get('field_media_document')->entity;
+      }
 
-        if ($fileEntity) {
-          $mediaTitle = $fileEntity->getFilename();
-        }
-      } elseif ($mediaItem && $mediaItem->hasField('field_media_image') && !$mediaItem->get('field_media_image')->isEmpty()){
-        $fileEntity = $mediaItem->get('field_media_image')->entity;
-
-        if ($fileEntity) {
-          $mediaTitle = $fileEntity->getFilename();
-        }
-      } elseif ($mediaItem && $mediaItem->hasField('field_media_oembed_video') && !$mediaItem->get('field_media_oembed_video')->isEmpty()){
-        $mediaTitle = $mediaItem->get('field_media_oembed_video')->value;
-
-      } elseif ($mediaItem && $mediaItem->hasField('field_media_video_file') && !$mediaItem->get('field_media_video_file')->isEmpty()){
-        $fileEntity = $mediaItem->get('field_media_video_file')->entity;
-
-        if ($fileEntity) {
-          $mediaTitle = $fileEntity->getFilename();
-        }
+      if ($fileEntity) {
+        $mediaTitle = $fileEntity->getFilename();
       }
     }
 
@@ -117,7 +89,7 @@ class DeleteContentItemsForm extends FormBase {
       '#required' => True
     ];
 
-    $form['#validate'][] = '::validateCheckbox';
+    //$form['#validate'][] = '::validateCheckbox';
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
