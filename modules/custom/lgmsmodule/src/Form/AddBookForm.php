@@ -24,7 +24,7 @@ class AddBookForm extends FormBase {
     $form_helper->set_form_data($form,$ids, $this->getFormId());
 
     // In the case of editing an HTML, get the item
-    $current_item = property_exists($ids, 'current_item') ? $ids->current_item : null;
+    $current_item = property_exists($ids, 'current_item') ? Node::load($ids->current_item) : null;
     $current_book = $current_item?->get('field_book_item')->entity;
     $edit = $current_item != null;
 

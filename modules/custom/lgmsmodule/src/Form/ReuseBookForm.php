@@ -346,6 +346,10 @@ class ReuseBookForm extends FormBase {
     $selected = $form_state->getValue('book_select');
     $selected_node = Node::load($selected);
 
+    if (!$selected_node){
+      return $form['update_wrapper'];
+    }
+
     $type_check = $form_state->getValue('type');
 
     if (!$form_state->getValue('prev_node') || $form_state->getValue('prev_node') != $selected_node->id()){
@@ -415,30 +419,35 @@ class ReuseBookForm extends FormBase {
     $title = $form_state->getValue('title');
     $type_check = $form_state->getValue('type');
 
+    $selected_book = $form_state->getValue('book_select');
 
-    if (!$reference && empty($title)) {
-      $form_state->setErrorByName('title', $this->t('Title: field is required.'));
-    }
-    if($type_check == 'print'){
-      if(empty($form_state->getValue('call_number'))){
-        $form_state->setErrorByName('call_number', t('Call Number is required.'));
-      }
-      if(empty($form_state->getValue('location'))) {
-        $form_state->setErrorByName('location', t('Location is required.'));
-      }
-      if(empty($form_state->getValue('url1'))){
-        $form_state->setErrorByName('cat_record_group][url', t('Cat Record\'s url is required.'));
-      }
-      if(empty($form_state->getValue('label1'))){
-        $form_state->setErrorByName('cat_record_group][label', t('Cat Record\'s label is required.'));
-      }
-
+    if (empty($selected_book)){
+      $form_state->setErrorByName('book_select', $this->t('Please Select A book'));
     } else {
-      if(empty($form_state->getValue('url2'))){
-        $form_state->setErrorByName('pub_finder_group][url', t('Pub Finder\'s URL is required.'));
+      if (!$reference && empty($title)) {
+        $form_state->setErrorByName('title', $this->t('Title: field is required.'));
       }
-      if(empty($form_state->getValue('label2'))){
-        $form_state->setErrorByName('pub_finder_group][label', t('Pub Finder\'s Label is required.'));
+      if($type_check == 'print'){
+        if(empty($form_state->getValue('call_number'))){
+          $form_state->setErrorByName('call_number', t('Call Number is required.'));
+        }
+        if(empty($form_state->getValue('location'))) {
+          $form_state->setErrorByName('location', t('Location is required.'));
+        }
+        if(empty($form_state->getValue('url1'))){
+          $form_state->setErrorByName('cat_record_group][url', t('Cat Record\'s url is required.'));
+        }
+        if(empty($form_state->getValue('label1'))){
+          $form_state->setErrorByName('cat_record_group][label', t('Cat Record\'s label is required.'));
+        }
+
+      } else {
+        if(empty($form_state->getValue('url2'))){
+          $form_state->setErrorByName('pub_finder_group][url', t('Pub Finder\'s URL is required.'));
+        }
+        if(empty($form_state->getValue('label2'))){
+          $form_state->setErrorByName('pub_finder_group][label', t('Pub Finder\'s Label is required.'));
+        }
       }
     }
 
@@ -528,7 +537,7 @@ class ReuseBookForm extends FormBase {
       $item = $new_item;
     } else {
       $new_item = $item->createDuplicate();
-      $new_item->set('field_book_item', TRUE);
+      $new_item->set('field_book_item', $book);
       $new_item->save();
       $item = $new_item;
     }
