@@ -148,20 +148,6 @@ class ReuseBookForm extends FormBase {
           '#required' => !$reference,
         ];
 
-//        if (!$reference){
-//          $form['update_wrapper']['cover_picture'] = [
-//            '#type' => 'managed_file',
-//            '#title' => $this->t('Cover Picture'),
-//            '#upload_location' => 'public://cover_picture/',
-//            '#upload_validators' => [
-//              'file_validate_extensions' => ['png jpg jpeg'],
-//            ],
-//            '#default_value' => $selected_node->field_book_cover_picture->target_id ? [$selected_node->field_book_cover_picture->target_id] : NULL,
-//            '#description' => $this->t('Allowed extensions: png jpg jpeg'),
-//            '#required' => !$reference,
-//          ];
-//        }
-
         $form['update_wrapper']['description'] = [
           '#type' => 'text_format',
           '#title' => $this->t('Description'),
@@ -505,26 +491,6 @@ class ReuseBookForm extends FormBase {
       }
 
 
-      $new_picture_fid = $form_state->getValue(['cover_picture', 0]);
-      $old_picture_fid = $book->get('field_book_cover_picture')->target_id;
-
-      if(!($new_picture_fid &&  $old_picture_fid == $new_picture_fid)){
-
-        if ($old_picture_fid) {
-          $book->set('field_book_cover_picture', NULL);
-          $file = File::load($old_picture_fid);
-          if ($file) {
-            $file_usage = \Drupal::service('file.usage');
-            $file_usage->delete($file, 'lgmsmodule');
-            $file->delete();
-          }
-        }
-
-
-        if($new_picture_fid){
-          $this->handleUserPicture($book, $form_state);
-        }
-      }
       $new_book->set('status', $form_state->getValue('published') == '0');
       $new_book->save();
 
@@ -567,21 +533,6 @@ class ReuseBookForm extends FormBase {
     }
 
     return $options;
-  }
-
-  protected function handleUserPicture(EntityInterface $node, FormStateInterface $form_state): void {
-    $picture_fid = $form_state->getValue(['cover_picture', 0]);
-
-    if (!empty($picture_fid)) {
-      $file = File::load($picture_fid);
-      if ($file) {
-        $file->setPermanent();
-        $file->save();
-        // Ensure file usage is recorded to prevent the file from being deleted.
-        \Drupal::service('file.usage')->add($file, 'lgmsmodule', 'node', $node->id());
-        $node->set('field_book_cover_picture', $picture_fid);
-      }
-    }
   }
 }
 

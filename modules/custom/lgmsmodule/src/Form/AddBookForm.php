@@ -344,12 +344,6 @@ class AddBookForm extends FormBase {
 
         if ($old_picture_fid) {
           $book->set('field_book_cover_picture', NULL);
-          $file = File::load($old_picture_fid);
-          if ($file) {
-            $file_usage = \Drupal::service('file.usage');
-            $file_usage->delete($file, 'lgmsmodule');
-            $file->delete();
-          }
         }
 
 
