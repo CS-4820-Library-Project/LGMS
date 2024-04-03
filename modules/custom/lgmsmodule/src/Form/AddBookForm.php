@@ -24,7 +24,7 @@ class AddBookForm extends FormBase {
     $form_helper->set_form_data($form,$ids, $this->getFormId());
 
     // In the case of editing a Book, get the item
-    $current_item = property_exists($ids, 'current_item')? Node::load($ids->current_item): null;
+    $current_item = property_exists($ids, 'current_item')? Node::load($ids->current_item) : null;
     $current_book = $current_item?->get('field_book_item')->entity;
     $edit = $current_item != null;
 
@@ -83,36 +83,18 @@ class AddBookForm extends FormBase {
       '#format' => $edit ? $current_book->get('field_book_description')->format : 'basic_html',
     ];
 
-    $term_ids = [];
-
-    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
-      'name' => ['eBook', 'print'],
-      'vid' => 'LGMS_Guide_Book_Type',
-    ]);
-
-    if (!empty($terms)) {
-      foreach ($terms as $term) {
-        $term_ids[$term->label()] = $term->id();
-      }
-    }
-
-    $form['terms'] = [
-      '#type' => 'hidden',
-      '#value' => $term_ids,
-    ];
-
     $form['type'] = [
       '#type' => 'select',
       '#title' => $this
         ->t('Type'),
       '#options' => [
-        $term_ids['print'] => $this
+        'print' => $this
           ->t('print'),
-        $term_ids['eBook'] => $this
+        'eBook' => $this
           ->t('eBook'),
       ],
       '#required' => FALSE,
-      '#default_value' => $edit? $current_book->get('field_book_type')->target_id: $term_ids['print'],
+      '#default_value' => $edit? $current_book->get('field_book_type')->value: 'print',
     ];
 
     $form['call_number'] = [
@@ -121,13 +103,13 @@ class AddBookForm extends FormBase {
       '#default_value' => $edit? $current_book->get('field_book_call_number')->value: '',
       '#states' => [
         'visible' => [
-          ':input[name="type"]' => ['value' => $term_ids['print']],
+          ':input[name="type"]' => ['value' => 'print'],
         ],
         'required' => [
-          ':input[name="type"]' => ['value' => $term_ids['print']],
+          ':input[name="type"]' => ['value' => 'print'],
         ],
         'invisible' => [
-          ':input[name="type"]' => ['value' => $term_ids['eBook']],
+          ':input[name="type"]' => ['value' => 'eBook'],
         ],
       ],
     ];
@@ -138,13 +120,13 @@ class AddBookForm extends FormBase {
       '#default_value' => $edit? $current_book->get('field_book_location')->value: '',
       '#states' => [
         'visible' => [
-          ':input[name="type"]' => ['value' => $term_ids['print']],
+          ':input[name="type"]' => ['value' => 'print'],
         ],
         'required' => [
-          ':input[name="type"]' => ['value' => $term_ids['print']],
+          ':input[name="type"]' => ['value' => 'print'],
         ],
         'invisible' => [
-          ':input[name="type"]' => ['value' => $term_ids['eBook']],
+          ':input[name="type"]' => ['value' => 'eBook'],
         ],
       ],
     ];
@@ -156,10 +138,10 @@ class AddBookForm extends FormBase {
       '#collapsed' => FALSE,
       '#states' => [
         'visible' => [
-          ':input[name="type"]' => ['value' => $term_ids['print']],
+          ':input[name="type"]' => ['value' => 'print'],
         ],
         'invisible' => [
-          ':input[name="type"]' => ['value' => $term_ids['eBook']],
+          ':input[name="type"]' => ['value' => 'eBook'],
         ],
       ],
     ];
@@ -169,7 +151,7 @@ class AddBookForm extends FormBase {
       '#title' => $this->t('Link Text'),
       '#states' => [
         'required' => [
-          ':input[name="type"]' => ['value' => $term_ids['print']],
+          ':input[name="type"]' => ['value' => 'print'],
         ],
       ],
       '#default_value' => $edit? $current_book->get('field_book_cat_record')->title: '',
@@ -181,7 +163,7 @@ class AddBookForm extends FormBase {
       '#default_value' => $edit? $current_book->get('field_book_cat_record')->uri: '',
       '#states' => [
         'required' => [
-          ':input[name="type"]' => ['value' => $term_ids['print']],
+          ':input[name="type"]' => ['value' => 'print'],
         ],
       ]
     );
@@ -193,10 +175,10 @@ class AddBookForm extends FormBase {
       '#collapsed' => FALSE,
       '#states' => [
         'visible' => [
-          ':input[name="type"]' => ['value' => $term_ids['eBook']],
+          ':input[name="type"]' => ['value' => 'eBook'],
         ],
         'invisible' => [
-          ':input[name="type"]' => ['value' => $term_ids['print']],
+          ':input[name="type"]' => ['value' => 'print'],
         ],
       ],
     ];
@@ -206,7 +188,7 @@ class AddBookForm extends FormBase {
       '#title' => $this->t('Link Text'),
       '#states' => [
         'required' => [
-          ':input[name="type"]' => ['value' => $term_ids['eBook']],
+          ':input[name="type"]' => ['value' => 'eBook'],
         ],
       ],
       '#default_value' => $edit? $current_book->get('field_book_pub_finder')->title: '',
@@ -218,7 +200,7 @@ class AddBookForm extends FormBase {
       '#default_value' => $edit? $current_book->get('field_book_pub_finder')->uri: '',
       '#states' => [
         'required' => [
-          ':input[name="type"]' => ['value' => $term_ids['eBook']],
+          ':input[name="type"]' => ['value' => 'eBook'],
         ],
       ]
     );
@@ -252,12 +234,11 @@ class AddBookForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state) {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'an Book item has been added.', '#'.$this->getFormId());
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'A Book item has been created.', '#'.$this->getFormId());
   }
 
   public function validateFields(array &$form, FormStateInterface $form_state) {
-    $terms = $form_state->getValue('terms');
-    if($form_state->getValue('type') == $terms['print']){
+    if($form_state->getValue('type') == 'print'){
       if(empty($form_state->getValue('call_number'))){
         $form_state->setErrorByName('call_number', t('Call Number is required.'));
       }
@@ -341,13 +322,7 @@ class AddBookForm extends FormBase {
 
       if(!($new_picture_fid &&  $old_picture_fid == $new_picture_fid)){
         if ($old_picture_fid) {
-          $book->set('field_book_cover_picture', null);
-          $file = File::load($old_picture_fid);
-          if ($file) {
-            $file_usage = \Drupal::service('file.usage');
-            $file_usage->delete($file, 'lgmsmodule');
-            $file->delete();
-          }
+          $book->set('field_book_cover_picture', NULL);
         }
 
         if($new_picture_fid){

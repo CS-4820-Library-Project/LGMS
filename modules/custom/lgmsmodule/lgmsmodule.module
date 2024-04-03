@@ -772,7 +772,7 @@ function book_display(EntityInterface $entity , bool $include_title = true){
     '#format' => $entity->get('field_book_description')->format,
   ];
 
-  if(Term::load($entity->get('field_book_type')->target_id)->getName() == 'print') {
+  if($entity->get('field_book_type')->value == 'print') {
     $build['book_container']['details'][] = [
       '#type' => 'html_tag',
       '#tag' => 'div',
@@ -2250,19 +2250,23 @@ function lgmsModule_install(): void
     'field_book_type',
     'node',
     'guide_book_item',
-    'Type',
-    'entity_reference',
-    ['target_type' => 'taxonomy_term',],
-    ['handler' => 'default:taxonomy_term',
-      'handler_settings' => [
-        'target_bundles' => [
-          'LGMS_Guide_Book_Type' => 'LGMS_Guide_Book_Type',
-        ],
+    'Book Type',
+    'list_string',
+    [
+      'allowed_values' => [
+        'print' => 'Print',
+        'eBook' => 'eBook',
+      ],
+    ],
+    [
+      'allowed_values' => [
+        'print' => 'Print',
+        'eBook' => 'eBook',
       ],
     ],
     'options_select',
     [],
-    False,
+    True,
     False,
     8,
     ''
