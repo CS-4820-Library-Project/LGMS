@@ -17,28 +17,17 @@ class AddMediaForm extends FormBase {
 
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_helper = new FormHelper();
-    $form_helper->set_prefix($form,  $this->getFormId());
 
-    $current_box = \Drupal::request()->query->get('current_box');
-    $current_node = \Drupal::request()->query->get('current_node');
-    $current_item = \Drupal::request()->query->get('current_item');
-
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $current_box,
+    $ids = [
+      'current_node' => \Drupal::request()->query->get('current_node'),
+      'current_box' => \Drupal::request()->query->get('current_box'),
+      'current_item' => \Drupal::request()->query->get('current_item'),
     ];
 
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $current_node,
-    ];
+    // Set the prefix, suffix, and hidden fields
+    $form_helper->set_form_fields_from_array($form, $ids, $this->getFormId());
 
-    $form['current_item'] = [
-      '#type' => 'hidden',
-      '#value' => $current_item,
-    ];
-
-    $current_item = Node::load($current_item);
+    $current_item = Node::load($ids['current_item']);
     $media = $current_item?->get('field_media_image')->entity;
     $edit = $current_item != null;
 
@@ -64,7 +53,7 @@ class AddMediaForm extends FormBase {
     $form['include_title'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Use Media Default name'),
-      '#default_value' => !$edit || $current_item->label() == 'Media Item',
+      '#default_value' => !$edit || $current_item->label() == $media->getName(),
     ];
 
     $form['title'] = [
@@ -78,7 +67,7 @@ class AddMediaForm extends FormBase {
           ':input[name="include_title"]' => ['checked' => False],
         ],
       ],
-      '#default_value' => $edit? $current_item->label() != 'Media Item'? $current_item->label(): '' : '',
+      '#default_value' => $edit? $current_item->label(): '',
     ];
 
 
@@ -115,7 +104,8 @@ class AddMediaForm extends FormBase {
 
       // Create a link to it and add it to the box
       $item = $ajaxHelper->create_link($media, $form_state->getValue('current_box'));
-      $item->set('title', $form_state->getValue('include_title') != '0'? 'Media Item' : $form_state->getValue('title'));
+      $item->set('title', $form_state->getValue('include_title') != '0'? $media->getName() : $form_state->getValue('title'));
+      $item->save();
 
     } else {
       // Load the Link
@@ -127,8 +117,7 @@ class AddMediaForm extends FormBase {
       $media = Media::load($media);
 
       // Update fields
-      $ajaxHelper->update_link($form, $form_state, $current_item);
-      $current_item->set('title', $form_state->getValue('include_title') != '0'? 'Media Item' : $form_state->getValue('title'));
+      $current_item->set('title', $form_state->getValue('include_title') != '0'? $media->getName() : $form_state->getValue('title'));
       $current_item->set('field_media_image', $media);
       $current_item->save();
     }
@@ -142,11 +131,13 @@ class AddMediaForm extends FormBase {
     $media_types = \Drupal::entityTypeManager()->getStorage('media_type')->loadMultiple();
     // Loop through all media types.
     foreach ($media_types as $media_type_id => $media_type) {
+      // Get all media of type $media_type
       $query = \Drupal::entityQuery('media')
         ->condition('bundle', $media_type_id)
         ->accessCheck(False)
-        ->sort('name', 'ASC');  // Sorting by name/title of media, adjust as needed.
+        ->sort('name', 'ASC');
       $media_ids = $query->execute();
+
       // Load all media entities of the type.
       $media_items = \Drupal::entityTypeManager()->getStorage('media')->loadMultiple($media_ids);
 
@@ -154,6 +145,8 @@ class AddMediaForm extends FormBase {
         // Create a group for each media type.
         $group_label = $media_type->label();
         $options[$group_label] = [];
+
+        // Add the media to the group
         foreach ($media_items as $media_id => $media_item) {
           $options[$group_label][$media_id] = $media_item->label();
         }
