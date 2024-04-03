@@ -70,6 +70,14 @@ class AddMediaForm extends FormBase {
       '#default_value' => $edit? $current_item->label(): '',
     ];
 
+    // Draft mode Field
+    $form['published'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Draft mode:'),
+      '#description' => $this->t('Un-check this box to publish.'),
+      '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
+    ];
+
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
@@ -105,6 +113,7 @@ class AddMediaForm extends FormBase {
       // Create a link to it and add it to the box
       $item = $ajaxHelper->create_link($media, $form_state->getValue('current_box'));
       $item->set('title', $form_state->getValue('include_title') != '0'? $media->getName() : $form_state->getValue('title'));
+      $item->set('status', $form_state->getValue('published') == '0');
       $item->save();
 
     } else {
@@ -118,6 +127,7 @@ class AddMediaForm extends FormBase {
 
       // Update fields
       $current_item->set('title', $form_state->getValue('include_title') != '0'? $media->getName() : $form_state->getValue('title'));
+      $current_item->set('status', $form_state->getValue('published') == '0');
       $current_item->set('field_media_image', $media);
       $current_item->save();
     }
