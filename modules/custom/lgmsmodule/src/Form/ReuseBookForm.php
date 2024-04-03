@@ -14,7 +14,6 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 
 class ReuseBookForm extends FormBase {
-
   public function getFormId() {
     return 'reuse_book_item_form';
   }
@@ -48,10 +47,10 @@ class ReuseBookForm extends FormBase {
       '#attributes' => ['id' => 'update-wrapper'],
     ];
 
-//    $form['update_wrapper']['type1'] = [
-//      '#type' => 'hidden',
-//      '#default_value' => NULL
-//    ];
+    $form['update_wrapper']['prev_node'] = [
+      '#type' => 'hidden',
+      '#default_value' => NULL
+    ];
 
     // Pre-fill form fields if a Database item is selected.
     $this->prefillSelectedBookItem($form, $form_state);
@@ -91,11 +90,11 @@ class ReuseBookForm extends FormBase {
         $form['update_wrapper']['reference'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('<Strong>Link:</Strong> By selecting this, a link to the Book item will be created. it will be un-editable from this box'),
-          '#ajax' => [
-            'callback' => '::bookItemSelectedAjaxCallback',
-            'wrapper' => 'update-wrapper',
-            'event' => 'change',
-          ],
+//          '#ajax' => [
+//            'callback' => '::bookItemSelectedAjaxCallback',
+//            'wrapper' => 'update-wrapper',
+//            'event' => 'change',
+//          ],
         ];
 
         $form['update_wrapper']['title'] = [
@@ -198,7 +197,11 @@ class ReuseBookForm extends FormBase {
           ],
         ];
 
-        $type_check = $form_state->getValue('type');//? $form_state->getValue('type') : $selected_node->get('field_book_type')->value;
+        $type_check = $form_state->getValue('type');
+
+        if (!$form_state->getValue('prev_node') || $form_state->getValue('prev_node') != $selected_node->id()){
+          $type_check = $selected_node->get('field_book_type')->value;
+        }
 
         $book_type = $selected_node->get('field_book_type')->value;
         $isEbookTypeSelected = ($book_type === $ebook);
@@ -344,6 +347,12 @@ class ReuseBookForm extends FormBase {
     $selected_node = Node::load($selected);
 
     $type_check = $form_state->getValue('type');
+
+    if (!$form_state->getValue('prev_node') || $form_state->getValue('prev_node') != $selected_node->id()){
+      $type_check = $selected_node->get('field_book_type')->value;
+      $form['update_wrapper']['type']['#value'] = $type_check;
+    }
+
     $ebook = 'eBook';
     $print = 'print';
 
@@ -358,11 +367,11 @@ class ReuseBookForm extends FormBase {
       $form['update_wrapper']['year']['#value'] = $selected_node->get('field_book_year')->value;
       $form['update_wrapper']['edition']['#value'] = $selected_node->get('field_book_edition')->value;
       $form['update_wrapper']['description']['value']['#value'] = $selected_node->get('field_book_description')->value;
-      // $form['update_wrapper']['type']['#value'] = $selected_node->get('field_book_type')->target_id;
+      //$form['update_wrapper']['type']['#value'] = $type_check;
       //$form['update_wrapper']['type1']['#value'] = $type_check;
 
       if ($type_check){
-        if ($type_check == $ebook || (gettype($type_check) === "NULL" && $isEbookTypeSelected)) {
+        if ($type_check == $ebook) {
           $form['update_wrapper']['pub_finder_group']['#required'] = TRUE;
           $form['update_wrapper']['pub_finder_group']['label2']['#required'] = TRUE;
           $form['update_wrapper']['pub_finder_group']['url2']['#required'] = TRUE;
@@ -394,6 +403,8 @@ class ReuseBookForm extends FormBase {
       $form_state->setValue('description', ['value' => $selected_node->get('field_book_description')->value, 'format' => $selected_node->get('field_book_description')->format]);
       //$form_state->setValue('type1', $selected_node->get('field_book_type')->target_id);
       //$form_state->setValue('type', $selected_node->get('field_book_type')->target_id);
+
+      $form['update_wrapper']['prev_node']['#value'] = $selected_node->id();
 
     }
     return $form['update_wrapper'];
