@@ -2,11 +2,14 @@
 
 Welcome to the LGMS Module installation guide. This document provides step-by-step instructions on how to install the LGMS module on your Drupal 10 site.
 
-## Prerequisites
+## Prerequisites for Option 2
 
-Before you begin, ensure you have the following installed:
+Before you begin with option 2, ensure you have the following installed:
 - **Drush**: Drupal's command-line interface tool. [See Drush documentation for installation instructions](https://www.drush.org/).
 - **Unzip tool**: Linux and macOS typically come with an unzip tool installed. Windows users can install a tool like [7-Zip](https://www.7-zip.org/download.html).
+
+Ready to proceed with Option 2? Jump to [Manual Installation and Activation](#option-2-manual-installation-and-activation).
+
 
 ## Option 1: Direct Installation via Drupal UI
 
@@ -17,10 +20,12 @@ Download the LGMS module ZIP file from the GitHub repository to your local machi
 Navigate to the Module Install page on your Drupal site by visiting /admin/modules/install.
 
 ### 3. Upload the Module
-Under **Upload a module or theme archive** Click on the "Choose File" link and select the downloaded lgmsmodule.zip file from your local machine.
-Click the "Continue" button to upload and install the module.
+- Go to `/admin/modules/install` in your Drupal site.
+- Click **Choose File** under **Upload a module or theme archive to install**.
+- Select the downloaded `lgmsmodule.zip` file.
+- Click **Install** to proceed.
 
-Drupal will automatically upload the ZIP file, extract it to the appropriate directory, and proceed with the installation process. Once the upload is complete, you might be redirected to the modules page where you can enable the LGMS module, or it might be automatically enabled for you.
+Drupal will handle the upload and installation. Afterward, you might need to enable the LGMS module from the `/admin/modules` page.
 
 ### 4. Verify Installation
 
