@@ -18,8 +18,7 @@ class CreateGuidePageForm extends FormBase
     return 'create_guide_page_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null)
-  {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null){
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
     $form_helper->set_form_data($form,$ids, $this->getFormId());
@@ -116,6 +115,7 @@ class CreateGuidePageForm extends FormBase
       ]);
       $new_page->save();
 
+      // Set the new node value for redirection
       $form_state->setValue('current_node', $new_page->id());
 
       //Update parents

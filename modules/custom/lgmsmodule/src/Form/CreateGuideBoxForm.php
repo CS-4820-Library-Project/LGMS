@@ -76,6 +76,7 @@ class CreateGuideBoxForm extends FormBase {
     $curr_page->set('field_child_boxes', $box_list);
     $curr_page->save();
 
+    // Update parents
     $ajaxHelper = new FormHelper();
     $ajaxHelper->updateParent($form, $form_state);
   }
