@@ -19,14 +19,17 @@ class DeleteGuideForm extends FormBase {
     $node_id = \Drupal::request()->query->get('node_id');
     \Drupal::logger('lgmsmodule')->notice('Node ID: @id, Type: @type', ['@id' => $node_id, '@type' => gettype($node_id)]);
 
-    $current_guide = NULL;
-    if ($node_id) {
-      $current_guide = Node::load($node_id);
-    }
+    if ($node_id && $current_guide = Node::load($node_id)) {
 
-    if ($current_guide) {
-      $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-      $form['#suffix'] = '</div>';
+      $form_helper = new FormHelper();
+
+      $form_helper->set_prefix($form, $this->getFormId());
+
+      // Hidden field to store the current guide ID
+      $form['current_node'] = [
+        '#type' => 'hidden',
+        '#value' => $current_guide->id(),
+      ];
 
       // Warning message
       $form['warning'] = [
@@ -34,12 +37,6 @@ class DeleteGuideForm extends FormBase {
         '#markup' => $this->t('<strong>Are you sure you want to delete this guide?</strong> Deleting this guide will remove it permanently from the system.'),
         '#prefix' => '<p>',
         '#suffix' => '</p>',
-      ];
-
-      // Hidden field to store the current guide ID
-      $form['current_node'] = [
-        '#type' => 'hidden',
-        '#value' => $current_guide->id(),
       ];
 
       // Actions wrapper

@@ -23,7 +23,9 @@ class DeleteGuideBoxForm extends FormBase {
 
     $form_helper = new FormHelper();
 
-    $form_helper->set_form_data($form,$ids, $this->getFormId());
+    $form_helper->set_prefix($form, $this->getFormId());
+
+    $form_helper->set_form_fields_from_array($form,$ids);
 
     $current_node = Node::load($current_node);
 
