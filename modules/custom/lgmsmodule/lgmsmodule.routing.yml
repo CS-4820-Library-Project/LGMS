@@ -54,14 +54,6 @@ lgmsmodule.reuse_guide_form:
   requirements:
     _permission: 'create guide content'
 
-create_guide_box.form:
-  path: '/custom-guide-box-form'
-  defaults:
-    _form: '\Drupal\lgmsmodule\Form\CreateGuideBoxForm'
-    _title: 'Add Guide Box'
-  requirements:
-    _permission: 'create guide_box content'
-
 delete_guide_box.form:
   path: '/delete_guide_box'
   defaults:
@@ -107,14 +99,6 @@ re_order_box_item.form:
   defaults:
     _form: '\Drupal\lgmsmodule\Form\ReOderBoxItemsForm'
     _title: 'Re-Order Box Items'
-  requirements:
-    _permission: 'create guide_item content'
-
-add_html.form:
-  path: '/add_html'
-  defaults:
-    _form: '\Drupal\lgmsmodule\Form\AddHTMLForm'
-    _title: 'Add HTML Box Items'
   requirements:
     _permission: 'create guide_item content'
 
@@ -198,14 +182,6 @@ lgmsmodule.databases:
   requirements:
     _permission: 'access content'
 
-add_database.form:
-  path: '/add_database'
-  defaults:
-    _form: '\Drupal\lgmsmodule\Form\AddDatabaseForm'
-    _title: 'Add Database Box Items'
-  requirements:
-    _permission: 'create guide_item content'
-
 add_media.form:
   path: '/add_media'
   defaults:
@@ -230,15 +206,6 @@ lgmsmodule.delete_guide:
     _title: 'Delete Guide'
   requirements:
     _permission: 'delete content'
-
-
-add_book.form:
-  path: '/add_book'
-  defaults:
-    _form: '\Drupal\lgmsmodule\Form\AddBookForm'
-    _title: 'Add Book Box Items'
-  requirements:
-    _permission: 'create guide_item content'
 
 reuse_book.form:
   path: '/add_book'
