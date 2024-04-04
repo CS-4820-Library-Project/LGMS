@@ -25,6 +25,30 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\views\Entity\View;
 
 /**
+ * Implements hook_toolbar().
+ */
+function lgmsmodule_toolbar() {
+  $items = [];
+
+  // Define the LGMS Dashboard toolbar item.
+  $items['lgms_dashboard'] = [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      '#type' => 'link',
+      '#title' => t('Guide Dashboard'),
+      '#url' => Url::fromRoute('lgmsmodule.dashboard_overview'),
+      '#attributes' => [
+        'title' => t('View the LGMS Dashboard'),
+        'class' => ['toolbar-icon', 'toolbar-icon-lgms-dashboard'],
+      ],
+    ],
+    '#weight' => 100, // Adjust the weight to position your link
+  ];
+
+  return $items;
+}
+
+/**
  * Implements hook_theme().
  */
 function lgmsmodule_theme($existing, $type, $theme, $path) {
