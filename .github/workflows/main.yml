@@ -22,7 +22,7 @@ jobs:
 
       - name: Sync files
         run: |
-          rsync -av --exclude='.git' ./ lgmsmodule-only/modules/custom/lgmsmodule/
+          rsync -av --exclude='.git' ./ lgmsmodule-only
           cd lgmsmodule-only
           git config user.name 'github-actions'
           git config user.email 'github-actions@github.com'
