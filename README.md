@@ -1,4 +1,4 @@
-# LGMS Module for Drupal
+# LGMS Module for Drupal 10
 
 Welcome to the LGMS Module installation guide. This document provides step-by-step instructions on how to install the LGMS module on your Drupal 10 site.
 
