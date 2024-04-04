@@ -143,7 +143,7 @@ class ReuseDatabaseForm extends FormBase {
         $form['update_wrapper']['includedesc'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Include Description'),
-          '#default_value' => !empty($parent_db->get('field_description')->value),
+          '#default_value' => !empty($selected_node->get('field_description')->value),
           '#states' => [
             'invisible' => [':input[name="reference"]' => ['checked' => TRUE]],
           ],
@@ -152,7 +152,8 @@ class ReuseDatabaseForm extends FormBase {
         $form['update_wrapper']['description'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Brief Description'),
-          '#default_value' => $parent_db->get('field_description')->value,
+          '#default_value' => $selected_node->get('field_description')->value,
+          '#format' => $selected_node->get('field_description')->format,
           '#states' => [
             'invisible' => [
               [':input[name="reference"]' => ['checked' => TRUE]],
@@ -221,8 +222,8 @@ class ReuseDatabaseForm extends FormBase {
       $form['update_wrapper']['link_text']['#value'] = $selected_node->get('field_database_link')->title;
       $form['update_wrapper']['field_database_link']['#value'] = $current_value;
       $form['update_wrapper']['field_make_proxy']['#value'] = $selected_node->get('field_make_proxy')->value;
-      $form['update_wrapper']['includedesc']['#checked'] = !empty($parent_db->get('field_description')->value);
-      $form['update_wrapper']['description']['#value'] = $parent_db->get('field_description')->value;
+      $form['update_wrapper']['includedesc']['#checked'] = !empty($selected_node->get('field_description')->value);
+      $form['update_wrapper']['description']['#value'] = $selected_node->get('field_description')->value;
       $form['update_wrapper']['includebody']['#checked'] = !empty($selected_node->get('field_database_body')->value);
       $form['update_wrapper']['field_database_body']['value']['#value'] = $selected_node->get('field_database_body')->value;
       $form['update_wrapper']['published']['#checked'] = $parent_db->isPublished() == '0';
@@ -268,16 +269,18 @@ class ReuseDatabaseForm extends FormBase {
       $new_database->set('field_parent_item', $new_item);
       $new_database->set('title', $form_state->getValue('title'));
       $new_database->set('field_database_link', ['uri' => $form_state->getValue('field_database_link'), 'title' => $form_state->getValue('link_text')]);
-      $new_database->set('field_database_body', $form_state->getValue('includebody') == '0'? '' : $form_state->getValue('field_database_body'));
+      $new_database->set('field_hide_body', $form_state->getValue('includebody') == '0');
+      $new_database->set('field_database_body', $form_state->getValue('field_database_body'));
       $new_database->set('field_make_proxy', $form_state->getValue('field_make_proxy') != '0');
       $new_database->set('status',$form_state->getValue('published') == '0');
+      $new_database->set('field_hide_description', $form_state->getValue('includedesc') == '0');
+      $new_database->set('field_description', $form_state->getValue('description'));
       $new_database->save();
 
       // Update fields on the new item
       $new_item->set('field_parent_box', $current_box);
       $new_item->set('title', $form_state->getValue('title'));
       $new_item->set('field_database_item', $new_database);
-      $new_item->set('field_description', $form_state->getValue('includedesc') == '0'? '': $form_state->getValue('description'));
       $new_item->set('status', $form_state->getValue('published') == '0');
       $new_item->save(); // Saving the new item
 

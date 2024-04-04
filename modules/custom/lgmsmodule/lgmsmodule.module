@@ -427,10 +427,10 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       '#url' => Url::fromRoute('entity.node.canonical', ['node' => $database->id()]),
     ];
 
-    if(!$item->get('field_hide_description')->value){
+    if(!$database->get('field_hide_description')->value){
       $item_container['content'][] = [
         '#type' => 'markup',
-        '#markup' => ' — ' . $item->get('field_description')->value,
+        '#markup' => ' — ' . $database->get('field_description')->value,
       ];
     }
 
@@ -1593,23 +1593,6 @@ function lgmsModule_install(): void
     ''
   );
 
-
-  createField(
-    'field_description',
-    'node',
-    'guide_item',
-    'Description',
-    'text_long',
-    [],
-    [],
-    'text_textarea',
-    ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
-    TRUE,
-    False,
-    3,
-    ''
-  );
-
 // page box children
   createField(
     'field_child_boxes',
@@ -1918,7 +1901,7 @@ function lgmsModule_install(): void
   createField(
     'field_hide_description',
     'node',
-    'guide_item',
+    'guide_database_item',
     'Hide Description',
     'boolean',
     [],
