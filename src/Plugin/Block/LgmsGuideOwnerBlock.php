@@ -192,25 +192,20 @@ class LgmsGuideOwnerBlock extends BlockBase {
 
   private function fetchSubjectsMarkup($node): string
   {
-    $subjects = [];
-    // Fetch subjects based on node type and bundle.
-    if ($node->bundle() === 'guide') {
-      $subjects = $this->extractSubjects($node, 'field_lgms_guide_subject');
-    } elseif ($node->bundle() === 'guide_page') {
-      $parent_guide = $node->get('field_parent_guide')->entity;
+    $owner = $node->getOwner();
 
-      if($parent_guide->bundle() == 'guide_page')
-        $parent_guide = $parent_guide->get('field_parent_guide')->entity;
+    $subjects = $owner->get('field_lgms_user_subjects')->referencedEntities();
+    $subjects_arr = [];
 
-      if ($parent_guide) {
-        $subjects = $this->extractSubjects($parent_guide, 'field_lgms_guide_subject');
-      }
+    foreach ($subjects as $subject){
+      $subjects_arr[] = $subject->label();
     }
 
+
     $subjectsMarkup = '';
-    if (!empty($subjects)) {
+    if (!empty($subjects_arr)) {
       $subjectsMarkup .= "<p><strong>Subjects:</strong></p><ul>";
-      foreach ($subjects as $subject) {
+      foreach ($subjects_arr as $subject) {
         $subjectsMarkup .= "<li>{$subject}</li>";
       }
       $subjectsMarkup .= "</ul>";
