@@ -47,7 +47,7 @@ class helperFunction
     return $accordion_items;
   }
 
-  public function getLGMSSearchBar(String $blockID)
+  public function getLGMSSearchBar(String $blockID, String $type)
   {
     $block_manager = \Drupal::service('plugin.manager.block');
     $config = [];
@@ -62,6 +62,7 @@ class helperFunction
       return  [];
     }
 
+    $plugin_block->setType($type);
     $render = $plugin_block->build();
     // Add the cache tags/contexts.
     \Drupal::service('renderer')->addCacheableDependency($render, $plugin_block);

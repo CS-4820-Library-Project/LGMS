@@ -48,7 +48,7 @@ class lgmsDatabasesController extends ControllerBase
         }
 
         // Render the searchbar block
-        $build['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_dashboard_search_block');
+        $build['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_search_block', 'dashboard');
 
         // Add the title and the rendered view to the build array
         $build['table'] = [

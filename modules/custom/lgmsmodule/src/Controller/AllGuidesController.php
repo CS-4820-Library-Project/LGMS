@@ -53,7 +53,7 @@ class AllGuidesController extends ControllerBase
         ];
 
         // Render the searchbar block
-        $build['top_row']['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_all_guides_search_block');
+        $build['top_row']['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_search_block', 'all_guides');
 
         // Render the dashboard button
         $build['top_row']['buttonDev'] = [
@@ -72,7 +72,7 @@ class AllGuidesController extends ControllerBase
       }
       else{
         // Render the searchbar block
-        $build['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_dashboard_search_block');
+        $build['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_search_block', 'dashboard');
       }
 
       $build['table'] = [

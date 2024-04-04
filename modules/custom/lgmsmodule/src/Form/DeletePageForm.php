@@ -21,23 +21,19 @@ class DeletePageForm extends FormBase
 
   public function buildForm(array $form, FormStateInterface $form_state)
   {
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
+    $form_helper = new FormHelper();
+
+    $form_helper->set_prefix($form, $this->getFormId());
 
     $current_guide = \Drupal::request()->query->get('guide_id');
-    if ($current_guide) {
-      $current_guide = Node::load($current_guide);
-    }
 
-    if ($current_guide) {
+    if ($current_guide = Node::load($current_guide)) {
+
       $form['current_node'] = [
         '#type' => 'hidden',
         '#value' => $current_guide->id(),
       ];
+
       $options = $this->getPageList($current_guide->id());
 
       $form['select_page'] = [
@@ -133,8 +129,6 @@ class DeletePageForm extends FormBase
         if (empty($child_pages)) {
           $form['include_sub_wrapper']['include_sub']['#checked'] = FALSE;
           $form['include_sub_wrapper']['include_sub']['#attributes']['disabled'] = 'disabled';
-
-          //unset($form['position_wrapper']['position']['#attributes']['disabled']);
         } else {
           // Ensure it is not disabled if there are child pages.
           unset($form['include_sub_wrapper']['include_sub']['#attributes']['disabled']);
@@ -148,7 +142,6 @@ class DeletePageForm extends FormBase
     } else {
       // If no page is selected, ensure the "Include Subpages" checkbox is not disabled.
       unset($form['include_sub_wrapper']['include_sub']['#attributes']['disabled']);
-      //unset($form['position_wrapper']['position']['#attributes']['disabled']);
     }
 
     // Return parts of the form that need to be re-rendered.
@@ -170,39 +163,6 @@ class DeletePageForm extends FormBase
 
     $helper->deletePages($selected_page, $delete_sub);
   }
-
-//  public function deleteItems($parent){
-//    $items = $parent->get('field_box_items')->referencedEntities();
-//
-//    foreach($items as $item){
-//      if($parent->id() == $item->get('field_parent_box')->entity->id()){
-//
-//        $query = \Drupal::entityQuery('node')
-//          ->condition('type', 'guide_box')
-//          ->condition('field_box_items', $item->id())
-//          ->accessCheck(TRUE);
-//        $result = $query->execute();
-//
-//        foreach ($result as $box){
-//          $box = Node::load($box);
-//          $child_items = $box->get('field_box_items')->getValue();
-//
-//          $child_items = array_filter($child_items, function ($box) use ($item) {
-//            return $box['target_id'] != $item->id();
-//          });
-//
-//          $box->set('field_box_items', $child_items);
-//          $box->save();
-//        }
-//
-//        $item->get('field_html_item')->entity?->delete();
-//        $item->get('field_book_item')->entity?->delete();
-//
-//        $item?->delete();
-//      }
-//    }
-//
-//  }
 
   public function getPageList($guide_id) {
     $options = [];

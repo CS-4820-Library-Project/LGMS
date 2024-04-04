@@ -94,6 +94,17 @@ class FormHelper {
     ];
   }
 
+  public function set_form_fields_from_array(array &$form, $ids)
+  {
+    foreach ($ids as $label => $id){
+      $form[$label] = [
+        '#type' => 'hidden',
+        '#value' => $id,
+      ];
+    }
+
+  }
+
   public function set_prefix(array &$form, string $id){
     $form['#prefix'] = '<div id="'. $id .'">';
     $form['#suffix'] = '</div>';

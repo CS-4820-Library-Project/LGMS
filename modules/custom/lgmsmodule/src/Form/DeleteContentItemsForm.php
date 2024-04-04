@@ -18,80 +18,24 @@ class DeleteContentItemsForm extends FormBase {
 
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_helper = new FormHelper();
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
+
+    $ids = [
+      'current_node' => \Drupal::request()->query->get('current_node'),
+      'current_box' => \Drupal::request()->query->get('current_box'),
+      'current_item' => \Drupal::request()->query->get('current_item'),
     ];
 
+    // Set the prefix, suffix, and hidden fields
+    $form_helper->set_form_fields_from_array($form, $ids, $this->getFormId());
 
-    $current_node = \Drupal::request()->query->get('current_node');
-    $current_box = \Drupal::request()->query->get('current_box');
-    $current_item = \Drupal::request()->query->get('current_item');
-
-    if (empty($current_box) || empty($current_node) || empty($current_item)){
-      throw new AccessDeniedHttpException();
-    }
-
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $current_box,
-    ];
-
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $current_node,
-    ];
-
-    $form['current_item'] = [
-      '#type' => 'hidden',
-      '#value' => $current_item,
-    ];
-
-    $current_item = Node::load($current_item);
+    $current_item = Node::load($ids['current_item']);
     $field_to_delete = '';
-    $possible_fields = $form_helper->get_fields();
-    $mediaTitle = '';
 
-    foreach ($possible_fields as $field_name) {
+    // Get the filled field (this is the one to delete)
+    foreach ($form_helper->get_fields() as $field_name) {
       if (!$current_item->get($field_name)->isEmpty()) {
         $field_to_delete = $field_name;
         break;
-      }
-    }
-
-    if ($current_item->hasField($field_to_delete) && !$current_item->get($field_to_delete)->isEmpty()) {
-
-      $mediaItem = $current_item->get($field_to_delete)->entity;
-
-      if ($mediaItem && $mediaItem->hasField('field_media_audio_file') && !$mediaItem->get('field_media_audio_file')->isEmpty()) {
-        $fileEntity = $mediaItem->get('field_media_audio_file')->entity;
-
-        if ($fileEntity) {
-          $mediaTitle = $fileEntity->getFilename();
-        }
-      } elseif ($mediaItem && $mediaItem->hasField('field_media_document') && !$mediaItem->get('field_media_document')->isEmpty()){
-        $fileEntity = $mediaItem->get('field_media_document')->entity;
-
-        if ($fileEntity) {
-          $mediaTitle = $fileEntity->getFilename();
-        }
-      } elseif ($mediaItem && $mediaItem->hasField('field_media_image') && !$mediaItem->get('field_media_image')->isEmpty()){
-        $fileEntity = $mediaItem->get('field_media_image')->entity;
-
-        if ($fileEntity) {
-          $mediaTitle = $fileEntity->getFilename();
-        }
-      } elseif ($mediaItem && $mediaItem->hasField('field_media_oembed_video') && !$mediaItem->get('field_media_oembed_video')->isEmpty()){
-        $mediaTitle = $mediaItem->get('field_media_oembed_video')->value;
-
-      } elseif ($mediaItem && $mediaItem->hasField('field_media_video_file') && !$mediaItem->get('field_media_video_file')->isEmpty()){
-        $fileEntity = $mediaItem->get('field_media_video_file')->entity;
-
-        if ($fileEntity) {
-          $mediaTitle = $fileEntity->getFilename();
-        }
       }
     }
 
@@ -108,7 +52,7 @@ class DeleteContentItemsForm extends FormBase {
     } elseif ($field_to_delete == 'field_database_item'){
       $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this Database Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
     } elseif ($field_to_delete == 'field_media_image'){
-      $title = $this->t('<Strong>Are you sure you want to Delete @item_title Media Item?</Strong>', ['@item_title' => $mediaTitle]);
+      $title = $this->t('<Strong>Are you sure you want to Delete @item_title Media Item from the box?</Strong>', ['@item_title' => $current_item->label()]);
     }
 
     $form['Delete'] = [
@@ -154,11 +98,12 @@ class DeleteContentItemsForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    // Get the field to delete and it's box and item
     $current_box = Node::load($form_state->getValue('current_box'));
     $current_item = Node::load($form_state->getValue('current_item'));
     $field_name = $form_state->getValue('field_name');
 
-    // remove link to current box
+    // remove link from the current box
     $child_items = $current_box->get('field_box_items')->getValue();
     $child_items = array_filter($child_items, function ($item) use ($current_item) {
       return $item['target_id'] != $current_item->id();
@@ -178,7 +123,7 @@ class DeleteContentItemsForm extends FormBase {
         ->accessCheck(false);
       $result = $query->execute();
 
-      // Go though all items that reference the given node and delete them
+      // Go through all items that reference the given node and delete them
       foreach ($result as $item){
         $item = Node::load($item);
         $parent_box = $item->get('field_parent_box')->entity;
@@ -195,9 +140,11 @@ class DeleteContentItemsForm extends FormBase {
         $item?->delete();
       }
 
+      // Delete Field
       $field?->delete();
     }
 
+    // Delete Link
     $current_item?->delete();
 
     $ajaxHelper = new FormHelper();

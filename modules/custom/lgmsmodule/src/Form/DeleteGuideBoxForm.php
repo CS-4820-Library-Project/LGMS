@@ -14,24 +14,18 @@ class DeleteGuideBoxForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
 
     $current_node = \Drupal::request()->query->get('current_node');
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $current_node,
-    ];
 
     $current_box = \Drupal::request()->query->get('current_box');
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $current_box,
-    ];
+
+    $ids = (object) ['current_node' => $current_node, 'current_box' => $current_box];
+
+    $form_helper = new FormHelper();
+
+    $form_helper->set_prefix($form, $this->getFormId());
+
+    $form_helper->set_form_fields_from_array($form,$ids);
 
     $current_node = Node::load($current_node);
 

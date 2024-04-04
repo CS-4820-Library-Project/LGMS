@@ -83,15 +83,15 @@ class AddDatabaseForm extends FormBase {
     $form['include_desc'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Include Description'),
-      '#default_value' => $edit? !$current_item->get('field_hide_description')->value: 1,
+      '#default_value' => $edit? !$current_database->get('field_hide_description')->value: 1,
     ];
 
     // Description field
     $form['description'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Brief Description'),
-      '#default_value' => $edit? $current_item->get('field_description')->value: '',
-      '#format' => $edit ? $current_item->get('field_description')->format : 'basic_html',
+      '#default_value' => $edit? $current_database->get('field_description')->value: '',
+      '#format' => $edit ? $current_database->get('field_description')->format : 'basic_html',
       '#states' => [
         'invisible' => [
           ':input[name="include_desc"]' => ['checked' => False],
@@ -152,17 +152,15 @@ class AddDatabaseForm extends FormBase {
         'field_database_body' =>  $form_state->getValue('field_database_body'),
         'field_make_proxy' => $form_state->getValue('field_make_proxy') != '0',
         'field_hide_body' => $form_state->getValue('include_body') == '0',
+        'field_hide_description' => $form_state->getValue('include_desc') == '0',
+        'field_description' => $form_state->getValue('description'),
         'status' => $form_state->getValue('published') == '0',
       ]);
       $new_database->save();
 
       // Create a link to the book and attach it to the box
-      $item = $ajaxHelper->create_link($new_database, $form_state->getValue('current_box'));
+      $ajaxHelper->create_link($new_database, $form_state->getValue('current_box'));
 
-      // Add the description
-      $item->set('field_hide_description', $form_state->getValue('include_desc') == '0');
-      $item->set('field_description', $form_state->getValue('description'));
-      $item->save();
     } else {
       // Load link and it's content
       $current_item = $form_state->getValue('current_item');
@@ -175,13 +173,12 @@ class AddDatabaseForm extends FormBase {
       $database->set('field_hide_body', $form_state->getValue('include_body') == '0');
       $database->set('field_database_body', $form_state->getValue('field_database_body'));
       $database->set('field_make_proxy', $form_state->getValue('field_make_proxy') != '0');
+      $database->set('field_hide_description', $form_state->getValue('include_desc') == '0');
+      $database->set('field_description', $form_state->getValue('description'));
       $database->save();
 
       // Update link
       $ajaxHelper->update_link($form, $form_state, $current_item);
-      $current_item->set('field_hide_description', $form_state->getValue('include_desc') == '0');
-      $current_item->set('field_description', $form_state->getValue('description'));
-      $current_item->save();
     }
 
     $ajaxHelper->updateParent($form, $form_state);
