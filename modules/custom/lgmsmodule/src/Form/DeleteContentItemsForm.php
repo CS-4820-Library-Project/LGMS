@@ -44,15 +44,22 @@ class DeleteContentItemsForm extends FormBase {
       '#value' => $field_to_delete,
     ];
 
-    $title = '';
-    if ($field_to_delete == 'field_html_item'){
-      $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this HTML Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
-    } elseif ($field_to_delete == 'field_book_item'){
-      $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this Book Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
-    } elseif ($field_to_delete == 'field_database_item'){
-      $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this Database Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
-    } elseif ($field_to_delete == 'field_media_image'){
-      $title = $this->t('<Strong>Are you sure you want to Delete @item_title Media Item from the box?</Strong>', ['@item_title' => $current_item->label()]);
+    $link = ($current_item->get('field_parent_box')->getValue()[0]['target_id'] == $ids->current_box && $current_item->get('field_lgms_database_link')->getValue()) || $current_item->get('field_lgms_database_link')->getValue();
+
+    $message = '<Strong>Are you sure you want to Delete ' . $current_item->label() . '?</Strong>';
+
+    if (!$link){
+      if ($field_to_delete == 'field_html_item'){
+        $title = $this->t($message . ' Deleting this HTML Item will remove it permanently from the system.');
+      } elseif ($field_to_delete == 'field_book_item'){
+        $title = $this->t($message . ' Deleting this Book Item will remove it permanently from the system.');
+      } elseif ($field_to_delete == 'field_database_item'){
+        $title = $this->t($message . ' Deleting this Database Item will remove it permanently from the system.');
+      } else {
+        $title = $message;
+      }
+    } else {
+      $title = $message;
     }
 
     $form['Delete'] = [
