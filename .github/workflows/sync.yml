@@ -14,29 +14,28 @@ jobs:
       - name: Checkout dev branch
         uses: actions/checkout@v2
         with:
-          ref: dev
-          path: dev
+          ref: 'dev'
 
-      - name: Sync module files to a separate folder
+      - name: Copy lgmsmodule contents to a temporary directory
         run: |
-          mkdir module-temp
-          cp -a dev/modules/custom/lgmsmodule/. module-temp/
+          mkdir -p lgms-temp
+          cp -a modules/custom/lgmsmodule/. lgms-temp/
 
       - name: Checkout lgmsmodule-only branch
         uses: actions/checkout@v2
         with:
-          ref: lgmsmodule-only
-          path: lgmsmodule-only
+          ref: 'lgmsmodule-only'
+          path: 'lgmsmodule-only'
 
-      - name: Rsync files
+      - name: Rsync files to lgmsmodule-only branch folder
         run: |
-          rsync -av --delete module-temp/ lgmsmodule-only/
+          rsync -av --delete --exclude '.git/' --exclude '.github/' lgms-temp/ lgmsmodule-only/
 
-      - name: Commit and push changes
+      - name: Push changes to lgmsmodule-only branch
         run: |
           cd lgmsmodule-only
           git config user.name 'github-actions'
           git config user.email 'github-actions@github.com'
           git add .
-          git commit -m "Sync updates from dev to lgmsmodule-only" || echo "No changes to commit"
-          git push --set-upstream origin lgmsmodule-only
+          git commit -m "Sync updates from dev branch" || echo "No changes to commit"
+          git push origin HEAD:refs/heads/lgmsmodule-only
