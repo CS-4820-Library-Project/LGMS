@@ -10,11 +10,11 @@ Before you begin, ensure you have the following installed:
 
 ## Installation Steps
 
-### Download the Module
+### 1. Download the Module
 
 Download the LGMS module ZIP file from the GitHub repository to your local machine.
 
-### Prepare the Module Directory
+### 2. Prepare the Module Directory
 
 Navigate to the Drupal root directory on your system and create a directory for custom modules if it doesn't exist.
 
@@ -23,7 +23,7 @@ cd /path/to/your/drupal/root
 mkdir -p modules/custom
 ```
 
-### Place the Module
+### 3. Place the Module
 
 Place the downloaded lgmsmodule.zip file into the modules/custom directory. Then, navigate to this directory:
 
@@ -31,7 +31,7 @@ Place the downloaded lgmsmodule.zip file into the modules/custom directory. Then
 cd modules/custom
 ```
 
-### Unzip the Module
+### 4. Unzip the Module
 
 Unzip the downloaded file.
 
@@ -45,13 +45,13 @@ After unzipping, if the extracted folder is not named lgmsmodule, rename it acco
 mv incorrect-folder-name lgmsmodule
 ```
 
-### Installation
+### 5. Installation
 
-#### Installing the Module via Drupal UI
+#### 5.1 Installing the Module via Drupal UI
 
 Navigate to the Extend page on your Drupal site by visiting /admin/modules. Use the filter box to search for **LGMS**, select the module, and click the install button.
 
-#### Installing the Module via Drush
+#### 5.2 Installing the Module via Drush
 
 Alternatively, you can install the module using Drush. From the Drupal root directory, run the following command to enable the LGMS module:
 
