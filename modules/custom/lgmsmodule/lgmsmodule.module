@@ -1201,10 +1201,6 @@ function lgmsModule_install(): void
     // After the block->save() call.
     \Drupal::service('cache_tags.invalidator')->invalidateTags(['block_list']);
     \Drupal::service('router.builder')->rebuild();
-
-    \Drupal::messenger()->addMessage('LGMS Guide Owner Block placed successfully.');
-  } else {
-    \Drupal::messenger()->addMessage('The LGMS Guide Owner Block already exists.');
   }
 
   $block_id = 'pageviewblock';
@@ -1234,9 +1230,6 @@ function lgmsModule_install(): void
     ]);
 
     $block->save();
-    \Drupal::messenger()->addMessage('LGMS Page View Block placed successfully.');
-  } else {
-    \Drupal::messenger()->addMessage('The LGMS Page View Block already exists.');
   }
 
   // Create content types with brief descriptions.
