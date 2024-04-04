@@ -113,9 +113,9 @@ class DeletePageForm extends FormBase
     if (!empty($selected_page)) {
       $pageTitle = Node::load($selected_page);
       if ($pageTitle->bundle() != 'guide'){
-        $form['include_sub_wrapper']['confirm_delete']['#title'] = t('<strong>Are you sure you want to delete the page @page_title?</strong> Deleting this page will remove it and its references permanently from the system!', ['@page_title' => $pageTitle->label()]);
+        $form['include_sub_wrapper']['confirm_delete']['#title'] = t('<strong>Are you sure you want to delete the page @page_title?</strong> This will remove it and any boxes it directly owns (but not links to boxes owned by other pages, nor any content items).', ['@page_title' => $pageTitle->label()]);
       } else {
-        $form['include_sub_wrapper']['confirm_delete']['#title'] = t('<strong>Are you sure you want to delete the guide @page_title?</strong> Deleting this guide will remove it permanently from the system!', ['@page_title' => $pageTitle->label()]);
+        $form['include_sub_wrapper']['confirm_delete']['#title'] = t('<strong>Are you sure you want to delete the guide @page_title?</strong> This will remove it and any Pages and boxes it directly owns and the boxes of it\'s pages (but not links to pages or boxes owned by other guides or pages, nor any content items).', ['@page_title' => $pageTitle->label()]);
       }
 
       // Load the selected page node to check its field_child_pages.
