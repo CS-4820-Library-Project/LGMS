@@ -23,11 +23,6 @@ class DeleteGuideBoxForm extends FormBase {
       'current_box' => \Drupal::request()->query->get('current_box')
     ];
 
-    // if Either is missing, deny access to the form
-    if (empty($ids->current_node) || empty($ids->current_box)) {
-      throw new AccessDeniedHttpException();
-    }
-
     // Set the prefix, suffix, and hidden fields
     $form_helper->set_form_data($form, $ids, $this->getFormId());
 

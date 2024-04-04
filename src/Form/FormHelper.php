@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class FormHelper {
 
@@ -73,36 +74,17 @@ class FormHelper {
   public function set_form_data(array &$form, $ids, string $form_id){
     $this->set_prefix($form,$form_id);
 
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => property_exists($ids, 'current_node') ? $ids->current_node : null,
-    ];
-
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => property_exists($ids, 'current_box') ? $ids->current_box : null,
-    ];
-
-    $form['current_item'] = [
-      '#type' => 'hidden',
-      '#value' => property_exists($ids, 'current_item') ? $ids->current_item : null,
-    ];
-
-    $form['current_guide'] = [
-      '#type' => 'hidden',
-      '#value' => property_exists($ids, 'current_guide') ? $ids->current_guide : null,
-    ];
-  }
-
-  public function set_form_fields_from_array(array &$form, $ids)
-  {
     foreach ($ids as $label => $id){
+      // if any of the fields is missing, deny access to the form
+      if ($label != 'current_item' && (empty($id) || !Node::load($id))){
+        throw new AccessDeniedHttpException();
+      }
+
       $form[$label] = [
         '#type' => 'hidden',
         '#value' => $id,
       ];
     }
-
   }
 
   public function set_prefix(array &$form, string $id){
