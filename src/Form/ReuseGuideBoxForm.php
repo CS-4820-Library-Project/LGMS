@@ -44,7 +44,7 @@ class ReuseGuideBoxForm extends FormBase {
       '#type' => 'select',
       '#title' => $this->t('Select a Box'),
       '#options' => $options,
-      '#empty_option' => $this->t('- Select a Box Item -'),
+      '#empty_option' => $this->t('- Select a Box -'),
       '#target_type' => 'node', // Adjust according to your needs
       '#selection_settings' => [
         'target_bundles' => ['guide_box'], // Adjust to your guide page bundle
