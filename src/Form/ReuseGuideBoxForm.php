@@ -175,7 +175,7 @@ class ReuseGuideBoxForm extends FormBase {
     $box = Node::load($form_state->getValue('box'));
     $box_parent = $box->get('field_parent_node')->target_id;
 
-    if(!$form_state->getValue('reference') && $box_parent !== $nid){
+    if(!$form_state->getValue('reference')){
       $new_box = $box->createDuplicate();
       $new_box->set('field_parent_node', $nid);
       $new_box->set('title', $form_state->getValue('title'));

@@ -188,12 +188,12 @@ class FormHelper {
   }
 
   public function deletePages($parent, $delete_sub){
-    $this->deleteBoxes($parent);
+    $this->delete_all_boxes($parent);
 
     if($delete_sub) {
       $pages = $parent->get('field_child_pages')->referencedEntities();
       foreach ($pages as $page) {
-        $this->deleteBoxes($page);
+        $this->delete_all_boxes($page);
         $this->deletePages($page, $delete_sub);
       }
     }
@@ -201,34 +201,41 @@ class FormHelper {
     $parent->delete();
   }
 
-  public function deleteBoxes($parent): void
+  public function delete_all_boxes($parent): void
   {
     $boxes = $parent->get('field_child_boxes')->referencedEntities();
 
     foreach($boxes as $box){
       if($parent->id() == $box->get('field_parent_node')->entity->id()){
-
-        $query = \Drupal::entityQuery('node')
-          ->condition('type', 'guide_page')
-          ->condition('field_child_boxes', $box->id())
-          ->accessCheck(TRUE);
-        $result = $query->execute();
-
-        foreach ($result as $page){
-          $page = Node::load($page);
-          $child_boxes = $page->get('field_child_boxes')->getValue();
-
-          $child_boxes = array_filter($child_boxes, function ($box_new) use ($box) {
-            return $box_new['target_id'] != $box->id();
-          });
-
-          $page->set('field_child_boxes', $child_boxes);
-          $page->save();
-        }
-
-        $box?->delete();
+        $this->delete_box($box);
       }
     }
+  }
+
+  public function delete_box($box): void {
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', 'guide_page')
+      ->condition('field_child_boxes', $box->id())
+      ->accessCheck(TRUE);
+    $result = $query->execute();
+
+    foreach ($result as $page){
+      $page = Node::load($page);
+      $this->remove_child_box($page,$box);
+    }
+
+    $box?->delete();
+  }
+
+  public function remove_child_box($page, $box): void {
+    $child_boxes = $page->get('field_child_boxes')->getValue();
+
+    $child_boxes = array_filter($child_boxes, function ($box_new) use ($box) {
+      return $box_new['target_id'] != $box->id();
+    });
+
+    $page->set('field_child_boxes', $child_boxes);
+    $page->save();
   }
 
   public function update_child_pages(EntityInterface $parent, EntityInterface $page)

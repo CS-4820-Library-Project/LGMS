@@ -19,16 +19,16 @@ class DeleteContentItemsForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_helper = new FormHelper();
 
-    $ids = [
+    $ids = (object) [
       'current_node' => \Drupal::request()->query->get('current_node'),
       'current_box' => \Drupal::request()->query->get('current_box'),
       'current_item' => \Drupal::request()->query->get('current_item'),
     ];
 
     // Set the prefix, suffix, and hidden fields
-    $form_helper->set_form_fields_from_array($form, $ids, $this->getFormId());
+    $form_helper->set_form_data($form, $ids, $this->getFormId());
 
-    $current_item = Node::load($ids['current_item']);
+    $current_item = property_exists($ids, 'current_item')? Node::load($ids->current_item) : null;
     $field_to_delete = '';
 
     // Get the filled field (this is the one to delete)
@@ -44,15 +44,22 @@ class DeleteContentItemsForm extends FormBase {
       '#value' => $field_to_delete,
     ];
 
-    $title = '';
-    if ($field_to_delete == 'field_html_item'){
-      $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this HTML Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
-    } elseif ($field_to_delete == 'field_book_item'){
-      $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this Book Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
-    } elseif ($field_to_delete == 'field_database_item'){
-      $title = $this->t('<Strong>Are you sure you want to Delete @item_title?</Strong> Deleting this Database Item will remove it permanently from the system.', ['@item_title' => $current_item->label()]);
-    } elseif ($field_to_delete == 'field_media_image'){
-      $title = $this->t('<Strong>Are you sure you want to Delete @item_title Media Item from the box?</Strong>', ['@item_title' => $current_item->label()]);
+    $link = ($current_item->get('field_parent_box')->getValue()[0]['target_id'] == $ids->current_box && $current_item->get('field_lgms_database_link')->getValue()) || $current_item->get('field_lgms_database_link')->getValue();
+
+    $message = '<Strong>Are you sure you want to Delete ' . $current_item->label() . '?</Strong>';
+
+    if (!$link){
+      if ($field_to_delete == 'field_html_item'){
+        $title = $this->t($message . ' Deleting this HTML Item will remove it permanently from the system.');
+      } elseif ($field_to_delete == 'field_book_item'){
+        $title = $this->t($message . ' Deleting this Book Item will remove it permanently from the system.');
+      } elseif ($field_to_delete == 'field_database_item'){
+        $title = $this->t($message . ' Deleting this Database Item will remove it permanently from the system.');
+      } else {
+        $title = $message;
+      }
+    } else {
+      $title = $message;
     }
 
     $form['Delete'] = [

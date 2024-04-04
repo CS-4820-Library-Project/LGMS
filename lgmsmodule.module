@@ -2488,7 +2488,6 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
       'field_html_item',
       'field_book_item',
       'field_media_image',
-      'field_description'
     ];
 
     // Track if any field is filled.
