@@ -19,16 +19,16 @@ class DeleteContentItemsForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_helper = new FormHelper();
 
-    $ids = [
+    $ids = (object) [
       'current_node' => \Drupal::request()->query->get('current_node'),
       'current_box' => \Drupal::request()->query->get('current_box'),
       'current_item' => \Drupal::request()->query->get('current_item'),
     ];
 
     // Set the prefix, suffix, and hidden fields
-    $form_helper->set_form_fields_from_array($form, $ids, $this->getFormId());
+    $form_helper->set_form_data($form, $ids, $this->getFormId());
 
-    $current_item = Node::load($ids['current_item']);
+    $current_item = property_exists($ids, 'current_item')? Node::load($ids->current_item) : null;
     $field_to_delete = '';
 
     // Get the filled field (this is the one to delete)
