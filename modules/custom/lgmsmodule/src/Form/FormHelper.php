@@ -94,7 +94,7 @@ class FormHelper {
     ];
   }
 
-  public function set_form_fields_from_array(array &$form, $ids, string $form_id)
+  public function set_form_fields_from_array(array &$form, $ids)
   {
     foreach ($ids as $label => $id){
       $form[$label] = [
