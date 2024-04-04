@@ -2032,6 +2032,28 @@ function lgmsModule_install(): void
   );
 
   createField(
+    'field_lgms_user_subjects',
+    'user',
+    'user',
+    'Subjects',
+    'entity_reference',
+    ['target_type' => 'taxonomy_term',],
+    ['handler' => 'default:taxonomy_term',
+      'handler_settings' => [
+        'target_bundles' => [
+          'LGMS_Guide_Subject' => 'LGMS_Guide_Subject',
+        ],
+      ],
+    ],
+    'options_buttons',
+    [],
+    False,
+    True,
+    4,
+    'The user\'s subjects'
+  );
+
+  createField(
     'field_media_image',
     'node',
     'guide_item',
