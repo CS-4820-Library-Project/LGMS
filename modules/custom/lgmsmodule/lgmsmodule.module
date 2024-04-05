@@ -30,20 +30,23 @@ use Drupal\views\Entity\View;
 function lgmsmodule_toolbar() {
   $items = [];
 
-  // Define the LGMS Dashboard toolbar item.
-  $items['lgms_dashboard'] = [
-    '#type' => 'toolbar_item',
-    'tab' => [
-      '#type' => 'link',
-      '#title' => t('Guide Dashboard'),
-      '#url' => Url::fromRoute('lgmsmodule.dashboard_overview'),
-      '#attributes' => [
-        'title' => t('View the LGMS Dashboard'),
-        'class' => ['toolbar-icon', 'toolbar-icon-lgms-dashboard'],
+  // Check if the user has access to the LGMS Dashboard route.
+  if (\Drupal::currentUser()->hasPermission('access dashboard')) {
+    // Define the LGMS Dashboard toolbar item.
+    $items['lgms_dashboard'] = [
+      '#type' => 'toolbar_item',
+      'tab' => [
+        '#type' => 'link',
+        '#title' => t('Guide Dashboard'),
+        '#url' => Url::fromRoute('lgmsmodule.dashboard_overview'),
+        '#attributes' => [
+          'title' => t('View the LGMS Dashboard'),
+          'class' => ['toolbar-icon', 'toolbar-icon-lgms-dashboard'],
+        ],
       ],
-    ],
-    '#weight' => 100, // Adjust the weight to position your link
-  ];
+      '#weight' => 100, // Adjust the weight to position your link
+    ];
+  }
 
   return $items;
 }
