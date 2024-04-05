@@ -59,7 +59,7 @@ class ReuseGuideBoxForm extends FormBase {
 
     $form['reference'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('<Strong>Reference:</Strong> By selecting this, a reference of the box will be created. it will be un-editable from this guide/page'),
+      '#title' => $this->t('<Strong>Link:</Strong> By selecting this, a link of the box will be created. it will be un-editable from this guide/page'),
     ];
 
     // Container to dynamically update based on AJAX callback.

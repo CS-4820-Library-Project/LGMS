@@ -122,7 +122,7 @@ class ReuseHTMLItemForm extends FormBase {
         $form['update_wrapper']['title'] = [
           '#type' => 'textfield',
           '#title' => $this->t('New Title:'),
-          '#default_value' => $reference ? $this->t('This is just a reference and cannot be edited.') : $selected_node->label(),
+          '#default_value' => $reference ? $this->t('This is just a Link and cannot be edited.') : $selected_node->label(),
           '#required' => !$reference,
           '#disabled' => $reference,
           '#states' => [
