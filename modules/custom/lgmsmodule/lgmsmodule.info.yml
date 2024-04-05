@@ -2,7 +2,7 @@ name: 'LGMS'
 type: module
 core_version_requirement: ^10
 description: 'Provides a library guide management system.'
-package: 'UPEI'
+package: 'Library Guide Management System'
 dependencies:
   - drupal:system
   - drupal:media
