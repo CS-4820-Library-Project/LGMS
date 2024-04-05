@@ -1079,7 +1079,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
             'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
           ],
         ],
-        '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['node_id' => $entity->id()]),
+        '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['guide_id' => $entity->id()]),
         '#attributes' => [
           'class' => ['use-ajax'],
           'data-dialog-type' => 'modal',
