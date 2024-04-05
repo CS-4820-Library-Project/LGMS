@@ -18,19 +18,20 @@ class AddMediaForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form_helper = new FormHelper();
 
-    $ids = [
+    $ids = (Object) [
       'current_node' => \Drupal::request()->query->get('current_node'),
       'current_box' => \Drupal::request()->query->get('current_box'),
       'current_item' => \Drupal::request()->query->get('current_item'),
     ];
 
     // Set the prefix, suffix, and hidden fields
-    $form_helper->set_form_fields_from_array($form, $ids, $this->getFormId());
+    $form_helper->set_form_data($form, $ids, $this->getFormId());
 
-    $current_item = Node::load($ids['current_item']);
+    $current_item = property_exists($ids, 'current_item')? Node::load($ids->current_item) : null;
     $media = $current_item?->get('field_media_image')->entity;
     $edit = $current_item != null;
 
+    // Link to upload more media
     $add_media_link = Link::fromTextAndUrl(
       $this->t('Create new Media'),
       Url::fromRoute('entity.media.collection')
@@ -41,6 +42,7 @@ class AddMediaForm extends FormBase {
     $renderer = \Drupal::service('renderer');
     $add_media_link_html = $renderer->render($add_media_link);
 
+    // Media select field
     $form['media'] = [
       '#type' => 'select',
       '#title' => $this->t('Media'),

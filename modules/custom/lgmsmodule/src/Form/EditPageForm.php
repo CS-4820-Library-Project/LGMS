@@ -60,7 +60,7 @@ class EditPageForm extends FormBase {
         $form['update_wrapper']['title'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Page Title'),
-          '#default_value' => $reference? t('This is Just a Reference and can not be Edited') : $selected_node->label(),
+          '#default_value' => $reference? t('This is Just a Link and can not be Edited') : $selected_node->label(),
           '#required' => !$reference,
           '#disabled' => $reference,
         ];
@@ -109,7 +109,7 @@ class EditPageForm extends FormBase {
         $form['update_wrapper']['draft_mode'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Draft Mode'),
-          '#description' => $disable? $this->t('The referenced page is unPublished. Publish it to be able to update this Page.') : $this->t('Check this box if the page is still in draft mode.'),
+          '#description' => $disable? $this->t('The Linked page is unPublished. Publish it to be able to update this Page.') : $this->t('Check this box if the page is still in draft mode.'),
           '#default_value' => !$selected_node->isPublished(),
           '#disabled' => $disable,
         ];

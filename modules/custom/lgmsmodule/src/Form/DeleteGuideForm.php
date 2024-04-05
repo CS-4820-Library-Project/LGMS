@@ -3,6 +3,7 @@
 namespace Drupal\lgmsmodule\Form;
 
 use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -15,80 +16,57 @@ class DeleteGuideForm extends FormBase {
     return 'delete_guide_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $node_id = NULL) {
-    $node_id = \Drupal::request()->query->get('node_id');
-    \Drupal::logger('lgmsmodule')->notice('Node ID: @id, Type: @type', ['@id' => $node_id, '@type' => gettype($node_id)]);
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form_helper = new FormHelper();
 
-    if ($node_id && $current_guide = Node::load($node_id)) {
+    // Get the data from the URL
+    $ids = (object) [
+      'guide_id' => \Drupal::request()->query->get('guide_id'),
+    ];
 
-      $form_helper = new FormHelper();
+    // Set the prefix, suffix, and hidden fields
+    $form_helper->set_form_data($form, $ids, $this->getFormId());
 
-      $form_helper->set_prefix($form, $this->getFormId());
+    // Warning message
+    $form['warning'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('<strong>Are you sure you want to delete this guide?</strong>
+                                    This will remove it and any pages and boxes it directly owns
+                                    (but not links to pages and boxes owned by other pages or guides, nor any content items).'),
+      '#prefix' => '<p>',
+      '#suffix' => '</p>',
+      '#required' => True,
+    ];
 
-      // Hidden field to store the current guide ID
-      $form['current_node'] = [
-        '#type' => 'hidden',
-        '#value' => $current_guide->id(),
-      ];
+    // Actions wrapper
+    $form['actions'] = [
+      '#type' => 'actions',
+    ];
 
-      // Warning message
-      $form['warning'] = [
-        '#type' => 'markup',
-        '#markup' => $this->t('<strong>Are you sure you want to delete this guide?</strong> Deleting this guide will remove it permanently from the system.'),
-        '#prefix' => '<p>',
-        '#suffix' => '</p>',
-      ];
+    // Delete button
+    $form['actions']['delete'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Delete'),
+      '#button_type' => 'danger',
+    ];
 
-      // Actions wrapper
-      $form['actions'] = [
-        '#type' => 'actions',
-      ];
-
-      // Cancel button
-      $form['actions']['cancel'] = [
-        '#type' => 'button',
-        '#value' => $this->t('Cancel'),
-        '#attributes' => ['class' => ['use-ajax']],
-        '#ajax' => [
-          'callback' => '::closeModalForm',
-        ],
-      ];
-
-      // Delete button
-      $form['actions']['delete'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Delete'),
-        '#button_type' => 'danger',
-      ];
-
-      $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
-    } else {
-      // Error message if the guide is not found
-      $form['error'] = [
-        '#type' => 'markup',
-        '#markup' => $this->t('The guide could not be found.'),
-      ];
-    }
 
     return $form;
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $node_id = $form_state->getValue('current_node');
     $helper = new FormHelper();
-    if ($node = Node::load($node_id)) {
-      $helper->deletePages($node, True);
-      $node->delete();
-      \Drupal::messenger()->addMessage($this->t('Guide has been deleted.'));
-    }
+    // Get the id of the guide to be deleted
+    $guide = Node::load($form_state->getValue('guide_id'));
 
-    \Drupal::logger('lgmsmodule')->notice('Node ID: @id, Type: @type');
+
+    // Delete pages
+    $helper->deletePages($guide, True);
+
+    // Delete Guide
+    $guide->delete();
+
+    // Redirect the user to the dashboard
     $form_state->setRedirect('lgmsmodule.dashboard_overview');
-  }
-
-  public function closeModalForm(array &$form, FormStateInterface $form_state) {
-    $response = new AjaxResponse();
-    $response->addCommand(new \Drupal\Core\Ajax\CloseModalDialogCommand());
-    return $response;
   }
 }

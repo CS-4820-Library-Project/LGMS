@@ -1079,7 +1079,7 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
             'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
           ],
         ],
-        '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['node_id' => $entity->id()]),
+        '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['guide_id' => $entity->id()]),
         '#attributes' => [
           'class' => ['use-ajax'],
           'data-dialog-type' => 'modal',
@@ -1201,10 +1201,6 @@ function lgmsModule_install(): void
     // After the block->save() call.
     \Drupal::service('cache_tags.invalidator')->invalidateTags(['block_list']);
     \Drupal::service('router.builder')->rebuild();
-
-    \Drupal::messenger()->addMessage('LGMS Guide Owner Block placed successfully.');
-  } else {
-    \Drupal::messenger()->addMessage('The LGMS Guide Owner Block already exists.');
   }
 
   $block_id = 'pageviewblock';
@@ -1234,9 +1230,6 @@ function lgmsModule_install(): void
     ]);
 
     $block->save();
-    \Drupal::messenger()->addMessage('LGMS Page View Block placed successfully.');
-  } else {
-    \Drupal::messenger()->addMessage('The LGMS Page View Block already exists.');
   }
 
   // Create content types with brief descriptions.
@@ -2039,6 +2032,28 @@ function lgmsModule_install(): void
   );
 
   createField(
+    'field_lgms_user_subjects',
+    'user',
+    'user',
+    'Subjects',
+    'entity_reference',
+    ['target_type' => 'taxonomy_term',],
+    ['handler' => 'default:taxonomy_term',
+      'handler_settings' => [
+        'target_bundles' => [
+          'LGMS_Guide_Subject' => 'LGMS_Guide_Subject',
+        ],
+      ],
+    ],
+    'options_buttons',
+    [],
+    False,
+    True,
+    4,
+    'The user\'s subjects'
+  );
+
+  createField(
     'field_media_image',
     'node',
     'guide_item',
@@ -2495,7 +2510,6 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
       'field_html_item',
       'field_book_item',
       'field_media_image',
-      'field_description'
     ];
 
     // Track if any field is filled.

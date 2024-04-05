@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class FormHelper {
 
@@ -73,36 +74,17 @@ class FormHelper {
   public function set_form_data(array &$form, $ids, string $form_id){
     $this->set_prefix($form,$form_id);
 
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => property_exists($ids, 'current_node') ? $ids->current_node : null,
-    ];
-
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => property_exists($ids, 'current_box') ? $ids->current_box : null,
-    ];
-
-    $form['current_item'] = [
-      '#type' => 'hidden',
-      '#value' => property_exists($ids, 'current_item') ? $ids->current_item : null,
-    ];
-
-    $form['current_guide'] = [
-      '#type' => 'hidden',
-      '#value' => property_exists($ids, 'current_guide') ? $ids->current_guide : null,
-    ];
-  }
-
-  public function set_form_fields_from_array(array &$form, $ids)
-  {
     foreach ($ids as $label => $id){
+      // if any of the fields is missing, deny access to the form
+      if ($label != 'current_item' && (empty($id) || !Node::load($id))){
+        throw new AccessDeniedHttpException();
+      }
+
       $form[$label] = [
         '#type' => 'hidden',
         '#value' => $id,
       ];
     }
-
   }
 
   public function set_prefix(array &$form, string $id){
@@ -188,12 +170,12 @@ class FormHelper {
   }
 
   public function deletePages($parent, $delete_sub){
-    $this->deleteBoxes($parent);
+    $this->delete_all_boxes($parent);
 
     if($delete_sub) {
       $pages = $parent->get('field_child_pages')->referencedEntities();
       foreach ($pages as $page) {
-        $this->deleteBoxes($page);
+        $this->delete_all_boxes($page);
         $this->deletePages($page, $delete_sub);
       }
     }
@@ -201,34 +183,41 @@ class FormHelper {
     $parent->delete();
   }
 
-  public function deleteBoxes($parent): void
+  public function delete_all_boxes($parent): void
   {
     $boxes = $parent->get('field_child_boxes')->referencedEntities();
 
     foreach($boxes as $box){
       if($parent->id() == $box->get('field_parent_node')->entity->id()){
-
-        $query = \Drupal::entityQuery('node')
-          ->condition('type', 'guide_page')
-          ->condition('field_child_boxes', $box->id())
-          ->accessCheck(TRUE);
-        $result = $query->execute();
-
-        foreach ($result as $page){
-          $page = Node::load($page);
-          $child_boxes = $page->get('field_child_boxes')->getValue();
-
-          $child_boxes = array_filter($child_boxes, function ($box_new) use ($box) {
-            return $box_new['target_id'] != $box->id();
-          });
-
-          $page->set('field_child_boxes', $child_boxes);
-          $page->save();
-        }
-
-        $box?->delete();
+        $this->delete_box($box);
       }
     }
+  }
+
+  public function delete_box($box): void {
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', 'guide_page')
+      ->condition('field_child_boxes', $box->id())
+      ->accessCheck(TRUE);
+    $result = $query->execute();
+
+    foreach ($result as $page){
+      $page = Node::load($page);
+      $this->remove_child_box($page,$box);
+    }
+
+    $box?->delete();
+  }
+
+  public function remove_child_box($page, $box): void {
+    $child_boxes = $page->get('field_child_boxes')->getValue();
+
+    $child_boxes = array_filter($child_boxes, function ($box_new) use ($box) {
+      return $box_new['target_id'] != $box->id();
+    });
+
+    $page->set('field_child_boxes', $child_boxes);
+    $page->save();
   }
 
   public function update_child_pages(EntityInterface $parent, EntityInterface $page)

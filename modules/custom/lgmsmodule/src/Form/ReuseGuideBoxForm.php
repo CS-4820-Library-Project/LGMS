@@ -44,7 +44,7 @@ class ReuseGuideBoxForm extends FormBase {
       '#type' => 'select',
       '#title' => $this->t('Select a Box'),
       '#options' => $options,
-      '#empty_option' => $this->t('- Select a Box Item -'),
+      '#empty_option' => $this->t('- Select a Box -'),
       '#target_type' => 'node', // Adjust according to your needs
       '#selection_settings' => [
         'target_bundles' => ['guide_box'], // Adjust to your guide page bundle
@@ -59,7 +59,7 @@ class ReuseGuideBoxForm extends FormBase {
 
     $form['reference'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('<Strong>Reference:</Strong> By selecting this, a reference of the box will be created. it will be un-editable from this guide/page'),
+      '#title' => $this->t('<Strong>Link:</Strong> By selecting this, a link of the box will be created. it will be un-editable from this guide/page'),
     ];
 
     // Container to dynamically update based on AJAX callback.
@@ -175,7 +175,7 @@ class ReuseGuideBoxForm extends FormBase {
     $box = Node::load($form_state->getValue('box'));
     $box_parent = $box->get('field_parent_node')->target_id;
 
-    if(!$form_state->getValue('reference') && $box_parent !== $nid){
+    if(!$form_state->getValue('reference')){
       $new_box = $box->createDuplicate();
       $new_box->set('field_parent_node', $nid);
       $new_box->set('title', $form_state->getValue('title'));

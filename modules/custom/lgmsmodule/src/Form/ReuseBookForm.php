@@ -95,7 +95,7 @@ class ReuseBookForm extends FormBase {
         $form['update_wrapper']['title'] = [
           '#type' => 'textfield',
           '#title' => $this->t('New Title:'),
-          '#default_value' => $reference? $this->t('This is just a reference and cannot be edited.') : $selected_node->label(),
+          '#default_value' => $reference? $this->t('This is just a Link and cannot be edited.') : $selected_node->label(),
           '#required' => !$reference,
           '#disabled' => $reference,
           '#states' => [
@@ -194,8 +194,8 @@ class ReuseBookForm extends FormBase {
         if ($type_check == $ebook){
           $form['update_wrapper']['pub_finder_group'] = [
             '#type' => 'fieldset',
-            '#title' => $this->t('Publication Finder'),
-            '#description' => $this->t('Provide the text and URL for the publication finder.'),
+            '#title' => $this->t('Access Ebook'),
+            '#description' => $this->t('Provide the text and URL for the Access Ebook.'),
             '#collapsible' => FALSE,
             '#collapsed' => FALSE,
             '#required' => $isEbookTypeSelected,
@@ -224,7 +224,7 @@ class ReuseBookForm extends FormBase {
           $form['update_wrapper']['pub_finder_group']['url2'] = [
             '#type' => 'url',
             '#title' => $this->t('URL'),
-            '#description' => $this->t('The URL for the publication finder.'),
+            '#description' => $this->t('The URL for the Access Ebook.'),
             '#default_value' => $selected_node->get('field_book_pub_finder')->uri,
             '#required' => $isEbookTypeSelected,
             '#states' => [
@@ -424,10 +424,10 @@ class ReuseBookForm extends FormBase {
 
       } else {
         if(empty($form_state->getValue('url2'))){
-          $form_state->setErrorByName('pub_finder_group][url', t('Pub Finder\'s URL is required.'));
+          $form_state->setErrorByName('pub_finder_group][url', t('Access Ebook\'s URL is required.'));
         }
         if(empty($form_state->getValue('label2'))){
-          $form_state->setErrorByName('pub_finder_group][label', t('Pub Finder\'s Label is required.'));
+          $form_state->setErrorByName('pub_finder_group][label', t('Access Ebook\'s Label is required.'));
         }
       }
     }

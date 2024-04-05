@@ -170,7 +170,7 @@ class AddBookForm extends FormBase {
 
     $form['pub_finder_group'] = [
       '#type' => 'fieldset',
-      '#title' => $this->t('Pub Finder'),
+      '#title' => $this->t('Access Ebook'),
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
       '#states' => [
