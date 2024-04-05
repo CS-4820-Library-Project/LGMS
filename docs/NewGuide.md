@@ -6,7 +6,7 @@ __Created By:__ Mohammed Amaan
 ***
 
 
-## [LGMS Module Landing Page | lgms](http://localhost/LGMS/lgms)
+## [Library Guide Management System | lgms](http://localhost/LGMS/lgms)
 Welcome to Library Guide Management System Setting up a new guide Help. Follow the steps below to create your first guide.
 
 
