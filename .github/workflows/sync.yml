@@ -29,7 +29,7 @@ jobs:
 
       - name: Rsync files to lgmsmodule-only branch folder
         run: |
-          rsync -av --delete --exclude '.git/' --exclude '.github/' lgms-temp/ lgmsmodule-only/
+          rsync -av --delete --exclude '.git/' --exclude '.github/' --exclude 'README.md' lgms-temp/ lgmsmodule-only/
 
       - name: Push changes to lgmsmodule-only branch
         run: |
