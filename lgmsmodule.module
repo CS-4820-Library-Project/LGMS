@@ -1050,44 +1050,100 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
       '#attributes' => ['class' => ['icons-container']],
     ];
 
-    if (\Drupal::currentUser()->isAuthenticated() && $entity->bundle() == 'guide') {
-      $icons['print_icon'] = [
-        '#type' => 'link',
-        '#title' => [
-          '#type' => 'html_tag',
-          '#tag' => 'i',
-          '#attributes' => [
-            'class' => ['fa', 'fa-print'],
-            'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 12px; margin-top: 11px;' : 'margin: 32px;',
+    if (\Drupal::currentUser()->isAuthenticated() && ($entity->bundle() == 'guide' || $entity->bundle() == 'guide_page')) {
 
+      if ($entity->bundle() == 'guide_page'){
+        $icons['dashboard_icon'] = [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-house'],
+              'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
+            ],
           ],
-        ],
-        '#url' => Url::fromRoute('lgmsmodule.download_guide', ['node' => $entity->id()]),
-        '#attributes' => [
-          'title' => 'Print Guide',
-          'style' => 'text-decoration: none;',
-        ],
-      ];
-
-      $icons['delete_icon'] = [
-        '#type' => 'link',
-        '#title' => [
-          '#type' => 'html_tag',
-          '#tag' => 'i',
+          '#url' => Url::fromRoute('lgmsmodule.dashboard_overview', ['node' => $entity->id()]),
           '#attributes' => [
-            'class' => ['fa', 'fa-trash'],
-            'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
+            'title' => 'Guide Dashboard',
+            'style' => 'text-decoration: none;',
           ],
-        ],
-        '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['guide_id' => $entity->id()]),
-        '#attributes' => [
-          'class' => ['use-ajax'],
-          'data-dialog-type' => 'modal',
-          'data-dialog-options' => json_encode(['width' => 700]),
-        ],
-      ];
+        ];
+      } else {
+        $icons['dashboard_icon'] = [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-house'],
+              'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 12px; margin-top: 11px;' : 'margin: 32px;',
+            ],
+          ],
+          '#url' => Url::fromRoute('lgmsmodule.dashboard_overview', ['node' => $entity->id()]),
+          '#attributes' => [
+            'title' => 'Guide Dashboard',
+            'style' => 'text-decoration: none;',
+          ],
+        ];
+
+        $icons['print_icon'] = [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-print'],
+              'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 12px; margin-top: 11px;' : 'margin: 32px;',
+
+            ],
+          ],
+          '#url' => Url::fromRoute('lgmsmodule.download_guide', ['node' => $entity->id()]),
+          '#attributes' => [
+            'title' => 'Print Guide',
+            'style' => 'text-decoration: none;',
+          ],
+        ];
+
+        $icons['delete_icon'] = [
+          '#type' => 'link',
+          '#title' => [
+            '#type' => 'html_tag',
+            '#tag' => 'i',
+            '#attributes' => [
+              'class' => ['fa', 'fa-trash'],
+              'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
+            ],
+          ],
+          '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['guide_id' => $entity->id()]),
+          '#attributes' => [
+            'class' => ['use-ajax'],
+            'data-dialog-type' => 'modal',
+            'data-dialog-options' => json_encode(['width' => 700]),
+          ],
+        ];
+      }
 
     }
+
+//    if (\Drupal::currentUser()->isAuthenticated() && ($entity->bundle() == 'guide' || $entity->bundle() == 'guide_page')){
+//      $icons['dashboard_icon'] = [
+//        '#type' => 'link',
+//        '#title' => [
+//          '#type' => 'html_tag',
+//          '#tag' => 'i',
+//          '#attributes' => [
+//            'class' => ['fa', 'fa-home'],
+//            'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 24px; margin-top: 11px;' : 'margin: 32px;',
+//          ],
+//        ],
+//        '#url' => Url::fromRoute('lgmsmodule.dashboard_overview', ['node' => $entity->id()]),
+//        '#attributes' => [
+//          'title' => 'Guide Dashboard',
+//          'style' => 'text-decoration: none;',
+//        ],
+//      ];
+//    }
 
     $build['guide_print'][] = [
       '#type' => 'container',
