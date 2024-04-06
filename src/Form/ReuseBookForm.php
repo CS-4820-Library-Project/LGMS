@@ -14,7 +14,8 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 
 class ReuseBookForm extends FormBase {
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'reuse_book_item_form';
   }
 
@@ -22,7 +23,8 @@ class ReuseBookForm extends FormBase {
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
     $form_helper->set_form_data($form,$ids, $this->getFormId());
@@ -319,10 +321,6 @@ class ReuseBookForm extends FormBase {
     }
   }
 
-  /**
-   * @throws InvalidPluginDefinitionException
-   * @throws PluginNotFoundException
-   */
   public function bookItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
     $selected = $form_state->getValue('book_select');
     $selected_node = Node::load($selected);
@@ -386,8 +384,6 @@ class ReuseBookForm extends FormBase {
       $form_state->setValue('year', $selected_node->get('field_book_year')->value);
       $form_state->setValue('edition', $selected_node->get('field_book_edition')->value);
       $form_state->setValue('description', ['value' => $selected_node->get('field_book_description')->value, 'format' => $selected_node->get('field_book_description')->format]);
-      //$form_state->setValue('type1', $selected_node->get('field_book_type')->target_id);
-      //$form_state->setValue('type', $selected_node->get('field_book_type')->target_id);
 
       $form['update_wrapper']['prev_node']['#value'] = $selected_node->id();
 
@@ -395,7 +391,8 @@ class ReuseBookForm extends FormBase {
     return $form['update_wrapper'];
   }
 
-  public function validateFields(array &$form, FormStateInterface $form_state) {
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
     $reference = $form_state->getValue('reference');
     $title = $form_state->getValue('title');
     $type_check = $form_state->getValue('type');
@@ -437,7 +434,8 @@ class ReuseBookForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Book created successfully.', '#'.$this->getFormId());
@@ -447,7 +445,8 @@ class ReuseBookForm extends FormBase {
   /**
    * @throws EntityStorageException
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $current_box_id = $form_state->getValue('current_box');
     $current_box = Node::load($current_box_id);
 
@@ -493,15 +492,12 @@ class ReuseBookForm extends FormBase {
       $new_item->set('title', $form_state->getValue('title'));
       $new_item->set('field_book_item', $new_book);
 
-      $new_item->save();
-
-      $item = $new_item;
     } else {
       $new_item = $item->createDuplicate();
       $new_item->set('field_book_item', $book);
-      $new_item->save();
-      $item = $new_item;
     }
+    $new_item->save();
+    $item = $new_item;
 
     $boxList = $current_box->get('field_box_items')->getValue();
     $boxList[] = ['target_id' => $item->id()];

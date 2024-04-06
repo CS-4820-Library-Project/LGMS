@@ -6,6 +6,7 @@ use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
@@ -14,11 +15,13 @@ use Drupal\node\Entity\Node;
 
 class ReuseGuidePageForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'lgmsmodule_reuse_guide_page_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
@@ -149,7 +152,11 @@ class ReuseGuidePageForm extends FormBase {
     return $form['include_sub_wrapper'];
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $page = Node::load($form_state->getValue('select_page'));
     $parent = Node::load($form_state->getValue('position'));
 
@@ -298,14 +305,16 @@ class ReuseGuidePageForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     // Create an array of AJAX commands.
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Page created successfully.', '#'.$this->getFormId());
   }
 
-  private function getGuidePageOptions($guide_id) {
+  private function getGuidePageOptions($guide_id): array
+  {
     $options = [];
 
     // Fetch all guides.
@@ -347,7 +356,8 @@ class ReuseGuidePageForm extends FormBase {
     return $options;
   }
 
-  public function getPageList($guide_id) {
+  public function getPageList($guide_id): array
+  {
     $options = [];
 
     $options['Page Level'][$guide_id] = t('Page Level');
@@ -383,7 +393,8 @@ class ReuseGuidePageForm extends FormBase {
 
 
   // Retrieves guide boxes belonging to a guide page
-  private function getChildBoxes($pageId) {
+  private function getChildBoxes($pageId): array
+  {
     $query = \Drupal::entityQuery('node')
       ->condition('type', 'guide_box')
       ->condition('field_parent_page', $pageId)

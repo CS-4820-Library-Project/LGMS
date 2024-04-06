@@ -2,6 +2,7 @@
 namespace Drupal\lgmsmodule\Form;
 
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -9,11 +10,13 @@ use Drupal\node\Entity\Node;
 
 class ReOrderPagesForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 're_order_box_items_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state){
+  public function buildForm(array $form, FormStateInterface $form_state): array
+  {
     $form_helper = new FormHelper();
 
     // Get the data from the URL
@@ -112,13 +115,18 @@ class ReOrderPagesForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Box Items Have been re-ordered.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     // Get the new order

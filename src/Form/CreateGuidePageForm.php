@@ -5,6 +5,8 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -13,12 +15,13 @@ use Drupal\node\Entity\Node;
 class CreateGuidePageForm extends FormBase
 {
 
-  public function getFormId()
+  public function getFormId(): string
   {
     return 'create_guide_page_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null){
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
     $form_helper->set_form_data($form,$ids, $this->getFormId());
@@ -78,7 +81,8 @@ class CreateGuidePageForm extends FormBase
     return $form;
   }
 
-  public function validateFields(array &$form, FormStateInterface $form_state) {
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
     $hide = $form_state->getValue('hide_description');
     $desc = $form_state->getValue('field_description')['value'];
     if (!$hide && empty($desc)) {
@@ -86,13 +90,21 @@ class CreateGuidePageForm extends FormBase
     }
   }
 
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityMalformedException
+   */
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Page created successfully.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state){
+  /**
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     // Get and Load the current guide node.

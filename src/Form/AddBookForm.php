@@ -12,7 +12,8 @@ use Exception;
 
 class AddBookForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'add_book_form';
   }
 
@@ -231,13 +232,15 @@ class AddBookForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'A Book item has been created.', '#'.$this->getFormId());
   }
 
-  public function validateFields(array &$form, FormStateInterface $form_state) {
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
     if($form_state->getValue('type') == 'print'){
       if(empty($form_state->getValue('call_number'))){
         $form_state->setErrorByName('call_number', t('Call Number is required.'));
@@ -265,7 +268,8 @@ class AddBookForm extends FormBase {
   /**
    * @throws EntityStorageException
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     $form_field_values = [
@@ -340,6 +344,9 @@ class AddBookForm extends FormBase {
     $ajaxHelper->updateParent($form, $form_state);
   }
 
+  /**
+   * @throws EntityStorageException
+   */
   protected function handleUserPicture(EntityInterface $node, FormStateInterface $form_state): void {
     $picture_fid = $form_state->getValue(['cover_picture', 0]);
 

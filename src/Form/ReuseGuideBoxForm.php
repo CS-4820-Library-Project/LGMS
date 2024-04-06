@@ -5,6 +5,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -12,11 +13,13 @@ use Drupal\node\Entity\Node;
 
 class ReuseGuideBoxForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'reuse_guide_box_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
@@ -87,7 +90,8 @@ class ReuseGuideBoxForm extends FormBase {
     return $form;
   }
 
-  public function validateFields(array &$form, FormStateInterface $form_state) {
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
     $reference = $form_state->getValue('reference');
     $title = $form_state->getValue('title');
     $curr_node = $form_state->getValue('current_node');
@@ -110,7 +114,8 @@ class ReuseGuideBoxForm extends FormBase {
     }
   }
 
-  private function prefillSelectedBoxItem(array &$form, FormStateInterface $form_state) {
+  private function prefillSelectedBoxItem(array &$form, FormStateInterface $form_state): void
+  {
     $selected = $form_state->getValue('box');
 
     if (!empty($selected)) {
@@ -146,14 +151,16 @@ class ReuseGuideBoxForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.', '#'.$this->getFormId());
   }
 
 
-  public static function hideTextFormatHelpText(array $element, FormStateInterface $form_state) {
+  public static function hideTextFormatHelpText(array $element, FormStateInterface $form_state): array
+  {
     if (isset($element['format']['help'])) {
       $element['format']['help']['#access'] = FALSE;
     }
@@ -166,7 +173,11 @@ class ReuseGuideBoxForm extends FormBase {
     return $element;
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $curr_node = $form_state->getValue('current_node');
     $curr_node = Node::load($curr_node);
 
@@ -241,7 +252,8 @@ class ReuseGuideBoxForm extends FormBase {
    * @return array
    *   An associative array of options for the select field.
    */
-  private function getBoxItemOptions() {
+  private function getBoxItemOptions(): array
+  {
     $query = \Drupal::entityQuery('node')
       ->condition('type', 'guide_box')
       ->sort('title', 'ASC')

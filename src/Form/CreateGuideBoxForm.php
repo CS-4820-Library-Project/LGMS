@@ -12,11 +12,13 @@ use Drupal\node\Entity\Node;
 
 class CreateGuideBoxForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'create_guide_box_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
     $form_helper->set_form_data($form,$ids, $this->getFormId());
@@ -49,13 +51,15 @@ class CreateGuideBoxForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     // Get the current page
     $curr_page = $form_state->getValue('current_node');
     $curr_page = Node::load($curr_page);
