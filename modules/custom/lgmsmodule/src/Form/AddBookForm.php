@@ -1,6 +1,7 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
@@ -10,14 +11,35 @@ use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Exception;
 
+/**
+ * Form handler for adding and editing book entities.
+ *
+ * Provides a form for adding new book entities to the system or editing existing
+ * ones. It supports different types of book entities (print and eBook), manages
+ * cover image uploads, and facilitates the dynamic adjustment of form fields
+ * based on the book type.
+ */
 class AddBookForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'add_book_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  /**
+   * Builds the add/edit book form.
+   *
+   * @param array $form The initial form array.
+   * @param FormStateInterface $form_state The state of the form.
+   * @param mixed $ids Optional parameters passed to the form.
+   *
+   * @return array The form array with all form elements added.
+   */
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     $form["#tree"] = TRUE;
 
     // Set the prefix, suffix, and hidden fields
@@ -230,15 +252,14 @@ class AddBookForm extends FormBase {
   }
 
   /**
-   * @throws EntityMalformedException
+   * Custom validation for the AddBookForm.
+   *
+   * Validates specific fields based on the selected book type and other criteria,
+   * ensuring required information is provided before submission.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
-  {
-    $ajaxHelper = new FormHelper();
-
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'A Book item has been created.', '#'.$this->getFormId());
-  }
-
   public function validateFields(array &$form, FormStateInterface $form_state): void
   {
     if($form_state->getValue('type') == 'print'){
@@ -266,7 +287,36 @@ class AddBookForm extends FormBase {
   }
 
   /**
-   * @throws EntityStorageException
+   * Handles AJAX form submission for the book form.
+   *
+   * Provides AJAX support to submit the form, allowing for a smoother user
+   * experience without requiring a page reload.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @return AjaxResponse The response for the AJAX request.
+   *
+   * @throws EntityMalformedException If there's an issue with the entity data.
+   */
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
+    $ajaxHelper = new FormHelper();
+
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'A Book item has been created.', '#'.$this->getFormId());
+  }
+
+  /**
+   * Handles the form submission.
+   *
+   * Processes the input from the form, creating or updating a book entity with
+   * the provided values. Manages file usage for uploaded images to ensure they
+   * are not removed by the system if unused elsewhere.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @throws EntityStorageException If there's an issue saving the entity.
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
@@ -345,7 +395,15 @@ class AddBookForm extends FormBase {
   }
 
   /**
-   * @throws EntityStorageException
+   * Manages the file usage for an uploaded book cover picture.
+   *
+   * Ensures the uploaded file is marked as permanent and records its usage,
+   * preventing Drupal from automatically removing it as unused.
+   *
+   * @param EntityInterface $node The book entity to associate the file with.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @throws EntityStorageException If there's an issue saving the file entity.
    */
   protected function handleUserPicture(EntityInterface $node, FormStateInterface $form_state): void {
     $picture_fid = $form_state->getValue(['cover_picture', 0]);
