@@ -71,7 +71,6 @@ class lgmsDashboardController extends ControllerBase
     $form = $this->entityFormBuilder()->getForm($node);
 
     return $form;
-    $build = [];
   }
 
   public function reuse()

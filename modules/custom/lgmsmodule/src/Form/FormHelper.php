@@ -203,35 +203,34 @@ class FormHelper {
 
     foreach ($result as $page){
       $page = Node::load($page);
-      $this->remove_child_box($page,$box);
+      $this->remove_child($page,$box,'field_child_boxes');
     }
 
     $box?->delete();
   }
 
-  public function remove_child_box($page, $box): void {
-    $child_boxes = $page->get('field_child_boxes')->getValue();
+  public function remove_child($page, $child_to_remove, $field): void {
+    $children = $page->get($field)->getValue();
 
-    $child_boxes = array_filter($child_boxes, function ($box_new) use ($box) {
-      return $box_new['target_id'] != $box->id();
+    $children = array_filter($children, function ($child) use ($child_to_remove) {
+      return $child['target_id'] != $child_to_remove->id();
     });
 
-    $page->set('field_child_boxes', $child_boxes);
+    $page->set($field, $children);
     $page->save();
   }
 
-  public function update_child_pages(EntityInterface $parent, EntityInterface $page)
+  public function add_child_page(EntityInterface $parent, EntityInterface $page)
   {
     $page_list = $parent->get('field_child_pages')->getValue();
     $page_list[] = ['target_id' => $page->id()];
 
     $parent->set('field_child_pages', $page_list);
-    $parent->set('changed', \Drupal::time()->getRequestTime());
     $parent->save();
 
   }
 
-  public function get_position_options(String $guide_id): array
+  public function get_position_options(FormStateInterface $form_state, String $guide_id, bool $onlyWithSubpages = false): array
   {
     $options = [];
 
@@ -260,11 +259,117 @@ class FormHelper {
 
         // Create options array from the child pages.
         foreach ($child_pages as $child_page) {
-          $options[$group_label][$child_page->id()] = $child_page->label(); // Use the title or label of the page.
+          if ($child_page->id() == $form_state->getValue('select_page')){
+            \Drupal::logger('my_module')->notice('<pre>' . print_r($child_page->id(), TRUE) . '</pre>');
+            continue;
+          }
+
+          if ($onlyWithSubpages){
+            if ($child_page->hasField('field_child_pages')) {
+              $sub_child_pages = $child_page->get('field_child_pages')->referencedEntities();
+              if (!empty($sub_child_pages)) {
+                $options[$child_page->id()] = $child_page->label();
+              }
+            }
+          } else {
+            $options[$group_label][$child_page->id()] = $child_page->label();
+          }
         }
       }
     }
 
     return $options;
+  }
+
+  public function get_pages_options(String $guide_id, bool $include_guide = true) {
+    $options = [];
+    // Load the guide entity.
+    $guide = Node::load($guide_id);
+
+    // Check if the guide has been loaded and has the field_child_pages field.
+    if ($guide && $guide->hasField('field_child_pages')) {
+      // Guide Option
+      if ($include_guide){
+        $options['Guide'][$guide_id] = t('Entire Guide');
+      }
+
+      // Get the array of child page IDs from the guide.
+      $child_pages = $guide->get('field_child_pages')->referencedEntities();
+
+      if (!empty($child_pages)) {
+        // Group label for child pages.
+        $group_label = 'Pages';
+
+        // Initialize the group if it's not set.
+        if (!isset($options[$group_label])) {
+          $options[$group_label] = [];
+        }
+
+        // Create options array from the child pages.
+        foreach ($child_pages as $child_page) {
+          $options[$group_label][$child_page->id()] = $child_page->label();
+
+          if ($child_page->get('field_parent_guide')->entity->id() == $guide_id) {
+            // Check if the child page has its own subpages.
+            if ($child_page->hasField('field_child_pages')) {
+              $subpages_ids = array_column($child_page->get('field_child_pages')->getValue(), 'target_id');
+              $subpages = !empty($subpages_ids) ? Node::loadMultiple($subpages_ids) : [];
+
+              // Label each subpage with the parent page title.
+              foreach ($subpages as $subpage) {
+                $label = '— ' .  $subpage->getTitle();
+                $options[$group_label][$subpage->id()] = $label;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Return the options array with the 'Top Level' and the grouped child pages.
+    return $options;
+  }
+
+  public function get_reorder_table(array &$form, $list){
+    $form['pages_table'] = [
+      '#type' => 'table',
+      '#header' => ['Title', 'Weight'],
+      '#tabledrag' => [[
+        'action' => 'order',
+        'relationship' => 'sibling',
+        'group' => 'pages-order-weight',
+      ]],
+    ];
+
+    foreach ($list as $weight => $item) {
+      $loaded_item = Node::load($item->target_id);
+
+      $form['pages_table'][$weight]['#attributes']['class'][] = 'draggable';
+      $form['pages_table'][$weight]['title'] = [
+        '#markup' => $loaded_item->label(),
+      ];
+
+      $form['pages_table'][$weight]['weight'] = [
+        '#type' => 'weight',
+        '#title' => t('Weight'),
+        '#title_display' => 'invisible',
+        '#default_value' => $weight,
+        '#attributes' => ['class' => ['pages-order-weight']],
+      ];
+    }
+  }
+
+  public function get_new_order($values, $items){
+    $reordered_items = [];
+
+    foreach ($values as $id => $value) {
+      if (isset($items[$id])) {
+        $reordered_items[$value['weight']] = $items[$id];
+      }
+    }
+
+    ksort($reordered_items);
+
+    return $reordered_items;
   }
 }

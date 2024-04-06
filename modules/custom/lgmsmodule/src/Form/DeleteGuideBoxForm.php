@@ -79,7 +79,7 @@ class DeleteGuideBoxForm extends FormBase {
     $current_node = Node::load($form_state->getValue('current_node'));
 
     // Remove box from the current page child boxes
-    $ajaxHelper->remove_child_box($current_node, $current_box);
+    $ajaxHelper->remove_child($current_node, $current_box, 'field_child_boxes');
 
     // Box's parent node
     $parent_node = $current_box->get('field_parent_node')->entity;

@@ -2,7 +2,7 @@ lgmsmodule.all_guides:
   path: '/lgms'
   defaults:
     _controller: '\Drupal\lgmsmodule\Controller\AllGuidesController::allGuides'
-    _title: 'LGMS Module Landing Page'
+    _title: 'Library Guide Management System'
   requirements:
     _permission: 'access content'
 

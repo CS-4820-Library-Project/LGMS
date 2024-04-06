@@ -59,12 +59,8 @@ class DeleteGuideForm extends FormBase {
     // Get the id of the guide to be deleted
     $guide = Node::load($form_state->getValue('guide_id'));
 
-
-    // Delete pages
+    // Delete guide and it's pages
     $helper->deletePages($guide, True);
-
-    // Delete Guide
-    $guide->delete();
 
     // Redirect the user to the dashboard
     $form_state->setRedirect('lgmsmodule.dashboard_overview');
