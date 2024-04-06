@@ -41,10 +41,7 @@ class ByGroupController {
       $nid = $record->entity_id;
       $node = Node::load($nid);
 
-      // Attempt to get the node title.
-      $title = $node->label();
-
-      if($title != null) {
+      if($node) {
         // Load the taxonomy term associated with this node.
         $term = Term::load($record->field_lgms_guide_group_target_id);
         $taxonomyTerm = $term->label();
@@ -54,9 +51,9 @@ class ByGroupController {
 
         // Organize data by taxonomy term, with links formatted in HTML.
         $data[$taxonomyTerm][] = [
-          'text' => $title, // Text to be used for sorting.
+          'text' => $node->label(), // Text to be used for sorting.
           'markup' => new FormattableMarkup('<a href=":link">@name</a>',
-            [':link' => $articleLink, '@name' => $title])
+            [':link' => $articleLink, '@name' => $node->label()])
         ];
       }
     }
