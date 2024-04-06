@@ -38,7 +38,6 @@ class lgmsDashboardController extends ControllerBase {
 
     if (is_object($view)) {
       $view->setDisplay('default');
-      $title = $view->getTitle();
       $view->execute();
 
       if (!$view->result) {
