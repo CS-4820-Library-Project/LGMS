@@ -319,4 +319,47 @@ class FormHelper {
     // Return the options array with the 'Top Level' and the grouped child pages.
     return $options;
   }
+
+  public function get_reorder_table(array &$form, $list){
+    $form['pages_table'] = [
+      '#type' => 'table',
+      '#header' => ['Title', 'Weight'],
+      '#tabledrag' => [[
+        'action' => 'order',
+        'relationship' => 'sibling',
+        'group' => 'pages-order-weight',
+      ]],
+    ];
+
+    foreach ($list as $weight => $item) {
+      $loaded_item = Node::load($item->target_id);
+
+      $form['pages_table'][$weight]['#attributes']['class'][] = 'draggable';
+      $form['pages_table'][$weight]['title'] = [
+        '#markup' => $loaded_item->label(),
+      ];
+
+      $form['pages_table'][$weight]['weight'] = [
+        '#type' => 'weight',
+        '#title' => t('Weight'),
+        '#title_display' => 'invisible',
+        '#default_value' => $weight,
+        '#attributes' => ['class' => ['pages-order-weight']],
+      ];
+    }
+  }
+
+  public function get_new_order($values, $items){
+    $reordered_items = [];
+
+    foreach ($values as $id => $value) {
+      if (isset($items[$id])) {
+        $reordered_items[$value['weight']] = $items[$id];
+      }
+    }
+
+    ksort($reordered_items);
+
+    return $reordered_items;
+  }
 }

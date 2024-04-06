@@ -14,55 +14,23 @@ class ReOderBoxItemsForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
+    $form_helper = new FormHelper();
+
+    // Get the data from the URL
+    $ids = (object) [
+      'current_node' => \Drupal::request()->query->get('current_node'),
+      'current_box' => \Drupal::request()->query->get('current_box'),
     ];
 
-    $current_box = \Drupal::request()->query->get('current_box');
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $current_box,
-    ];
+    // Set the prefix, suffix, and hidden fields
+    $form_helper->set_form_data($form, $ids, $this->getFormId());
 
-    $current_node = \Drupal::request()->query->get('current_node');
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $current_node,
-    ];
-
-    $form['pages_table'] = [
-      '#type' => 'table',
-      '#header' => ['Title', 'Weight'],
-      '#tabledrag' => [[
-        'action' => 'order',
-        'relationship' => 'sibling',
-        'group' => 'pages-order-weight',
-      ]],
-    ];
-
-    $box = Node::load($current_box);
-
+    // Get the items to reorder
+    $box = Node::load($ids->current_box);
     $box_items = $box->get('field_box_items');
 
-    foreach ($box_items as $weight => $item) {
-      $loaded_item = Node::load($item->target_id);
-
-      $form['pages_table'][$weight]['#attributes']['class'][] = 'draggable';
-      $form['pages_table'][$weight]['title'] = [
-        '#markup' => $loaded_item->label(),
-      ];
-
-      $form['pages_table'][$weight]['weight'] = [
-        '#type' => 'weight',
-        '#title' => t('Weight'),
-        '#title_display' => 'invisible',
-        '#default_value' => $weight,
-        '#attributes' => ['class' => ['pages-order-weight']],
-      ];
-    }
+    // Add reorder items Field
+    $form_helper->get_reorder_table($form, $box_items);
 
 
     $form['actions']['#type'] = 'actions';
@@ -70,11 +38,10 @@ class ReOderBoxItemsForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;
@@ -90,27 +57,25 @@ class ReOderBoxItemsForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $ajaxHelper = new FormHelper();
+
+    // Get the new order
     $values = $form_state->getValue('pages_table');
 
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
+    // Load the box that holds the items to be sorted
+    $current_box = Node::load($form_state->getValue('current_box'));
 
+    // Get the items to sort
     $items = $current_box->get('field_box_items')->getValue();
 
-    $reordered_items = [];
+    // Get the new order
+    $items = $ajaxHelper->get_new_order($values,$items);
 
-    foreach ($values as $id => $value) {
-      if (isset($items[$id])) {
-        $reordered_items[$value['weight']] = $items[$id];
-      }
-    }
-
-    ksort($reordered_items);
-
-    $current_box->set('field_box_items', array_values($reordered_items));
+    // Save the new order
+    $current_box->set('field_box_items', array_values($items));
     $current_box->save();
 
-    $ajaxHelper = new FormHelper();
+    // Update parents
     $ajaxHelper->updateParent($form, $form_state);
   }
 }
