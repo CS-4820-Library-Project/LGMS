@@ -21,21 +21,17 @@ class LgmsSearchBlock extends BlockBase {
    */
   public function build() {
     $build = [];
-
     $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
-
-    $classes = 'lgms-search ';
-
-    if($this->type == "dashboard"){
-      $classes .= 'lgms-dashboard-search';
-    }
-    else {
-      $classes .= 'lgms-all_guides-search';
-    }
 
     $build['search'] = [
       '#type' => 'search',
-      '#attributes' => ['class' => [$classes], 'placeholder' => $this->t('Search ...'),],
+      '#attributes' => [
+        'class' => [
+          'lgms-search',
+          $this->type == "dashboard"? 'lgms-dashboard-search' : 'lgms-all_guides-search'
+        ],
+        'placeholder' => $this->t('Search ...'),
+      ],
     ];
 
     return $build;
