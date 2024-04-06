@@ -54,6 +54,11 @@ class AddMediaForm extends FormBase {
       '#required' => TRUE,
       '#description' => $add_media_link_html,
       '#default_value' => $edit? $media->id(): null,
+      '#ajax' => [
+        'callback' => '::mediaSelectedCallBack',
+        'wrapper' => 'update-wrapper',
+        'event' => 'change',
+      ],
     ];
 
     $form['include_title'] = [
@@ -76,12 +81,18 @@ class AddMediaForm extends FormBase {
       '#default_value' => $edit? $current_item->label(): '',
     ];
 
+    $form['update_wrapper'] = [
+      '#type' => 'container',
+      '#attributes' => ['id' => 'update-wrapper'],
+    ];
+
     // Draft mode Field
-    $form['published'] = [
+    $form['update_wrapper']['published'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Draft mode:'),
       '#description' => $this->t('Un-check this box to publish.'),
-      '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
+      '#default_value' => $edit ? $current_item->isPublished() == '0' || $media->isPublished() == '0': 0,
+      '#disabled' => $edit && !$media->isPublished(),
     ];
 
 
@@ -97,6 +108,23 @@ class AddMediaForm extends FormBase {
     ];
 
     return $form;
+  }
+
+  public function mediaSelectedCallBack(array &$form, FormStateInterface $form_state) {
+    $selected = $form_state->getValue('media');
+    $selected = Media::load($selected);
+
+    if ($selected->isPublished()){
+      unset($form['update_wrapper']['published']['#disabled']);
+      $form['update_wrapper']['published']['#checked'] = false;
+      $form['update_wrapper']['published']['#description'] = $this->t('Un-check this box to publish.');
+    } else{
+      $form['update_wrapper']['published']['#checked'] = true;
+      $form['update_wrapper']['published']['#attributes']['disabled'] = true;
+      $form['update_wrapper']['published']['#description'] = $this->t('Please publish the original node');
+    }
+
+    return $form['update_wrapper'];
   }
 
   /**
