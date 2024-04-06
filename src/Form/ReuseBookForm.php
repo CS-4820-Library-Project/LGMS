@@ -33,7 +33,7 @@ class ReuseBookForm extends FormBase {
     $form['book_select'] = [
       '#type' => 'select',
       '#title' => $this->t('Select Book Item'),
-      '#options' => $this->getBookItemOptions(),
+      '#options' => $form_helper->get_item_options('guide_book_item'),
       '#empty_option' => $this->t('- Select a Book Item -'),
       '#required' => TRUE,
       '#ajax' => [
@@ -519,27 +519,6 @@ class ReuseBookForm extends FormBase {
 
     // Update the parents
     $ajaxHelper->updateParent($form, $form_state);
-  }
-
-  private function getBookItemOptions(): array
-  {
-    // Get all the book items
-    $query = \Drupal::entityQuery('node')
-      ->condition('type', 'guide_book_item')
-      ->sort('title', 'ASC')
-      ->accessCheck(false);
-    $ids = $query->execute();
-
-    // Load all the books
-    $nodes = Node::loadMultiple($ids);
-    $options = [];
-
-    // Add them to the options
-    foreach ($nodes as $node) {
-      $options[$node->id()] = $node->label();
-    }
-
-    return $options;
   }
 }
 

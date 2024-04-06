@@ -389,4 +389,25 @@ class FormHelper {
 
     return $reordered_items;
   }
+
+  public function get_item_options(String $content_type): array
+  {
+    $query = \Drupal::entityQuery('node')
+      ->condition('type', $content_type)
+      ->sort('title', 'ASC')
+      ->accessCheck(False);
+    $items_ids = $query->execute();
+
+    // Load all the items
+    $nodes = Node::loadMultiple($items_ids);
+    $options = [];
+
+    // Add them to the options
+    foreach ($nodes as $node) {
+      $options[$node->id()] = $node->label();
+    }
+
+    // Return the options
+    return $options;
+  }
 }
