@@ -32,15 +32,9 @@ class DeleteContentItemsForm extends FormBase {
     $form_helper->set_form_data($form, $ids, $this->getFormId());
 
     $current_item = property_exists($ids, 'current_item')? Node::load($ids->current_item) : null;
-    $field_to_delete = '';
 
     // Get the filled field (this is the one to delete)
-    foreach ($form_helper->get_fields() as $field_name) {
-      if (!$current_item->get($field_name)->isEmpty()) {
-        $field_to_delete = $field_name;
-        break;
-      }
-    }
+    $field_to_delete = $form_helper->get_filled_field($current_item);
 
     $form['field_name'] = [
       '#type' => 'hidden',

@@ -159,20 +159,20 @@ class FormHelper {
 
   public function get_filled_field($current_item): string
   {
-    $possible_fields = $this->get_fields();
-    $field_to_delete = '';
+    $possible_fields = $this->get_content_items();
+    $filled_field = '';
 
     foreach ($possible_fields as $field_name) {
       if (!$current_item->get($field_name)->isEmpty()) {
-        $field_to_delete = $field_name;
+        $filled_field = $field_name;
         break;
       }
     }
 
-    return $field_to_delete;
+    return $filled_field;
   }
 
-  public function get_fields(): array
+  public function get_content_items(): array
   {
     return [
       'field_database_item',
@@ -428,5 +428,79 @@ class FormHelper {
 
     // Return the options
     return $options;
+  }
+
+  public function clone_pages($parent, $new_parent, bool $ref = false){
+    $pages = $parent->get('field_child_pages')->referencedEntities();
+
+    $new_page_list = [];
+
+    foreach ($pages as $page) {
+      $cloned_page = $page->createDuplicate();
+      $cloned_page->set('field_parent_guide', $new_parent);
+
+      if ($ref){
+        $cloned_page->set('field_reference_node', $page);
+      }
+
+      $cloned_page->setOwnerId(\Drupal::currentUser()->id());
+      $cloned_page->save();
+
+      $this->clone_boxes($page, $cloned_page);
+      $this->clone_pages($page, $cloned_page);
+
+      $new_page_list[] = ['target_id' => $cloned_page->id()];
+    }
+
+    // After cloning all boxes, update the cloned guide with the list of cloned boxes.
+    if (!empty($new_page_list)) {
+      $new_parent->set('field_child_pages', $new_page_list);
+      $new_parent->save();
+    }
+  }
+
+  public function clone_boxes($page, $new_page): void
+  {
+    $guide_boxes = $page->get('field_child_boxes')->referencedEntities();
+
+    $new_box_list = [];
+
+    foreach ($guide_boxes as $box) {
+      if ($box->hasField('field_parent_node') && $box->get('field_parent_node')->entity->id() != $page->id()){
+        $new_box_list[] = ['target_id' => $box->id()];
+      } else {
+        $cloned_box = $box->createDuplicate();
+        $cloned_box->set('field_parent_node', $new_page->id());
+        $cloned_box->save();
+
+        $new_box_list[] = ['target_id' => $cloned_box->id()];
+
+        $new_items_list = [];
+        $items = $box->get('field_box_items')->referencedEntities();
+
+        foreach ($items as $item){
+          // Create a copy of the item and update it's owner
+          $new_item = $item->createDuplicate();
+          $new_item->set('field_parent_box', $cloned_box);
+          $new_item->set('field_lgms_database_link', TRUE);
+          $new_item->setOwnerId(\Drupal::currentUser()->id());
+
+          // Add the item to the list
+          $new_item->save();
+          $new_items_list[] = $new_item;
+        }
+
+        // Save the list of items
+        $cloned_box->set('field_box_items', $new_items_list);
+        $cloned_box->setOwnerId(\Drupal::currentUser()->id());
+        $cloned_box->save();
+      }
+    }
+
+    // After cloning all boxes, update the cloned guide with the list of cloned boxes.
+    if (!empty($new_box_list)) {
+      $new_page->set('field_child_boxes', $new_box_list);
+      $new_page->save();
+    }
   }
 }

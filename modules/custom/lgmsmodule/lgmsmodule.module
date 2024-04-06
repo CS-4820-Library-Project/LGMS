@@ -354,7 +354,10 @@ function lgmsmodule_refresh_cache(NodeInterface $node): void
 
     // Clear the cache of the guide
     $parent_page = Node::load($parent_page_id);
-    lgmsmodule_refresh_cache($parent_page);
+
+    if ($parent_page){
+      lgmsmodule_refresh_cache($parent_page);
+    }
   } elseif ($node->bundle() === 'guide_page') {
     // Invalidate cache for 'guide_page' as before
     $parent_guide_id = $node->get('field_parent_guide')->target_id;
