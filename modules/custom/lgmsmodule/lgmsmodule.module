@@ -1128,25 +1128,6 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
 
     }
 
-//    if (\Drupal::currentUser()->isAuthenticated() && ($entity->bundle() == 'guide' || $entity->bundle() == 'guide_page')){
-//      $icons['dashboard_icon'] = [
-//        '#type' => 'link',
-//        '#title' => [
-//          '#type' => 'html_tag',
-//          '#tag' => 'i',
-//          '#attributes' => [
-//            'class' => ['fa', 'fa-home'],
-//            'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 24px; margin-top: 11px;' : 'margin: 32px;',
-//          ],
-//        ],
-//        '#url' => Url::fromRoute('lgmsmodule.dashboard_overview', ['node' => $entity->id()]),
-//        '#attributes' => [
-//          'title' => 'Guide Dashboard',
-//          'style' => 'text-decoration: none;',
-//        ],
-//      ];
-//    }
-
     $build['guide_print'][] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['guide-box-2container']],
