@@ -390,7 +390,7 @@ class FormHelper {
     return $reordered_items;
   }
 
-  public function get_item_options(String $content_type): array
+  public function get_item_options(String $content_type, String $group_by = ''): array
   {
     $query = \Drupal::entityQuery('node')
       ->condition('type', $content_type)
@@ -404,7 +404,26 @@ class FormHelper {
 
     // Add them to the options
     foreach ($nodes as $node) {
-      $options[$node->id()] = $node->label();
+      if (!empty($group_by)){
+        $parent = $node->get($group_by)->entity;
+
+        if ($parent && $parent->bundle() == 'guide_page'){
+          $parent = $parent->get('field_parent_guide')->entity;
+        }
+
+        if ($parent) {
+          $options[$parent->label()][$node->id()] = $node->label();
+        } else {
+          $options['Uncategorized'][$node->id()] = $node->label();
+        }
+
+      } else{
+        $options[$node->id()] = $node->label();
+      }
+    }
+
+    if (!empty($group_by)) {
+      ksort($options);
     }
 
     // Return the options
