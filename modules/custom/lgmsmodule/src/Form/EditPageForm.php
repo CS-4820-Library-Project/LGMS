@@ -218,7 +218,7 @@ class EditPageForm extends FormBase {
         $selected_page->save();
 
         // Add the page to the new position's children
-        $ajaxHelper->add_child_page($new_parent, $selected_page);
+        $ajaxHelper->add_child($new_parent, $selected_page, 'field_child_pages');
       }
     }
 

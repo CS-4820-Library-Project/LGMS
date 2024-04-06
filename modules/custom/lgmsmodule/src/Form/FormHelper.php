@@ -234,12 +234,12 @@ class FormHelper {
     $page->save();
   }
 
-  public function add_child_page(EntityInterface $parent, EntityInterface $page): void
+  public function add_child(EntityInterface $parent, EntityInterface $child, $field): void
   {
-    $page_list = $parent->get('field_child_pages')->getValue();
-    $page_list[] = ['target_id' => $page->id()];
+    $page_list = $parent->get($field)->getValue();
+    $page_list[] = ['target_id' => $child->id()];
 
-    $parent->set('field_child_pages', $page_list);
+    $parent->set($field, $page_list);
     $parent->save();
 
   }
