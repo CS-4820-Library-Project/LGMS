@@ -14,33 +14,25 @@ class EditGuideBoxForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
+    $form_helper = new FormHelper();
+
+    // Get the data from the URL
+    $ids = (object) [
+      'current_node' => \Drupal::request()->query->get('current_node'),
+      'current_box' => \Drupal::request()->query->get('current_box'),
     ];
 
-    $current_node = \Drupal::request()->query->get('current_node');
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $current_node,
-    ];
+    // Set the prefix, suffix, and hidden fields
+    $form_helper->set_form_data($form, $ids, $this->getFormId());
 
-    $current_box = \Drupal::request()->query->get('current_box');
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $current_box,
-    ];
+    // Load Nodes
+    $current_node = Node::load($ids->current_node);
+    $current_box = Node::load($ids->current_box);
 
-    $current_node = Node::load($current_node);
+    // Get Box parent
+    $parent_page = $current_box->get('field_parent_node')->entity;
 
-    $current_box = Node::load($current_box);
-
-    $parent_page = $current_box->get('field_parent_node')->getValue();
-    $parent_page = Node::load($parent_page[0]['target_id']);
-
-
+    // If the user can edit it from this page
     if($current_node->id() == $parent_page->id()){
       $form['title'] = [
         '#type' => 'textfield',
@@ -56,8 +48,9 @@ class EditGuideBoxForm extends FormBase {
       ];
 
     } else {
+      // Get the url for the parent node
       $node_url = $parent_page->toUrl()->toString();
-      $link_html = '<a href="' . $node_url . '">' . $parent_page->getTitle() . '</a>';
+      $link_html = '<a href="' . $node_url . '">' . $parent_page->label() . '</a>';
 
       $form['title'] = [
         '#markup' => 'This Box can not be edited from this Guide, you can edit it from: ' . $link_html,
@@ -71,11 +64,10 @@ class EditGuideBoxForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;
@@ -91,16 +83,15 @@ class EditGuideBoxForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-
-    $current_box = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box);
+    // Load the box
+    $current_box = Node::load($form_state->getValue('current_box'));
 
     if ($current_box) {
+      // Update Box
       $current_box->setTitle(rtrim($form_state->getValue('title')));
-
-      // Check the value of the 'published' checkbox to determine the published state.
       $form_state->getValue('published')? $current_box->setUnpublished() : $current_box->setPublished();
 
+      // Save updates
       $current_box->save();
 
       // Update last change date for parents.
