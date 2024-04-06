@@ -267,4 +267,51 @@ class FormHelper {
 
     return $options;
   }
+
+  public function get_pages_options($guide_id) {
+    $options = [];
+    // Load the guide entity.
+    $guide = Node::load($guide_id);
+
+    // Check if the guide has been loaded and has the field_child_pages field.
+    if ($guide && $guide->hasField('field_child_pages')) {
+      // Guide Option
+      $options['Guide'][$guide_id] = t('Entire Guide');
+
+      // Get the array of child page IDs from the guide.
+      $child_pages = $guide->get('field_child_pages')->referencedEntities();
+
+      if (!empty($child_pages)) {
+        // Group label for child pages.
+        $group_label = 'Pages';
+
+        // Initialize the group if it's not set.
+        if (!isset($options[$group_label])) {
+          $options[$group_label] = [];
+        }
+
+        // Create options array from the child pages.
+        foreach ($child_pages as $child_page) {
+          $options[$group_label][$child_page->id()] = $child_page->label();
+
+          if ($child_page->get('field_parent_guide')->entity->id() == $guide_id) {
+            // Check if the child page has its own subpages.
+            if ($child_page->hasField('field_child_pages')) {
+              $subpages_ids = array_column($child_page->get('field_child_pages')->getValue(), 'target_id');
+              $subpages = !empty($subpages_ids) ? Node::loadMultiple($subpages_ids) : [];
+
+              // Label each subpage with the parent page title.
+              foreach ($subpages as $subpage) {
+                $label = '— ' .  $subpage->getTitle();
+                $options[$group_label][$subpage->id()] = $label;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Return the options array with the 'Top Level' and the grouped child pages.
+    return $options;
+  }
 }
