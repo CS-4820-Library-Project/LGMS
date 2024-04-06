@@ -41,6 +41,7 @@ class lgmsmoduleSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    // Get new and old prefix
     $proxy_prefix = $form_state->getValue('proxy_prefix');
     $old_proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
 
@@ -51,25 +52,29 @@ class lgmsmoduleSettingsForm extends ConfigFormBase {
 
 
     // Load all guide_database_item nodes
-    $nids = \Drupal::entityQuery('node')
+    $databases_ids = \Drupal::entityQuery('node')
       ->condition('type', 'guide_database_item')
       ->accessCheck(FALSE)
       ->execute();
 
-    $nodes = Node::loadMultiple($nids);
+    $nodes = Node::loadMultiple($databases_ids);
 
     foreach ($nodes as $node) {
       // Check if the field exists and is not empty
       if ($node->hasField('field_database_link') && !$node->get('field_database_link')->isEmpty()) {
         $current_value = $node->get('field_database_link')->uri;
 
-        if (substr($current_value, 0, strlen($old_proxy_prefix)) === $old_proxy_prefix) {
+        // if it has a proxy prefix
+        if ($node->hasField('field_make_proxy') && $node->get('field_make_proxy')->value
+          && str_starts_with($current_value, $old_proxy_prefix)) {
+          // Remove old prefix
           $current_value = substr($current_value, strlen($old_proxy_prefix));
-        }
 
-        $new_value = $proxy_prefix . $current_value;
-        $node->set('field_database_link', ['uri' => $new_value, 'title' => $node->get('field_database_link')->title]);
-        $node->save();
+          // Attach new prefix
+          $new_value = $proxy_prefix . $current_value;
+          $node->set('field_database_link', ['uri' => $new_value, 'title' => $node->get('field_database_link')->title]);
+          $node->save();
+        }
       }
     }
 

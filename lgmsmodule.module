@@ -650,8 +650,10 @@ function database_display(EntityInterface $entity){
   if (!$entity->get('field_database_link')->isEmpty()) {
     // Fetch the first item of the field_database_link field
     $link_item = $entity->get('field_database_link')->first();
+
     // Get the URL from the link field
     $url = $link_item->getUrl()->toString();
+
     // Get the link title (text) from the link field, fall back to the URL if the title is empty
     $link_text = $link_item->title ?: $url;
 
