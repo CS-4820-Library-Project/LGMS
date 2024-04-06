@@ -230,7 +230,7 @@ class FormHelper {
 
   }
 
-  public function get_position_options(FormStateInterface $form_state, String $guide_id): array
+  public function get_position_options(FormStateInterface $form_state, String $guide_id, bool $onlyWithSubpages = false): array
   {
     $options = [];
 
@@ -263,7 +263,17 @@ class FormHelper {
             \Drupal::logger('my_module')->notice('<pre>' . print_r($child_page->id(), TRUE) . '</pre>');
             continue;
           }
-          $options[$group_label][$child_page->id()] = $child_page->label(); // Use the title or label of the page.
+
+          if ($onlyWithSubpages){
+            if ($child_page->hasField('field_child_pages')) {
+              $sub_child_pages = $child_page->get('field_child_pages')->referencedEntities();
+              if (!empty($sub_child_pages)) {
+                $options[$child_page->id()] = $child_page->label();
+              }
+            }
+          } else {
+            $options[$group_label][$child_page->id()] = $child_page->label();
+          }
         }
       }
     }

@@ -13,27 +13,28 @@ class ReOrderPagesForm extends FormBase {
     return 're_order_box_items_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state)
-  {
+  public function buildForm(array $form, FormStateInterface $form_state){
     $form_helper = new FormHelper();
-    $form_helper->set_prefix($form,  $this->getFormId());
 
-    $current_guide = \Drupal::request()->query->get('guide_id');
-    $form['guide_id'] = [
-      '#type' => 'hidden',
-      '#value' => $current_guide,
+    // Get the data from the URL
+    $ids = (object) [
+      'current_node' => \Drupal::request()->query->get('current_node'),
+      'guide_id' => \Drupal::request()->query->get('guide_id'),
     ];
 
-    $current_node = \Drupal::request()->query->get('current_node');
-    $form['current_node'] = [
+    // Set the prefix, suffix, and hidden fields
+    $form_helper->set_form_data($form, $ids, $this->getFormId());
+
+    $form['current_page'] = [
       '#type' => 'hidden',
-      '#value' => $current_node,
+      '#value' => $ids->current_guide,
     ];
 
+    // A select field to choose the page to be sorted
     $form['page_to_sort'] = [
       '#type' => 'select',
-      '#title' => $this->t('Page To Sort:'),
-      '#options' => $this->getPageList($current_guide),
+      '#title' => $this->t('Pages To Sort:'),
+      '#options' => $form_helper->get_position_options($form_state, $ids->guide_id, true),
       '#required' => TRUE,
       '#ajax' => [
         'callback' => '::updateTable',
@@ -42,34 +43,36 @@ class ReOrderPagesForm extends FormBase {
       ],
     ];
 
-    $form['current_page'] = [
-      '#type' => 'hidden',
-      '#value' => $current_guide,
-    ];
-
+    // A wrapper to update the table based on the selection
     $form['pages_table_wrapper'] = [
       '#type' => 'container',
       '#attributes' => ['id' => 'pages-table-wrapper'],
     ];
 
-    $form['pages_table_wrapper']['pages_table'] = [
-      '#type' => 'table',
-      '#header' => ['Title', 'Weight'],
-      '#tabledrag' => [[
-        'action' => 'order',
-        'relationship' => 'sibling',
-        'group' => 'pages-order-weight',
-      ]],
-    ];
+    $selected_page = $form_state->getValue('page_to_sort');
+    $selected_page = $selected_page? Node::load($selected_page): null;
 
-    $guide = $form_state->getValue('page_to_sort') != null ? Node::load($form_state->getValue('page_to_sort')): null;
-    \Drupal::logger('my_module')->notice('<pre>' . print_r($guide?->id(), TRUE) . '</pre>');
+    if($selected_page && !$selected_page->get('field_child_pages')->isEmpty()){
+      // Table header
+      $form['pages_table_wrapper']['pages_table'] = [
+        '#type' => 'table',
+        '#header' => ['Title', 'Weight'],
+        '#tabledrag' => [[
+          'action' => 'order',
+          'relationship' => 'sibling',
+          'group' => 'pages-order-weight',
+        ]],
+      ];
 
-    if($guide && !$guide->get('field_child_pages')->isEmpty()){
-      $page_list = $guide->get('field_child_pages');
+      // Get the child pages
+      $page_list = $selected_page->get('field_child_pages');
+
       foreach ($page_list as $weight => $page) {
+        // Load the child page
         $loaded_item = Node::load($page->target_id);
+
         if($loaded_item){
+          // initialize row with the page's current weight
           $form['pages_table_wrapper']['pages_table'][$weight]['#attributes']['class'][] = 'draggable';
           $form['pages_table_wrapper']['pages_table'][$weight]['title'] = [
             '#markup' => $loaded_item->label(),
@@ -92,18 +95,16 @@ class ReOrderPagesForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;
   }
 
   public function updateTable(array &$form, FormStateInterface $form_state) {
-
     return $form['pages_table_wrapper'];
   }
 
@@ -118,64 +119,25 @@ class ReOrderPagesForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $ajaxHelper = new FormHelper();
+
+    // Get the new order
     $values = $form_state->getValue('pages_table');
 
-    $selected_page = $form_state->getValue('page_to_sort');
-    $guide = Node::load($form_state->getValue('guide_id'));
+    // Load the selected page
+    $selected_page = Node::load($form_state->getValue('page_to_sort'));
 
-    $parent = Node::load($selected_page);
+    // Get its child pages
+    $pages = $selected_page->get('field_child_pages')->getValue();
 
+    // Get the new order
+    $pages = $ajaxHelper->get_new_order($values,$pages);
 
-    $items = $parent->get('field_child_pages')->getValue();
+    // Save the new order
+    $selected_page->set('field_child_pages', array_values($pages));
+    $selected_page->save();
 
-    \Drupal::logger('my_modul22e')->notice('<pre>' . print_r($items, TRUE) . '</pre>');
-    \Drupal::logger('my_modul22e')->notice('<pre>' . print_r($values, TRUE) . '</pre>');
-
-    $reordered_items = [];
-
-    foreach ($values as $id => $value) {
-      if (isset($items[$id])) {
-        $reordered_items[$value['weight']] = $items[$id];
-      }
-    }
-
-    ksort($reordered_items);
-
-    $parent->set('field_child_pages', array_values($reordered_items));
-    $parent->save();
-
-    $ajaxHelper = new FormHelper();
+    // Update parents
     $ajaxHelper->updateParent($form, $form_state);
-  }
-
-  public function getPageList($guide_id) {
-    $options = [];
-
-    // Load the guide entity.
-    $guide = Node::load($guide_id);
-
-    $options['Page Level'][$guide->id()] = t('Page Level');
-
-    // Check if the guide has been loaded and has the field_child_pages field.
-    if ($guide && $guide->hasField('field_child_pages')) {
-      // Get the array of child page IDs from the guide.
-      $child_pages = $guide->get('field_child_pages')->referencedEntities();
-
-      if (!empty($child_pages)) {
-        // Create options array from the child pages.
-        foreach ($child_pages as $child_page) {
-          // Check if the child page itself has child pages
-          if ($child_page->hasField('field_child_pages')) {
-            $sub_child_pages = $child_page->get('field_child_pages')->referencedEntities();
-            if (!empty($sub_child_pages)) {
-              $options[$child_page->id()] = $child_page->label(); // Include the page if it has child pages
-            }
-          }
-        }
-      }
-    }
-
-    // Return the options array with the 'Top Level' and the grouped child pages.
-    return $options;
   }
 }
