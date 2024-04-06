@@ -53,7 +53,7 @@ class CreateGuidePageForm extends FormBase
     $form['position'] = [
       '#type' => 'select',
       '#title' => $this->t('Position'),
-      '#options' => $form_helper->get_position_options(property_exists($ids, 'current_guide') ? $ids->current_guide : null),
+      '#options' => $form_helper->get_position_options($form_state, property_exists($ids, 'current_guide') ? $ids->current_guide : null),
       '#required' => TRUE,
     ];
 
@@ -119,7 +119,7 @@ class CreateGuidePageForm extends FormBase
       $form_state->setValue('current_node', $new_page->id());
 
       //Update parents
-      $ajaxHelper->update_child_pages($parent, $new_page);
+      $ajaxHelper->add_child_page($parent, $new_page);
       $ajaxHelper->updateParent($form, $form_state);
     }
 
