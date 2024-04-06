@@ -2476,46 +2476,56 @@ function createHelpGuide(): array {
   $help_guide = createHelpGuideNode();
 
   // Create guide pages
-  $add_html_page = createGuidePageNode($help_guide->id(), 'Add HTML', 'Guide for adding a new html entry.');
-  $add_book_page = createGuidePageNode($help_guide->id(), 'Add Book', 'Step-by-step instructions to add a book.');
-  $add_database_page = createGuidePageNode($help_guide->id(), 'Add Database', 'Guide for adding a new database entry.');
-  $add_media_page = createGuidePageNode($help_guide->id(), 'Add Media', 'Guide for adding a new media entry.');
-  $create_box_page = createGuidePageNode($help_guide->id(), 'Create a Box', 'Guide for creating a new box.');
-  $create_guide_page = createGuidePageNode($help_guide->id(), 'Create a Guide', 'Guide for creating a new guide.');
-  $create_page_page = createGuidePageNode($help_guide->id(), 'Create a Page', 'Guide for adding a new page entry.');
-  $reuse_guide_page = createGuidePageNode($help_guide->id(), 'Reuse a Guide', 'Guide for reusing an existing guide.');
-  $reuse_html_page = createGuidePageNode($help_guide->id(), 'Reuse an HTML', 'Guide for reusing an HTML.');
-  $reuse_page_page = createGuidePageNode($help_guide->id(), 'Reuse a Page', 'Guide for reusing a page.');
-  $reuse_database_page = createGuidePageNode($help_guide->id(), 'Reuse a Database', 'Guide for reusing a database.');
-  $reuse_book_page = createGuidePageNode($help_guide->id(), 'Reuse a Book', 'Guide for reusing a book.');
+  $guide_page = createGuidePageNode($help_guide->id(), 'Guide', 'Tutorial for guide creation and reuse.');
+  $guide_page_page = createGuidePageNode($help_guide->id(), 'Guide Page', 'Tutorial for guide page creation and reuse.');
+  $guide_box_page = createGuidePageNode($help_guide->id(), 'Guide Box', 'Tutorial for guide box creation and reuse.');
+  $html_page = createGuidePageNode($help_guide->id(), 'HTML', 'Tutorial for HTML creation and reuse.');
+  $book_page = createGuidePageNode($help_guide->id(), 'Book', 'Tutorial for book creation and reuse.');
+  $database_page = createGuidePageNode($help_guide->id(), 'Database', 'Tutorial for database creation and reuse.');
+  $media_page = createGuidePageNode($help_guide->id(), 'Media', 'Tutorial for media creation.');
+
 
   // Create guide boxes
-  $html_guide_box = createGuideBoxNode($add_html_page->id(), 'HTML Guide Box');
-  $book_guide_box = createGuideBoxNode($add_book_page->id(), 'Book Guide Box');
-  $database_guide_box = createGuideBoxNode($add_database_page->id(), 'Database Guide Box');
-  $media_guide_box = createGuideBoxNode($add_media_page->id(), 'Media Guide Box');
-  $create_box_guide_box = createGuideBoxNode($create_box_page->id(), 'Create Box Guide Box');
-  $create_guide_box = createGuideBoxNode($create_guide_page->id(), 'Create Guide Box');
-  $create_page_guide_box = createGuideBoxNode($create_page_page->id(), 'Create Page Guide Box');
-  $reuse_guide_box = createGuideBoxNode($reuse_guide_page->id(), 'Reuse Guide Box');
-  $reuse_html_guide_box = createGuideBoxNode($reuse_html_page->id(), 'Reuse HTML Guide Box');
-  $reuse_page_guide_box = createGuideBoxNode($reuse_page_page->id(), 'Reuse Page Guide Box');
-  $reuse_database_guide_box = createGuideBoxNode($reuse_database_page->id(), 'Reuse Database Guide Box');
-  $reuse_book_guide_box = createGuideBoxNode($reuse_book_page->id(), 'Reuse Book Guide Box');
+  $create_guide_box = createGuideBoxNode($guide_page->id(), 'Create Guide Box');
+  $reuse_guide_box = createGuideBoxNode($guide_page->id(), 'Reuse Guide Box');
+
+  $create_page_guide_box = createGuideBoxNode($guide_page_page->id(), 'Create Page Guide Box');
+  $reuse_page_guide_box = createGuideBoxNode($guide_page_page->id(), 'Reuse Page Guide Box');
+
+  $create_box_guide_box = createGuideBoxNode($guide_box_page->id(), 'Create a Guide Box');
+  $reuse_box_guide_box = createGuideBoxNode($guide_box_page->id(), 'Reuse a Guide Box');
+
+  $html_guide_box = createGuideBoxNode($html_page->id(), 'HTML Guide Box');
+  $reuse_html_guide_box = createGuideBoxNode($html_page->id(), 'Reuse HTML Guide Box');
+
+  $book_guide_box = createGuideBoxNode($book_page->id(), 'Book Guide Box');
+  $reuse_book_guide_box = createGuideBoxNode($book_page->id(), 'Reuse Book Guide Box');
+
+  $database_guide_box = createGuideBoxNode($database_page->id(), 'Database Guide Box');
+  $reuse_database_guide_box = createGuideBoxNode($database_page->id(), 'Reuse Database Guide Box');
+
+  $media_guide_box = createGuideBoxNode($media_page->id(), 'Media Guide Box');
 
   // Attach guide boxes to pages
-  attachChildNodes($add_html_page, 'field_child_boxes', [$html_guide_box->id()]);
-  attachChildNodes($add_book_page, 'field_child_boxes', [$book_guide_box->id()]);
-  attachChildNodes($add_database_page, 'field_child_boxes', [$database_guide_box->id()]);
-  attachChildNodes($add_media_page, 'field_child_boxes', [$media_guide_box->id()]);
-  attachChildNodes($create_box_page, 'field_child_boxes', [$create_box_guide_box->id()]);
-  attachChildNodes($create_guide_page, 'field_child_boxes', [$create_guide_box->id()]);
-  attachChildNodes($create_page_page, 'field_child_boxes', [$create_page_guide_box->id()]);
-  attachChildNodes($reuse_guide_page, 'field_child_boxes', [$reuse_guide_box->id()]);
-  attachChildNodes($reuse_html_page, 'field_child_boxes', [$reuse_html_guide_box->id()]);
-  attachChildNodes($reuse_page_page, 'field_child_boxes', [$reuse_page_guide_box->id()]);
-  attachChildNodes($reuse_database_page, 'field_child_boxes', [$reuse_database_guide_box->id()]);
-  attachChildNodes($reuse_book_page, 'field_child_boxes', [$reuse_book_guide_box->id()]);
+  attachChildNodes($guide_page, 'field_child_boxes', [$create_guide_box->id()]);
+  attachChildNodes($guide_page, 'field_child_boxes', [$reuse_guide_box->id()]);
+
+  attachChildNodes($guide_page_page, 'field_child_boxes', [$create_page_guide_box->id()]);
+  attachChildNodes($guide_page_page, 'field_child_boxes', [$reuse_page_guide_box->id()]);
+
+  attachChildNodes($guide_box_page, 'field_child_boxes', [$create_box_guide_box->id()]);
+  attachChildNodes($guide_box_page, 'field_child_boxes', [$reuse_box_guide_box->id()]);
+
+  attachChildNodes($html_page, 'field_child_boxes', [$html_guide_box->id()]);
+  attachChildNodes($html_page, 'field_child_boxes', [$reuse_html_guide_box->id()]);
+
+  attachChildNodes($book_page, 'field_child_boxes', [$book_guide_box->id()]);
+  attachChildNodes($book_page, 'field_child_boxes', [$reuse_book_guide_box->id()]);
+
+  attachChildNodes($database_page, 'field_child_boxes', [$database_guide_box->id()]);
+  attachChildNodes($database_page, 'field_child_boxes', [$reuse_database_guide_box->id()]);
+
+  attachChildNodes($media_page, 'field_child_boxes', [$media_guide_box->id()]);
 
   // Create guide box items
   $html_box_item = createGuideBoxItemNode($html_guide_box->id(), 'HTML Item');
@@ -2577,66 +2587,61 @@ function createHelpGuide(): array {
 
   // Update the 'Help Guide' with the new guide pages
   attachChildNodes($help_guide, 'field_child_pages', [
-    $add_html_page->id(),
-    $add_book_page->id(),
-    $add_database_page->id(),
-    $add_media_page->id(),
-    $create_box_page->id(),
-    $create_guide_page->id(),
-    $create_page_page->id(),
-    $reuse_guide_page->id(),
-    $reuse_html_page->id(),
-    $reuse_page_page->id(),
-    $reuse_database_page->id(),
-    $reuse_book_page->id(),
+    $guide_page->id(),
+    $guide_page_page->id(),
+    $guide_box_page->id(),
+    $html_page->id(),
+    $book_page->id(),
+    $database_page->id(),
+    $media_page->id(),
   ]);
   return [
     'help_guide_id' => $help_guide->id(),
-    'add_html_page_id' => $add_html_page->id(),
+    'add_html_page_id' => $html_page->id(),
     'html_guide_box_id' => $html_guide_box->id(),
     'html_box_item_id' => $html_box_item->id(),
     'html_content_id' => $the_html_content->id(),
-    'add_book_page_id' => $add_book_page->id(),
+    'add_book_page_id' => $book_page->id(),
     'book_guide_box_id' => $book_guide_box->id(),
     'book_box_item_id' => $book_box_item->id(),
     'book_html_content_id' => $book_html_content->id(),
-    'add_database_page_id' => $add_database_page->id(),
+    'add_database_page_id' => $book_page->id(),
     'database_guide_box_id' => $database_guide_box->id(),
     'database_box_item_id' => $database_box_item->id(),
     'database_html_content_id' => $database_html_content->id(),
-    'add_media_page_id' => $add_media_page->id(),
+    'add_media_page_id' => $media_page->id(),
     'media_guide_box_id' => $media_guide_box->id(),
     'media_box_item_id' => $media_box_item->id(),
     'media_html_content_id' => $media_html_content->id(),
-    'create_box_page_id' => $create_box_page->id(),
+    'create_box_page_id' => $guide_box_page->id(),
     'create_box_guide_box_id' => $create_box_guide_box->id(),
     'create_box_box_item_id' => $create_box_box_item->id(),
     'create_box_html_content_id' => $create_box_html_content->id(),
-    'create_guide_page_id' => $create_guide_page->id(),
+    'create_guide_page_id' => $guide_page->id(),
     'create_guide_box_id' => $create_guide_box->id(),
     'create_guide_box_item_id' => $create_guide_box_item->id(),
     'create_guide_html_content_id' => $create_guide_html_content->id(),
-    'create_page_page_id' => $create_page_page->id(),
+    'create_page_page_id' => $guide_page_page->id(),
     'create_page_guide_box_id' => $create_page_guide_box->id(),
     'create_page_box_item_id' => $create_page_box_item->id(),
     'create_page_html_content_id' => $create_page_html_content->id(),
-    'reuse_guide_page_id' => $reuse_guide_page->id(),
+    'reuse_guide_page_id' => $guide_page->id(),
     'reuse_guide_box_id' => $reuse_guide_box->id(),
     'reuse_guide_box_item_id' => $reuse_guide_box_item->id(),
     'reuse_guide_html_content_id' => $reuse_guide_html_content->id(),
-    'reuse_html_page_id' => $reuse_html_page->id(),
+    'reuse_html_page_id' => $html_page->id(),
     'reuse_html_guide_box_id' => $reuse_html_guide_box->id(),
     'reuse_html_box_item_id' => $reuse_html_box_item->id(),
     'reuse_html_html_content_id' => $reuse_html_html_content->id(),
-    'reuse_page_page_id' => $reuse_page_page->id(),
+    'reuse_page_page_id' => $guide_page_page->id(),
     'reuse_page_guide_box_id' => $reuse_page_guide_box->id(),
     'reuse_page_box_item_id' => $reuse_page_box_item->id(),
     'reuse_page_html_content_id' => $reuse_page_html_content->id(),
-    'reuse_database_page_id' => $reuse_database_page->id(),
+    'reuse_database_page_id' => $database_page->id(),
     'reuse_database_guide_box_id' => $reuse_database_guide_box->id(),
     'reuse_database_box_item_id' => $reuse_database_box_item->id(),
     'reuse_database_html_content_id' => $reuse_database_html_content->id(),
-    'reuse_book_page_id' => $reuse_book_page->id(),
+    'reuse_book_page_id' => $book_page->id(),
     'reuse_book_guide_box_id' => $reuse_book_guide_box->id(),
     'reuse_book_box_item_id' => $reuse_book_box_item->id(),
     'reuse_book_html_content_id' => $reuse_book_html_content->id(),
