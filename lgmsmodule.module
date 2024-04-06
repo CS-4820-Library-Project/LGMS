@@ -853,7 +853,7 @@ function box_display(EntityInterface $entity, EntityInterface $box)
   $json_data = json_encode($array_of_objects);
   $database_query_param = urlencode($json_data);
 
-  if($entity->access('update') && $box->access('update') && (($box->get('field_parent_node')->entity->id() == $entity->id()) || $entity->id() == $box->id())) {
+  if($entity->access('update') && $box->access('update') && (($box->get('field_parent_node')->entity->id() == $entity->id()) || $entity->id() == $box->id()) && (!$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty())) {
     $guide_box_build['items_list'] = [
       '#type' => 'container',
       '#attributes' => ['id' => 'add-reorder-list', 'class' => ['guide-item2']],
