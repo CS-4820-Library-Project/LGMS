@@ -4,6 +4,7 @@ namespace Drupal\lgmsmodule\Form;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\RedirectCommand;
+use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -11,11 +12,13 @@ use Drupal\node\Entity\Node;
 
 
 class DeletePageForm extends FormBase{
-  public function getFormId(){
+  public function getFormId(): string
+  {
     return 'delete_page_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state){
+  public function buildForm(array $form, FormStateInterface $form_state): array
+  {
     $form_helper = new FormHelper();
 
     // Get the data from the URL
@@ -82,7 +85,11 @@ class DeletePageForm extends FormBase{
     return $form;
   }
 
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityMalformedException
+   */
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     // Load the selected node
@@ -145,7 +152,8 @@ class DeletePageForm extends FormBase{
   }
 
 
-  public function submitForm(array &$form, FormStateInterface $form_state){
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     // Get form values

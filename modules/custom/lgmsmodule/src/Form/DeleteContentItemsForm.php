@@ -3,6 +3,7 @@ namespace Drupal\lgmsmodule\Form;
 
 use Drupal;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
@@ -12,11 +13,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class DeleteContentItemsForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'delete_html_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array
+  {
     $form_helper = new FormHelper();
 
     $ids = (object) [
@@ -98,13 +101,18 @@ class DeleteContentItemsForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Item was deleted Successfully.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     // Get the field to delete and it's box and item
     $current_box = Node::load($form_state->getValue('current_box'));
     $current_item = Node::load($form_state->getValue('current_item'));

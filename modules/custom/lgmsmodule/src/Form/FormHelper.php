@@ -7,6 +7,7 @@ use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
@@ -48,7 +49,10 @@ class FormHelper {
     return $response;
   }
 
-  public function updateParent(array &$form, FormStateInterface $form_state,)
+  /**
+   * @throws EntityStorageException
+   */
+  public function updateParent(array &$form, FormStateInterface $form_state,): void
   {
     $current_node = $form_state->getValue('current_node');
     $current_node = Node::load($current_node);
@@ -71,7 +75,8 @@ class FormHelper {
     $current_node->save();
   }
 
-  public function set_form_data(array &$form, $ids, string $form_id){
+  public function set_form_data(array &$form, $ids, string $form_id): void
+  {
     $this->set_prefix($form,$form_id);
 
     foreach ($ids as $label => $id){
@@ -87,7 +92,8 @@ class FormHelper {
     }
   }
 
-  public function set_prefix(array &$form, string $id){
+  public function set_prefix(array &$form, string $id): void
+  {
     $form['#prefix'] = '<div id="'. $id .'">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [
@@ -96,6 +102,9 @@ class FormHelper {
     ];
   }
 
+  /**
+   * @throws EntityStorageException
+   */
   public function create_link(EntityInterface $new_content, String $current_box)
   {
     //find what item is being created
@@ -137,7 +146,11 @@ class FormHelper {
     return $new_item;
   }
 
-  public function update_link(array &$form, FormStateInterface $form_state, EntityInterface $current_item){
+  /**
+   * @throws EntityStorageException
+   */
+  public function update_link(array &$form, FormStateInterface $form_state, EntityInterface $current_item): void
+  {
     $current_item->set('title', $form_state->getValue('title'));
     $current_item->set('status', $form_state->getValue('published') == '0');
     $current_item->set('changed', \Drupal::time()->getRequestTime());
@@ -169,7 +182,8 @@ class FormHelper {
     ];
   }
 
-  public function deletePages($parent, $delete_sub){
+  public function deletePages($parent, $delete_sub): void
+  {
     $this->delete_all_boxes($parent);
 
     if($delete_sub) {
@@ -220,7 +234,7 @@ class FormHelper {
     $page->save();
   }
 
-  public function add_child_page(EntityInterface $parent, EntityInterface $page)
+  public function add_child_page(EntityInterface $parent, EntityInterface $page): void
   {
     $page_list = $parent->get('field_child_pages')->getValue();
     $page_list[] = ['target_id' => $page->id()];
@@ -281,7 +295,8 @@ class FormHelper {
     return $options;
   }
 
-  public function get_pages_options(String $guide_id, bool $include_guide = true) {
+  public function get_pages_options(String $guide_id, bool $include_guide = true): array
+  {
     $options = [];
     // Load the guide entity.
     $guide = Node::load($guide_id);
@@ -330,7 +345,8 @@ class FormHelper {
     return $options;
   }
 
-  public function get_reorder_table(array &$form, $list){
+  public function get_reorder_table(array &$form, $list): void
+  {
     $form['pages_table'] = [
       '#type' => 'table',
       '#header' => ['Title', 'Weight'],
@@ -359,7 +375,8 @@ class FormHelper {
     }
   }
 
-  public function get_new_order($values, $items){
+  public function get_new_order($values, $items): array
+  {
     $reordered_items = [];
 
     foreach ($values as $id => $value) {

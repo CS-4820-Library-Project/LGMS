@@ -1,6 +1,8 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -11,11 +13,13 @@ use Drupal\node\Entity\Node;
 
 class AddMediaForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'add_media_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array
+  {
     $form_helper = new FormHelper();
 
     $ids = (Object) [
@@ -98,13 +102,15 @@ class AddMediaForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'A Media item has been added.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     if($form_state->getValue('current_item') == null){
@@ -138,7 +144,12 @@ class AddMediaForm extends FormBase {
     $ajaxHelper->updateParent($form, $form_state);
   }
 
-  public function getMediaOptions() {
+  /**
+   * @throws InvalidPluginDefinitionException
+   * @throws PluginNotFoundException
+   */
+  public function getMediaOptions(): array
+  {
     $options = [];
     $media_types = \Drupal::entityTypeManager()->getStorage('media_type')->loadMultiple();
     // Loop through all media types.

@@ -2,6 +2,7 @@
 namespace Drupal\lgmsmodule\Form;
 
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -9,11 +10,13 @@ use Drupal\node\Entity\Node;
 
 class AddHTMLForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'add_html_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
     $form_helper->set_form_data($form,$ids, $this->getFormId());
@@ -66,13 +69,18 @@ class AddHTMLForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'an HTML field has been added.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     // If we are creating a new node
