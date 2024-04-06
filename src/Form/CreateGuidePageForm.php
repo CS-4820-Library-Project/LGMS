@@ -131,7 +131,7 @@ class CreateGuidePageForm extends FormBase
       $form_state->setValue('current_node', $new_page->id());
 
       //Update parents
-      $ajaxHelper->add_child_page($parent, $new_page);
+      $ajaxHelper->add_child($parent, $new_page, 'field_child_pages');
       $ajaxHelper->updateParent($form, $form_state);
     }
 
