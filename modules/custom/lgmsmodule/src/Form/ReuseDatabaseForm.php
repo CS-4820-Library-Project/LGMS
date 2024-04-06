@@ -10,11 +10,13 @@ use Drupal\node\Entity\Node;
 
 class ReuseDatabaseForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'reuse_database_item_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
     $form['#suffix'] = '</div>';
     $form['messages'] = [

@@ -10,21 +10,24 @@ class lgmsmoduleSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames(): array
+  {
     return ['lgmsmodule.settings'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'lgmsmodule_admin_settings';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array
+  {
     $config = $this->config('lgmsmodule.settings');
 
     $form['proxy_prefix'] = [
@@ -40,7 +43,8 @@ class lgmsmoduleSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     // Get new and old prefix
     $proxy_prefix = $form_state->getValue('proxy_prefix');
     $old_proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');

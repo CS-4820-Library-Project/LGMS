@@ -16,7 +16,6 @@
   };
   Drupal.behaviors.customLayoutRemover = {
     attach: function (context, settings) {
-      // Remove the class "layout-container" from all elements.
       $('.layout-container', context).removeClass('layout-container');
     }
   };
@@ -28,11 +27,8 @@
         console.log(activeTabExists);
         // If an active tab exists, show its content
         var activeTabId = $('.tabs-list .tab-link.active').attr('href');
-        //$('.tabs-list .tab-link').first().addClass('active');
-        console.log(activeTabId);
         $(activeTabId).show();
       } else {
-        console.log(activeTabExists);
         // If no active tab exists, default to the first tab
         // Hide all tab content by default
         $('.tab-content').hide();
@@ -44,7 +40,6 @@
 
       $('.tab-link', context).click(function () {
         var tabId = $(this).attr('href');
-          console.log(tabId);
         // Remove active class from all tabs and then add to the current tab
         $('.tabs-list .tab-link').removeClass('active');
         $(this).addClass('active');

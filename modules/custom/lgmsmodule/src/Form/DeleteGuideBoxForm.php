@@ -10,11 +10,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class DeleteGuideBoxForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'delete_guide_box_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array
+  {
     $form_helper = new FormHelper();
 
     // Get the data from the URL
@@ -65,13 +67,15 @@ class DeleteGuideBoxForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Box was deleted Successfully.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     // Load the current box and node

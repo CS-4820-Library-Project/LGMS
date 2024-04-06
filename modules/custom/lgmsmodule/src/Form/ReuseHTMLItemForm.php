@@ -5,6 +5,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -12,11 +13,13 @@ use Drupal\node\Entity\Node;
 
 class ReuseHTMLItemForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'reuse_html_item_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     // Define form wrapper and status messages.
     $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
     $form['#suffix'] = '</div>';
@@ -88,7 +91,8 @@ class ReuseHTMLItemForm extends FormBase {
    * @return array
    *   An associative array of options for the select field.
    */
-  private function getHtmlItemOptions() {
+  private function getHtmlItemOptions(): array
+  {
     $query = \Drupal::entityQuery('node')
       ->condition('type', 'guide_html_item')
       ->sort('title', 'ASC')
@@ -112,7 +116,8 @@ class ReuseHTMLItemForm extends FormBase {
    * @param FormStateInterface $form_state
    *   The current state of the form.
    */
-  private function prefillSelectedHtmlItem(array &$form, FormStateInterface $form_state) {
+  private function prefillSelectedHtmlItem(array &$form, FormStateInterface $form_state): void
+  {
     $selected = $form_state->getValue('box');
 
     if (!empty($selected)) {
@@ -144,7 +149,8 @@ class ReuseHTMLItemForm extends FormBase {
     }
   }
 
-  public function validateFields(array &$form, FormStateInterface $form_state) {
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
     $reference = $form_state->getValue('reference');
     $title = $form_state->getValue('title');
     if (!$reference && empty($title)) {
@@ -167,13 +173,18 @@ class ReuseHTMLItemForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'HTML Item created successfully.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
 
     $current_box_id = $form_state->getValue('current_box');
     $current_box = Node::load($current_box_id);

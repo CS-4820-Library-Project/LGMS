@@ -81,14 +81,4 @@ class lgmsDashboardController extends ControllerBase
     // Return the form render array.
     return $form;
   }
-
-  //public function edit() {
-  //  // Generate the content for editing items.
-
-  //    $node = Node::create(['type' => 'guide']);
-  //      $form = $this->entityFormBuilder()->getForm($node);
-
-  //    return $form;
-  //      $build = [];
-  //}
 }

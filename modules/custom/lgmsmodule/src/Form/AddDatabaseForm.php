@@ -11,11 +11,13 @@ use Drupal\taxonomy\Entity\Term;
 
 class AddDatabaseForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'add_database_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
     $form_helper->set_form_data($form,$ids, $this->getFormId());
@@ -124,7 +126,8 @@ class AddDatabaseForm extends FormBase {
     return $form;
   }
 
-  public function validateFields(array &$form, FormStateInterface $form_state) {
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
     $reference = $form_state->getValue('include_desc');
     $title = $form_state->getValue('description');
     if ($reference && empty($title)) {
@@ -135,13 +138,15 @@ class AddDatabaseForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'A Database item has been added.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     if(empty($form_state->getValue('current_item'))){

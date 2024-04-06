@@ -2,6 +2,8 @@
 
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -11,12 +13,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class ReuseGuideForm extends FormBase
 {
 
-  public function getFormId()
+  public function getFormId(): string
   {
     return 'lgmsmodule_reuse_guide_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state)
+  public function buildForm(array $form, FormStateInterface $form_state): array
   {
     $query = \Drupal::entityQuery('node')
       ->condition('type', 'guide')
@@ -49,7 +51,7 @@ class ReuseGuideForm extends FormBase
   }
 
   // Retrieves guide pages belonging to a guide
-  private function getChildPages($guideId)
+  private function getChildPages($guideId): array
   {
     $query = \Drupal::entityQuery('node')
       ->condition('type', 'guide_page')
@@ -60,7 +62,7 @@ class ReuseGuideForm extends FormBase
   }
 
   // Retrieves guide boxes belonging to a guide page
-  private function getChildBoxes($pageId)
+  private function getChildBoxes($pageId): array
   {
     $query = \Drupal::entityQuery('node')
       ->condition('type', 'guide_box')
@@ -70,7 +72,12 @@ class ReuseGuideForm extends FormBase
     return Node::loadMultiple($result); // Assuming you have 'id()' on the box entity
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityStorageException
+   * @throws EntityMalformedException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $selected_guide_id = $form_state->getValue('guide_select');
     $original_guide = Node::load($selected_guide_id);
     if ($original_guide) {
