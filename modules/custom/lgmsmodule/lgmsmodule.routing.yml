@@ -175,7 +175,7 @@ lgmsmodule.owner_block_form:
     _permission: 'access content'
 
 lgmsmodule.databases:
-  path: '/databases'
+  path: '/lgms/databases'
   defaults:
     _controller: '\Drupal\lgmsmodule\Controller\lgmsDatabasesController::databases'
     _title: 'Databases'

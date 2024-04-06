@@ -71,7 +71,7 @@ class AllGuidesController extends ControllerBase
       }
 
       if (\Drupal::currentUser()->isAuthenticated()) {
-      // Add a container
+        // Add a container
         $build['top_row'] = [
           '#type' => 'container',
           '#attributes' => ['class' => ['lgms_all_guides_search_button_container']],
@@ -80,19 +80,12 @@ class AllGuidesController extends ControllerBase
         // Render the searchbar block
         $build['top_row']['searchbar'] =  $landingMethods->getLGMSSearchBar('lgms_search_block', 'all_guides');
 
-        // Render the dashboard button
-        $build['top_row']['buttonDev'] = [
-          '#type' => 'container',
-          '#attributes' => ['class' => ['buttonDev']],
-        ];
-
-
         // Add the button only for authenticated users.
         $build['top_row']['buttonDev'] = [
           '#type' => 'link',
           '#title' => 'My Dashboard',
           '#url' => Url::fromUri('internal:/lgms/dashboard'),
-          '#attributes' => ['class' => ['button']],
+          '#attributes' => ['class' => ['buttonDev', 'button']],
         ];
       }
       else{
