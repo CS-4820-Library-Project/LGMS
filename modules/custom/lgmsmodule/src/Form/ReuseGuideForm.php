@@ -57,6 +57,7 @@ class ReuseGuideForm extends FormBase
       // Create a copy
       $cloned_guide = $original_guide->createDuplicate();
       $cloned_guide->set('title', $original_guide->label() . ' copy');
+      $cloned_guide->setOwnerId(\Drupal::currentUser()->id());
       $cloned_guide->save();
 
       // 1. Clone Guide Boxes of Each Guide
@@ -80,6 +81,7 @@ class ReuseGuideForm extends FormBase
     foreach ($pages as $page) {
       $cloned_page = $page->createDuplicate();
       $cloned_page->set('field_parent_guide', $new_parent->id());
+      $cloned_page->setOwnerId(\Drupal::currentUser()->id());
       $cloned_page->save();
 
       $this->clone_boxes($page, $cloned_page);
@@ -103,11 +105,35 @@ class ReuseGuideForm extends FormBase
     $new_box_list = [];
 
     foreach ($guide_boxes as $box) {
-      $cloned_box = $box->createDuplicate();
-      $cloned_box->set('field_parent_node', $new_page->id());
-      $cloned_box->save();
+      if ($box->hasField('field_parent_node') && $box->get('field_parent_node')->entity->id() != $page->id()){
+        $new_box_list[] = ['target_id' => $box->id()];
+      } else {
+        $cloned_box = $box->createDuplicate();
+        $cloned_box->set('field_parent_node', $new_page->id());
+        $cloned_box->save();
 
-      $new_box_list[] = ['target_id' => $cloned_box->id()];
+        $new_box_list[] = ['target_id' => $cloned_box->id()];
+
+        $new_items_list = [];
+        $items = $box->get('field_box_items')->referencedEntities();
+
+        foreach ($items as $item){
+          // Create a copy of the item and update it's owner
+          $new_item = $item->createDuplicate();
+          $new_item->set('field_parent_box', $cloned_box);
+          $new_item->set('field_lgms_database_link', TRUE);
+          $new_item->setOwnerId(\Drupal::currentUser()->id());
+
+          // Add the item to the list
+          $new_item->save();
+          $new_items_list[] = $new_item;
+        }
+
+        // Save the list of items
+        $cloned_box->set('field_box_items', $new_items_list);
+        $cloned_box->setOwnerId(\Drupal::currentUser()->id());
+        $cloned_box->save();
+      }
     }
 
     // After cloning all boxes, update the cloned guide with the list of cloned boxes.
