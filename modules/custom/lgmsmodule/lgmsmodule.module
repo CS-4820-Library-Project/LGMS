@@ -407,12 +407,12 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   } elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
     $book_item = $item->get('field_book_item')->entity;
 
-    $html_unpublished_class = unpublished_status($book_item);
-    if($html_unpublished_class != '' && !\Drupal::currentUser()->isAuthenticated()){
+    $book_unpublished_class = unpublished_status($book_item);
+    if($book_unpublished_class != '' && !\Drupal::currentUser()->isAuthenticated()){
       return [];
     }
 
-    $item_container['#attributes']['class'][] = $html_unpublished_class;
+    $item_container['#attributes']['class'][] = $book_unpublished_class;
 
     $item_container['content'][] = book_display($book_item, false);
 
@@ -420,6 +420,13 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $delete_route = 'delete_book.form';
   } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
     $database = $item->get('field_database_item')->entity;
+
+    $database_unpublished_class = unpublished_status($database);
+    if($database_unpublished_class != '' && !\Drupal::currentUser()->isAuthenticated()){
+      return [];
+    }
+
+    $item_container['#attributes']['class'][] = $database_unpublished_class;
 
     $item_container['content'][] = [
       '#type' => 'link',
@@ -446,6 +453,14 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
     $media = $item->get('field_media_image')->entity;
     $media_type = $media->bundle();
+
+    $media_unpublished_class = unpublished_status($media);
+    if($media_unpublished_class != '' && !\Drupal::currentUser()->isAuthenticated()){
+      return [];
+    }
+
+    $item_container['#attributes']['class'][] = $media_unpublished_class;
+
     //$media_item = \Drupal::entityTypeManager()->getViewBuilder('media')->view($media, 'full');
 
     switch ($media_type) {

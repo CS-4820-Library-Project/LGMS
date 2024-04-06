@@ -102,8 +102,9 @@ class AddDatabaseForm extends FormBase {
     $form['published'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Draft mode:'),
-      '#description' => $this->t('Un-check this box to publish.'),
+      '#description' => $edit && !$current_database->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
       '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
+      '#disabled' => $edit && !$current_database->isPublished(),
     ];
 
     $form['#validate'][] = '::validateFields';
