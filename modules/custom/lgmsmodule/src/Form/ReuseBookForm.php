@@ -474,6 +474,7 @@ class ReuseBookForm extends FormBase {
       $new_book->set('field_book_year', $form_state->getValue('publisher'));
       $new_book->set('field_book_edition', $form_state->getValue('edition'));
       $new_book->set('field_book_description', $form_state->getValue('description'));
+      $new_book->setOwnerId(\Drupal::currentUser()->id());
       $new_book->set('field_book_type', $type);
 
       if ($type == 'print'){
@@ -511,6 +512,7 @@ class ReuseBookForm extends FormBase {
     }
 
     // Save the item
+    $new_item->setOwnerId(\Drupal::currentUser()->id());
     $new_item->save();
     $item = $new_item;
 
