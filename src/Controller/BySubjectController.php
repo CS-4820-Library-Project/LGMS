@@ -46,10 +46,7 @@ class BySubjectController {
       $nid = $record->entity_id;
       $node = Node::load($nid);
 
-      // Retrieve the node title, ensuring it's not null.
-      $title = $node->label();
-
-      if ($title != null) {
+      if ($node) {
         // Load the associated subject taxonomy term.
         $term = Term::load($record->field_lgms_guide_subject_target_id);
         $taxonomyTerm = $term->label();
@@ -59,10 +56,10 @@ class BySubjectController {
 
         // Organize nodes by subject term, preparing HTML link for each.
         $data[$taxonomyTerm][] = [
-          'text' => $title, // Sortable text.
+          'text' => $node->label(), // Sortable text.
           'markup' => new FormattableMarkup('<a href=":link">@name</a>', [
             ':link' => $articleLink,
-            '@name' => $title
+            '@name' => $node->label()
           ])
         ];
       }

@@ -46,10 +46,7 @@ class ByTypeController {
       $nid = $record->entity_id;
       $node = Node::load($nid);
 
-      // Check for a valid node title.
-      $title = $node->label();
-
-      if ($title != null) {
+      if ($node) {
         // Load the associated "Guide Type" taxonomy term.
         $term = Term::load($record->field_lgms_guide_type_target_id);
         $taxonomyTerm = $term->label();
@@ -59,10 +56,10 @@ class ByTypeController {
 
         // Organize nodes by "Guide Type", with HTML links for display.
         $data[$taxonomyTerm][] = [
-          'text' => $title, // The text used for sorting within the group.
+          'text' => $node->label(), // The text used for sorting within the group.
           'markup' => new FormattableMarkup('<a href=":link">@name</a>', [
             ':link' => $articleLink,
-            '@name' => $title
+            '@name' => $node->label()
           ])
         ];
       }

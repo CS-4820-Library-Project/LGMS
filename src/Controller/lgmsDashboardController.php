@@ -31,9 +31,11 @@ class lgmsDashboardController extends ControllerBase {
    */
   public function overview(): array
   {
-    $build = [];
-    $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
     $landingMethods = new helperFunction(\Drupal::database());
+    $build = [];
+
+    $build['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
+
     $view = Views::getView('lgms_dashboard_table');
 
     if (is_object($view)) {

@@ -57,9 +57,6 @@ class AllGuidesController extends ControllerBase
       // Set the display id
       $view->setDisplay('default');
 
-      // Get the title from the view
-      $title = $view->getTitle();
-
       // Render the view
       $rendered_view = $view->buildRenderable('default', []);
 
@@ -70,6 +67,7 @@ class AllGuidesController extends ControllerBase
         ];
       }
 
+      // if the user is authenticated
       if (\Drupal::currentUser()->isAuthenticated()) {
         // Add a container
         $build['top_row'] = [
