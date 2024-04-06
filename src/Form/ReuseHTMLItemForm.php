@@ -20,32 +20,15 @@ class ReuseHTMLItemForm extends FormBase {
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
   {
-    // Define form wrapper and status messages.
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
-
-    // Hidden fields to store current context.
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_box,
-    ];
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_node,
-    ];
-
-    // Load HTML items to populate the select options.
-    $options = $this->getHtmlItemOptions();
+    // Set the prefix, suffix, and hidden fields
+    $form_helper = new FormHelper();
+    $form_helper->set_form_data($form,$ids, $this->getFormId());
 
     // Select element for HTML items.
-    $form['box'] = [
+    $form['html_select'] = [
       '#type' => 'select',
       '#title' => $this->t('Select HTML Item'),
-      '#options' => $options,
+      '#options' => $form_helper->get_item_options('guide_html_item'),
       '#empty_option' => $this->t('- Select an HTML Item -'),
       '#required' => TRUE,
       '#ajax' => [
@@ -86,29 +69,6 @@ class ReuseHTMLItemForm extends FormBase {
   }
 
   /**
-   * Queries and returns options for the HTML item select field.
-   *
-   * @return array
-   *   An associative array of options for the select field.
-   */
-  private function getHtmlItemOptions(): array
-  {
-    $query = \Drupal::entityQuery('node')
-      ->condition('type', 'guide_html_item')
-      ->sort('title', 'ASC')
-      ->accessCheck(TRUE);
-    $nids = $query->execute();
-
-    $nodes = Node::loadMultiple($nids);
-    $options = [];
-    foreach ($nodes as $node) {
-      $options[$node->id()] = $node->label();
-    }
-
-    return $options;
-  }
-
-  /**
    * Pre-fills the selected HTML item fields if one is selected.
    *
    * @param array $form
@@ -118,12 +78,17 @@ class ReuseHTMLItemForm extends FormBase {
    */
   private function prefillSelectedHtmlItem(array &$form, FormStateInterface $form_state): void
   {
-    $selected = $form_state->getValue('box');
+    // Get the selected html
+    $selected = $form_state->getValue('html_select');
 
     if (!empty($selected)) {
+      // Load the HTML item
       $selected_node = Node::load($selected);
+
       if ($selected_node) {
         $reference = $form_state->getValue('reference');
+
+        // Add the fields for the HTML if the user wants a copy
         $form['update_wrapper']['title'] = [
           '#type' => 'textfield',
           '#title' => $this->t('New Title:'),
@@ -134,6 +99,7 @@ class ReuseHTMLItemForm extends FormBase {
             'invisible' => [':input[name="reference"]' => ['checked' => TRUE]],
           ],
         ];
+
         $form['update_wrapper']['body'] = [
           '#type' => 'text_format',
           '#title' => $this->t('HTML Body'),
@@ -151,17 +117,18 @@ class ReuseHTMLItemForm extends FormBase {
 
   public function validateFields(array &$form, FormStateInterface $form_state): void
   {
-    $reference = $form_state->getValue('reference');
-    $title = $form_state->getValue('title');
-    if (!$reference && empty($title)) {
+    // Throw error if title field is not filled
+    if (!$form_state->getValue('reference') && empty($form_state->getValue('title'))) {
       $form_state->setErrorByName('title', $this->t('Title: field is required.'));
     }
   }
 
   public function htmlItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
-
-    $selected = $form_state->getValue('box');
+    // Load the selected html
+    $selected = $form_state->getValue('html_select');
     $selected_node = Node::load($selected);
+
+    // update the title and body fields
     if ($selected_node){
       $form['update_wrapper']['title']['#value'] = $selected_node->label();
       $form['update_wrapper']['body']['value']['#value'] = $selected_node->get('field_text_box_item2')->value;
@@ -185,48 +152,50 @@ class ReuseHTMLItemForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
+    $ajaxHelper = new FormHelper();
 
+    // Get the box to add the html item to
     $current_box_id = $form_state->getValue('current_box');
     $current_box = Node::load($current_box_id);
 
-
-    $html_id = $form_state->getValue('box');
+    // Get the selected html
+    $html_id = $form_state->getValue('html_select');
     $html = Node::load($html_id);
+
+    // Get the link to the selected html
     $item = $html->get('field_parent_item')->entity;
 
+    // creating a copy
     if(!$form_state->getValue('reference')){
+      // create a copy of both the link and html item
       $new_html = $html->createDuplicate();
       $new_item = $item->createDuplicate();
 
+      // Update html fields
       $new_html->set('field_parent_item', $new_item);
       $new_html->set('title', $form_state->getValue('title'));
-      $new_html->set('field_text_box_item2', [
-        'value' => $form_state->getValue('body')['value'],
-        'format' => $form_state->getValue('body')['format']
-      ]);
+      $new_html->set('field_text_box_item2', $form_state->getValue('body'));
       $new_html->save();
 
+      // Update link fields
       $new_item->set('field_parent_box', $current_box);
       $new_item->set('title', $form_state->getValue('title'));
       $new_item->set('field_html_item', $new_html);
-
       $new_item->save();
 
-      $item = $new_item;
     } else {
+      // Create a new link
       $new_item = $item->createDuplicate();
       $new_item->set('field_lgms_database_link', TRUE);
       $new_item->save();
-      $item = $new_item;
     }
 
-    $boxList = $current_box->get('field_box_items')->getValue();
-    $boxList[] = ['target_id' => $item->id()];
+    $item = $new_item;
 
-    $current_box->set('field_box_items', $boxList);
-    $current_box->save();
+    // Updating the box list with the new item
+    $ajaxHelper->add_child($current_box, $item,'field_box_items');
 
-    $ajaxHelper = new FormHelper();
+    // Update link
     $ajaxHelper->updateParent($form, $form_state);
   }
 }
