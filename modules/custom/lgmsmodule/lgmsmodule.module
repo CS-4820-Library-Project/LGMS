@@ -602,7 +602,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
         ]);
       }
 
-      if (!$item->get('field_lgms_database_link')->value) {
+      if (!$item->get('field_lgms_reference')->value) {
 
         $edit_link = [
           '#type' => 'link',
@@ -1226,67 +1226,44 @@ function lgmsModule_install(): void
   // Get the default theme.
   $default_theme = \Drupal::config('system.theme')->get('default');
 
-  $block_id = 'lgmsguideownerblock';
+  // Blocks to place
+  $block_id = ['lgmsguideownerblock', 'pageviewblock'];
+  $plugin = ['lgms_guide_owner_block', 'page_view_block'];
+  $label = ['LGMS Guide Owner Block', 'LGMS page view Block'];
+  $weight = [0,1];
 
-  if (!\Drupal\block\Entity\Block::load($block_id)) {
-    $block = \Drupal\block\Entity\Block::create([
-      'id' => $block_id,
-      'theme' => $default_theme,
-      'region' => 'sidebar_first',
-      'weight' => 0,
-      'provider' => 'lgmsmodule',
-      'plugin' => 'lgms_guide_owner_block',
-      'label' => 'LGMS Guide Owner Block',
-      'label_display' => 'visible',
-      'visibility' => [
-        'entity_bundle:node' => [
-          'id' => 'entity_bundle:node',
-          'bundles' => [
-            'guide' => 'guide',
-            'guide_page' => 'guide_page',
-          ],
-          'negate' => FALSE,
-          'context_mapping' => [
-            'node' => '@node.node_route_context:node',
-          ],
-        ],
-      ],
-    ]);
-
-    $block->save();
-
-    // After the block->save() call.
-    \Drupal::service('cache_tags.invalidator')->invalidateTags(['block_list']);
-    \Drupal::service('router.builder')->rebuild();
-  }
-
-  $block_id = 'pageviewblock';
-  if (!\Drupal\block\Entity\Block::load($block_id)) {
-    $block = \Drupal\block\Entity\Block::create([
-      'id' => $block_id,
-      'theme' => $default_theme,
-      'region' => 'sidebar_first',
-      'weight' => 1,
-      'provider' => 'lgmsmodule',
-      'plugin' => 'page_view_block',
-      'label' => 'LGMS page view Block',
-      'label_display' => 'visible',
-      'visibility' => [
-        'entity_bundle:node' => [
-          'id' => 'entity_bundle:node',
-          'bundles' => [
-            'guide' => 'guide',
-            'guide_page'=>'guide_page',
-          ],
-          'negate' => FALSE,
-          'context_mapping' => [
-            'node' => '@node.node_route_context:node',
+  for ($i = 0; $i < 2; $i++){
+    if (!\Drupal\block\Entity\Block::load($block_id[$i])) {
+      $block = \Drupal\block\Entity\Block::create([
+        'id' => $block_id[$i],
+        'theme' => $default_theme,
+        'region' => 'sidebar_first',
+        'weight' => $weight[$i],
+        'provider' => 'lgmsmodule',
+        'plugin' => $plugin[$i],
+        'label' => $label[$i],
+        'label_display' => 'visible',
+        'visibility' => [
+          'entity_bundle:node' => [
+            'id' => 'entity_bundle:node',
+            'bundles' => [
+              'guide' => 'guide',
+              'guide_page' => 'guide_page',
+            ],
+            'negate' => FALSE,
+            'context_mapping' => [
+              'node' => '@node.node_route_context:node',
+            ],
           ],
         ],
-      ],
-    ]);
+      ]);
 
-    $block->save();
+      $block->save();
+
+      // After the block->save() call.
+      \Drupal::service('cache_tags.invalidator')->invalidateTags(['block_list']);
+      \Drupal::service('router.builder')->rebuild();
+    }
   }
 
   // Create content types with brief descriptions.
@@ -1299,359 +1276,168 @@ function lgmsModule_install(): void
   createContentType('guide_book_item', 'Book Box Item', 'References to books within Guide Boxes.');
 
 
-  // Create a new Guide Type taxonomy.
+  // Create taxonomies.
   create_vocab('LGMS_Guide_Type', 'Guide Type', 'Use Guide Type to group guides by their type');
+  create_vocab('LGMS_Guide_Subject', 'Guide Subject', 'Use Guide Subject to group guides related to each other under the same category');
+  create_vocab('LGMS_Guide_Group', 'Guide Group', 'Use Guide Group to assign a guide to a specific group and.');
 
   // Add terms to the Guide Type taxonomy
-  $terms = array(
-    'General purpose Guide',
-    'Subject Guide',
-    'Topic Guide',
-    'Course Guide',
-  );
+  $terms = array('General purpose Guide', 'Subject Guide', 'Topic Guide', 'Course Guide',);
   add_terms($terms, 'LGMS_Guide_Type');
 
-  // Create a new Guide Subject taxonomy.
-  create_vocab('LGMS_Guide_Subject', 'Guide Subject', 'Use Guide Subject to group guides related to each other under the same category');
-
   // Add terms to the Guide Subject taxonomy
-  $terms = array(
-    'Anthropology',
-    'Biology ',
-    'Biotechnology',
-    'Business & Management',
-    'Chemistry',
-    'Communication & Mass Media',
-    'Computer Science',
-    'Drama & Theater Arts',
-    'Earth & Atmospheric Sciences',
-    'Economics',
-    'Education',
-    'Engineering',
-    'Environmental Sciences',
-    'Ethnic & Cultural Studies',
-    'Geography & Cartography',
-    'Health & Medicine',
-    'History',
-    'Language & Linguistics',
-    'Law',
-    'Library & Information Science',
-    'Literature & Writing',
-    'Marketing',
-    'Mathematics',
-    'Music',
-    'Nursing & Allied Health',
-    'Nutrition & Dietetics',
-    'Physics',
-    'Political Science',
-    'Politics & Government',
-    'Psychology',
-    'Religion & Philosophy',
-    'Science',
-    'Sociology',
-    'Sports & Leisure',
-    'Sports Medicine',
-    'Veterinary Medicine',
-    'Visual Arts',
-    'Women\'s Studies & Feminism',
+  $terms = array('Anthropology', 'Biology ', 'Biotechnology', 'Business & Management', 'Chemistry',
+    'Communication & Mass Media', 'Computer Science', 'Drama & Theater Arts', 'Earth & Atmospheric Sciences',
+    'Economics', 'Education', 'Engineering', 'Environmental Sciences', 'Ethnic & Cultural Studies',
+    'Geography & Cartography', 'Health & Medicine', 'History', 'Language & Linguistics', 'Law',
+    'Library & Information Science', 'Literature & Writing', 'Marketing', 'Mathematics', 'Music',
+    'Nursing & Allied Health', 'Nutrition & Dietetics', 'Physics', 'Political Science', 'Politics & Government',
+    'Psychology', 'Religion & Philosophy', 'Science', 'Sociology', 'Sports & Leisure', 'Sports Medicine',
+    'Veterinary Medicine', 'Visual Arts', 'Women\'s Studies & Feminism',
   );
   add_terms($terms, 'LGMS_Guide_Subject');
 
-  // Create a new Guide Group taxonomy.
-  create_vocab('LGMS_Guide_Group', 'Guide Group', 'Use Guide Group to assign a guide to a specific group and.');
-
   // Add terms to the Guide Group taxonomy
-  $terms = array(
-    'Group 1',
-    'Group 2',
-    'Group 3',
-    'Group 4',
-  );
+  $terms = array('Group 1', 'Group 2', 'Group 3', 'Group 4',);
   add_terms($terms, 'LGMS_Guide_Group');
 
-  // Create field storages and instances...
-  createField(
-    'field_lgms_guide_subject',
-    'node',
-    'guide',
-    'Subject',
-    'entity_reference',
-    ['target_type' => 'taxonomy_term',],
-    ['handler' => 'default:taxonomy_term',
+  // Guide fields
+  createField('field_hide_description', 'node', 'guide', 'Hide Description',
+    'boolean', [], [
+      'default_value' => 0,
+      'on_label' => 'Yes',
+      'off_label' => 'No',
+    ],
+    'boolean_checkbox', [], TRUE, False, 1, ''
+  );
+
+  createField('field_description', 'node', 'guide', 'Description',
+    'text_long', [], [], 'text_textarea', [], True, False, 2, ''
+  );
+
+
+  createField('field_lgms_guide_subject', 'node', 'guide', 'Subject',
+    'entity_reference', ['target_type' => 'taxonomy_term',],
+    [
+      'handler' => 'default:taxonomy_term',
       'handler_settings' => [
         'target_bundles' => [
           'LGMS_Guide_Subject' => 'LGMS_Guide_Subject',
         ],
       ],
     ],
-    'options_buttons',
-    [],
-    False,
-    True,
-    3,
-    ''
+    'options_buttons', [], True, True, 3, ''
   );
 
-  createField(
-    'field_lgms_guide_type',
-    'node',
-    'guide',
-    'Type',
-    'entity_reference',
-    ['target_type' => 'taxonomy_term',],
-    ['handler' => 'default:taxonomy_term',
+  createField('field_lgms_guide_type', 'node', 'guide', 'Type',
+    'entity_reference', ['target_type' => 'taxonomy_term',],
+    [
+      'handler' => 'default:taxonomy_term',
       'handler_settings' => [
         'target_bundles' => [
           'LGMS_Guide_Subject' => 'LGMS_Guide_Type',
         ],
       ],
     ],
-    'options_select',
-    ['weight' => 1],
-    False,
-    False,
-    4,
-    ''
+    'options_select', [], True, False, 4, ''
   );
 
-  createField(
-    'field_lgms_guide_group',
-    'node',
-    'guide',
-    'Group',
-    'entity_reference',
-    ['target_type' => 'taxonomy_term',],
-    ['handler' => 'default:taxonomy_term',
+  createField('field_lgms_guide_group', 'node', 'guide', 'Group',
+    'entity_reference', ['target_type' => 'taxonomy_term',],
+    [
+      'handler' => 'default:taxonomy_term',
       'handler_settings' => [
         'target_bundles' => [
           'LGMS_Guide_Subject' => 'LGMS_Guide_Group',
         ],
       ],
     ],
-    'options_select',
-    ['weight' => 2],
-    False,
-    False,
-    5,
-    ''
+    'options_select', [], True, False, 5, ''
   );
 
-  // Guide Description field
-  createField(
-    'field_description',
-    'node',
-    'guide',
-    'Description',
-    'text_long',
-    [],
-    [],
-    'text_textarea',
-    [],
-    False,
-    False,
-    2,
-    ''
-  );
-
-  // Add a reference field to Guide content type on Guide Page.
-  createField(
-    'field_parent_guide',
-    'node',
-    'guide_page',
-    'Parent Guide',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  createField('field_child_pages', 'node', 'guide', 'Children Pages',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
-          'guide' => 'guide',
           'guide_page' => 'guide_page',
         ],
       ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    False,
-    1,
-    ''
-  );
-
-  createField(
-    'field_parent_node',
-    'node',
-    'guide_box',
-    'Parent node',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
-      'handler_settings' => [
-        'target_bundles' => [
-          'guide' => 'guide',
-          'guide_page' => 'guide_page',
-        ],
+      'sort' => [
+        'field' => '_none',
       ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    False,
-    1,
-    ''
+    ], 'entity_reference_autocomplete', [], TRUE, TRUE, 6, ''
   );
 
-  createField(
-    'field_parent_box',
-    'node',
-    'guide_item',
-    'Parent node',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  createField('field_child_boxes', 'node', 'guide', 'Children Boxes',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
           'guide_box' => 'guide_box',
         ],
       ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    False,
-    1,
-    ''
+      'sort' => [
+        'field' => '_none',
+      ],
+    ], 'entity_reference_autocomplete', [], TRUE, TRUE, 7, ''
   );
 
-  createField(
-    'field_parent_item',
-    'node',
-    'guide_html_item',
-    'Parent node',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  // Guide_Page content type fields
+  createField('field_parent_guide', 'node', 'guide_page', 'Parent Guide',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
-          'guide_item' => 'guide_item',
+          'guide' => 'guide',
+          'guide_page' => 'guide_page',
         ],
       ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    False,
-    1,
-    ''
+    ], 'entity_reference_autocomplete', [], TRUE, False, 1, ''
   );
 
-  createField(
-    'field_parent_item',
-    'node',
-    'guide_book_item',
-    'Parent node',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  createField('field_hide_description', 'node', 'guide_page', 'Hide Description',
+    'boolean', [],
+    [
+      'default_value' => 0,
+      'on_label' => 'Yes',
+      'off_label' => 'No',
+    ],
+    'boolean_checkbox', [], TRUE, False, 2, ''
+  );
+
+  createField('field_description', 'node', 'guide_page', 'Description',
+    'text_long', [], [], 'text_textarea',
+    [
+      'rows' => 5,
+      'placeholder' => 'Enter the page description here...'
+    ],
+    TRUE, False, 3, ''
+  );
+
+  createField('field_child_pages', 'node', 'guide_page', 'Children Pages',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
-          'guide_item' => 'guide_item',
+          'guide_page' => 'guide_page',
         ],
       ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    False,
-    0,
-    ''
-  );
-
-  createField(
-    'field_parent_item',
-    'node',
-    'guide_database_item',
-    'Parent node',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
-      'handler_settings' => [
-        'target_bundles' => [
-          'guide_item' => 'guide_item',
-        ],
+      'sort' => [
+        'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    False,
-    0,
-    ''
+    'entity_reference_autocomplete', [], TRUE, TRUE, 4, ''
   );
 
-
-
-//add page description field
-  createField(
-    'field_description',
-    'node',
-    'guide_page',
-    'Description',
-    'text_long',
-    [],
-    [],
-    'text_textarea',
-    ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
-    TRUE,
-    False,
-    2,
-    ''
-  );
-
-  createField(
-    'field_draft_mode',
-    'node',
-    'guide_page',
-    'Draft Mode',
-    'boolean',
-    [],
-    [],
-    'boolean_checkbox',
-    [ // Widget settings.
-      'settings' => [
-        'display_label' => TRUE,
-      ],
-    ],
-    FALSE,
-    FALSE,
-    10,
-    ''
-  );
-
-  createField(
-    'field_description',
-    'node',
-    'guide_database_item',
-    'Description',
-    'text_long',
-    [],
-    [],
-    'text_textarea',
-    ['rows' => 5, 'placeholder' => 'Enter the page description here...'],
-    TRUE,
-    False,
-    3,
-    ''
-  );
-
-// page box children
-  createField(
-    'field_child_boxes',
-    'node',
-    'guide_page',
-    'Children Boxes',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  createField('field_child_boxes', 'node', 'guide_page', 'Children Boxes',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
           'guide_box' => 'guide_box',
@@ -1661,22 +1447,13 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    TRUE,
-    5,
-    ''
+    'entity_reference_autocomplete', [], TRUE, TRUE, 5, ''
   );
 
-  createField(
-    'field_child_pages',
-    'node',
-    'guide_page',
-    'Children Pages',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  createField('field_reference_node', 'node', 'guide_page', 'Reference Page',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
           'guide_page' => 'guide_page',
@@ -1686,88 +1463,69 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    TRUE,
-    5,
-    ''
+    'entity_reference_autocomplete', [], TRUE, False, 6, ''
   );
 
-  createField(
-    'field_reference_node',
-    'node',
-    'guide_page',
-    'Reference To',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  // Guide_box fields
+  createField('field_parent_node', 'node', 'guide_box', 'Parent node',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
+          'guide' => 'guide',
           'guide_page' => 'guide_page',
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete', [], TRUE, False, 1, ''
+  );
+
+  createField('field_box_items', 'node', 'guide_box', 'Items List',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_item' => 'guide_item',
         ],
       ],
       'sort' => [
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    False,
-    5,
-    ''
+    'entity_reference_autocomplete', [], TRUE, True, 2, ''
   );
 
-  createField(
-    'field_child_pages',
-    'node',
-    'guide',
-    'Children Pages',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  // Guide_item fields
+  createField('field_parent_box', 'node', 'guide_item', 'Parent Box',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
-          'guide_page' => 'guide_page',
+          'guide_box' => 'guide_box',
         ],
       ],
-      'sort' => [
-        'field' => '_none',
+    ],
+    'entity_reference_autocomplete', [], TRUE, False, 1, ''
+  );
+
+  createField('field_media_image', 'node', 'guide_item', 'Media',
+    'entity_reference', ['target_type' => 'media'],
+    [
+      'handler' => 'default:media',
+      'handler_settings' => [
+        'sort' => ['field' => '_none'],
       ],
     ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    TRUE,
-    6,
-    ''
+    'media_library_widget', [], TRUE, false, 2, ''
   );
 
-  createField(
-    'field_text_box_item2',
-    'node',
-    'guide_html_item',
-    'Text',
-    'text_long',
-    [],
-    [],
-    'text_textarea',
-    ['rows' => 20,],
-    TRUE,
-    False,
-    1,
-    ''
-  );
-
-  createField(
-    'field_html_item',
-    'node',
-    'guide_item',
-    'html item',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  createField('field_html_item', 'node', 'guide_item', 'html item',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
           'guide_html_item' => 'guide_html_item',
@@ -1777,22 +1535,13 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    True,
-    4,
-    ''
+    'entity_reference_autocomplete', [], TRUE, False, 3, ''
   );
 
-  createField(
-    'field_database_item',
-    'node',
-    'guide_item',
-    'Database item',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+  createField('field_database_item', 'node', 'guide_item', 'Database item',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
           'guide_database_item' => 'guide_database_item',
@@ -1802,343 +1551,13 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    True,
-    4,
-    ''
+    'entity_reference_autocomplete', [], TRUE, False, 4, ''
   );
 
-  createField(
-    'field_lgms_database_link',
-    'node',
-    'guide_item',
-    'Link',
-    'boolean',
-    [],
-    [],
-    'boolean_checkbox',
-    [ // Widget settings.
-      'settings' => [
-        'display_label' => TRUE,
-      ],
-    ],
-    FALSE,
-    FALSE,
-    10,
-    ''
-  );
-
-//guide_item
-  createField(
-    'field_box_items',
-    'node',
-    'guide_box',
-    'Items List',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
-      'handler_settings' => [
-        'target_bundles' => [
-          'guide_item' => 'guide_item',
-        ],
-      ],
-      'sort' => [
-        'field' => '_none',
-      ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    True,
-    4,
-    ''
-  );
-
-  // Guide box children
-  createField(
-    'field_child_boxes',
-    'node',
-    'guide',
-    'Children Boxes',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
-      'handler_settings' => [
-        'target_bundles' => [
-          'guide_box' => 'guide_box',
-        ],
-      ],
-      'sort' => [
-        'field' => '_none',
-      ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    TRUE,
-    7,
-    ''
-  );
-
-  // Guide page children
-  createField(
-    'field_child_pages',
-    'node',
-    'guide',
-    'Children Pages',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
-      'handler_settings' => [
-        'target_bundles' => [
-          'guide_page' => 'guide_page',
-        ],
-      ],
-      'sort' => [
-        'field' => '_none',
-      ],
-    ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    TRUE,
-    6,
-    ''
-  );
-
-  createField(
-    'field_hide_description',
-    'node',
-    'guide',
-    'Hide Description',
-    'boolean',
-    [],
+  createField('field_book_item', 'node', 'guide_item', 'Book item',
+    'entity_reference', ['target_type' => 'node',],
     [
-      'default_value' => 0,
-      'on_label' => 'Yes',
-      'off_label' => 'No',
-    ],
-    'boolean_checkbox',
-    [],
-    TRUE,
-    1,
-    1,
-    ''
-  );
-
-  createField(
-    'field_hide_description',
-    'node',
-    'guide_page',
-    'Hide Description',
-    'boolean',
-    [],
-    [
-      'default_value' => 0,
-      'on_label' => 'Yes',
-      'off_label' => 'No',
-    ],
-    'boolean_checkbox',
-    [],
-    TRUE,
-    1,
-    1,
-    ''
-  );
-
-  createField(
-    'field_hide_description',
-    'node',
-    'guide_database_item',
-    'Hide Description',
-    'boolean',
-    [],
-    [
-      'default_value' => 0,
-      'on_label' => 'Yes',
-      'off_label' => 'No',
-    ],
-    'boolean_checkbox',
-    [],
-    TRUE,
-    1,
-    1,
-    ''
-  );
-
-  createField(
-    'field_hide_body',
-    'node',
-    'guide_database_item',
-    'Hide Body',
-    'boolean',
-    [],
-    [
-      'default_value' => 0,
-      'on_label' => 'Yes',
-      'off_label' => 'No',
-    ],
-    'boolean_checkbox',
-    [],
-    TRUE,
-    1,
-    1,
-    ''
-  );
-
-  createField(
-    'field_database_link',
-    'node',
-    'guide_database_item',
-    'proxied Link',
-    'link',
-    [],
-    ['link_type' => LinkItemInterface::LINK_GENERIC],
-    'link_default',
-    [],
-    TRUE,
-    FALSE,
-    0,
-    'Enter the Title of the proxied content. All links in this field will have a proxy prefix attached to the url by the system (eg. https://proxy.library.xxx.xx/login?url=). so enter the URL of the content without the proxy.'
-  );
-
-  createField(
-    'field_database_body',
-    'node',
-    'guide_database_item',
-    'Body',
-    'text_long',
-    [],
-    ['text_processing' => 1],
-    'text_textarea',
-    [],
-    TRUE,
-    FALSE,
-    1,
-    ''
-  );
-
-  // First Name
-  createField(
-    'field_lgms_first_name',
-    'user',
-    'user',
-    'First Name',
-    'string',
-    [],
-    [],
-    'string_textfield',
-    ['size' => 20],
-    TRUE,
-    FALSE,
-    1,
-    'The user\'s first name.'
-  );
-
-  // Last Name
-  createField(
-    'field_lgms_last_name',
-    'user',
-    'user',
-    'Last Name',
-    'string',
-    [],
-    [],
-    'string_textfield',
-    ['size' => 20],
-    TRUE,
-    FALSE,
-    2,
-    'The user\'s last name.'
-  );
-
-  // Phone Number
-  createField(
-    'field_lgms_phone_number',
-    'user',
-    'user',
-    'Phone Number',
-    'string',
-    [],
-    [],
-    'string_textfield',
-    ['size' => 20],
-    TRUE,
-    FALSE,
-    3,
-    'The user\'s phone number.'
-  );
-
-  // Body
-  createField(
-    'field_lgms_body',
-    'user',
-    'user',
-    'Body',
-    'text_long',
-    [],
-    [],
-    'text_textarea',
-    [],
-    TRUE,
-    FALSE,
-    3,
-    'The user\'s custom body.'
-  );
-
-  createField(
-    'field_lgms_user_subjects',
-    'user',
-    'user',
-    'Subjects',
-    'entity_reference',
-    ['target_type' => 'taxonomy_term',],
-    ['handler' => 'default:taxonomy_term',
-      'handler_settings' => [
-        'target_bundles' => [
-          'LGMS_Guide_Subject' => 'LGMS_Guide_Subject',
-        ],
-      ],
-    ],
-    'options_buttons',
-    [],
-    False,
-    True,
-    4,
-    'The user\'s subjects'
-  );
-
-  createField(
-    'field_media_image',
-    'node',
-    'guide_item',
-    'Media',
-    'entity_reference',
-    ['target_type' => 'media'],
-    [
-      'handler' => 'default:media',
-      'handler_settings' => [
-        'sort' => ['field' => '_none'],
-      ],
-    ],
-    'media_library_widget',
-    [],
-    TRUE,
-    false,
-    0,
-    ''
-  );
-
-  createField(
-    'field_book_item',
-    'node',
-    'guide_item',
-    'Book item',
-    'entity_reference',
-    ['target_type' => 'node',],
-    ['handler' => 'default:node',
+      'handler' => 'default:node',
       'handler_settings' => [
         'target_bundles' => [
           'guide_book_item' => 'guide_book_item',
@@ -2148,164 +1567,156 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete',
-    [],
-    TRUE,
-    True,
-    4,
-    ''
+    'entity_reference_autocomplete', [], TRUE, False, 5, ''
   );
 
-  createField(
-    'field_book_author_or_editor',
-    'node',
-    'guide_book_item',
-    'Author/Editor',
-    'string',
-    [],
-    [],
-    'string_textfield',
-    [],
-    TRUE,
-    FALSE,
-    1,
-    ''
-  );
-
-  createField(
-    'field_book_publisher',
-    'node',
-    'guide_book_item',
-    'Publisher',
-    'string',
-    [],
-    [],
-    'string_textfield',
-    [],
-    TRUE,
-    FALSE,
-    2,
-    ''
-  );
-
-  createField(
-    'field_book_year',
-    'node',
-    'guide_book_item',
-    'Year',
-    'string',
-    [],
-    [],
-    'string_textfield',
-    [],
-    TRUE,
-    FALSE,
-    3,
-    ''
-  );
-
-  createField(
-    'field_make_proxy',
-    'node',
-    'guide_database_item',
-    'Include Proxy',
-    'boolean',
-    [],
-    [],
-    'boolean_checkbox',
-    [ // Widget settings.
+  createField('field_lgms_reference', 'node', 'guide_item', 'Link', 'boolean',
+    [], [], 'boolean_checkbox',
+    [
       'settings' => [
         'display_label' => TRUE,
       ],
     ],
-    FALSE,
-    FALSE,
-    1,
-    ''
+    FALSE, FALSE, 6, ''
+  );
+
+  // Guide_html_item content type fields
+  createField(
+    'field_parent_item', 'node', 'guide_html_item', 'Parent node',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_item' => 'guide_item',
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete', [], TRUE, False, 1, ''
+  );
+
+  createField('field_text_box_item2', 'node', 'guide_html_item', 'Text',
+    'text_long', [], [], 'text_textarea', ['rows' => 20,], TRUE, False,
+    2, ''
+  );
+
+  // guide_database_item content type fields
+  createField('field_parent_item', 'node', 'guide_database_item', 'Parent node',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_item' => 'guide_item',
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete', [], TRUE, False, 1, ''
+  );
+
+  createField('field_database_link', 'node', 'guide_database_item', 'Link',
+    'link', [],
+    [
+      'link_type' => LinkItemInterface::LINK_GENERIC
+    ],
+    'link_default', [], TRUE, FALSE, 2, 'Enter the Title of the proxied content.
+     All links in this field will have a proxy prefix attached to the url by the system (eg. https://proxy.library.xxx.xx
+     /login?url=).so enter the URL of the content without the proxy.'
+  );
+
+  createField('field_make_proxy', 'node', 'guide_database_item', 'Make Link Proxy',
+    'boolean', [], [], 'boolean_checkbox',
+    [
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+    ],
+    FALSE, FALSE, 3, ''
+  );
+
+  createField('field_hide_body', 'node', 'guide_database_item', 'Hide Body',
+    'boolean', [],
+    [
+      'default_value' => 0,
+      'on_label' => 'Yes',
+      'off_label' => 'No',
+    ],
+    'boolean_checkbox', [], TRUE, 1, 1, ''
+  );
+
+  createField('field_database_body', 'node', 'guide_database_item', 'Body',
+    'text_long', [], ['text_processing' => 1], 'text_textarea', [], TRUE, FALSE,
+    1, ''
+  );
+
+  createField(
+    'field_hide_description', 'node', 'guide_database_item', 'Hide Description',
+    'boolean', [],
+    [
+      'default_value' => 0,
+      'on_label' => 'Yes',
+      'off_label' => 'No',
+    ],
+    'boolean_checkbox', [], TRUE, False, 2, ''
   );
 
 
-  createField(
-    'field_book_edition',
-    'node',
-    'guide_book_item',
-    'Edition',
-    'string',
-    [],
-    [],
-    'string_textfield',
-    [],
-    TRUE,
-    FALSE,
-    4,
-    ''
+  createField('field_description', 'node', 'guide_database_item', 'Description',
+    'text_long', [], ['text_processing' => 1], 'text_textarea', [], TRUE, False,
+    3, ''
   );
 
-  createField(
-    'field_book_cover_picture',
-    'node',
-    'guide_book_item',
-    'Cover Picture',
+  // guide_book_item content type fields
+  createField('field_parent_item', 'node', 'guide_book_item', 'Parent node',
+    'entity_reference', ['target_type' => 'node',],
+    [
+      'handler' => 'default:node',
+      'handler_settings' => [
+        'target_bundles' => [
+          'guide_item' => 'guide_item',
+        ],
+      ],
+    ],
+    'entity_reference_autocomplete', [], TRUE, False, 0, ''
+  );
+
+  createField('field_book_author_or_editor', 'node', 'guide_book_item',
+    'Author/Editor', 'string', [], [], 'string_textfield', [], TRUE, FALSE,
+    1, ''
+  );
+
+  createField('field_book_publisher', 'node', 'guide_book_item', 'Publisher',
+    'string', [], [], 'string_textfield', [], TRUE, FALSE, 2, ''
+  );
+
+  createField('field_book_year', 'node', 'guide_book_item', 'Year', 'string',
+    [], [], 'string_textfield', [], TRUE, FALSE, 3, ''
+  );
+
+  createField('field_book_edition', 'node', 'guide_book_item', 'Edition',
+    'string', [], [], 'string_textfield', [], TRUE, FALSE, 4, ''
+  );
+
+  createField('field_book_cover_picture', 'node', 'guide_book_item', 'Cover Picture',
     'image',
-    ['uri_scheme' => 'public', 'file_extensions' => 'png jpg jpeg'],
-    [],
-    'image_image',
-    ['progress_indicator' => 'throbber'],
-    TRUE,
-    FALSE,
-    5,
+    [
+      'uri_scheme' => 'public',
+      'file_extensions' => 'png jpg jpeg'
+    ],
+    [], 'image_image', ['progress_indicator' => 'throbber'], TRUE, FALSE, 5, ''
+  );
+
+  createField('field_book_url', 'node', 'guide_book_item', 'URL', 'link',
+    [], ['link_type' => LinkItemInterface::LINK_GENERIC], 'link_default', [], TRUE, FALSE,
+    6, ''
+  );
+
+  createField('field_book_description', 'node', 'guide_book_item', 'Description',
+    'text_long', [], [], 'text_textarea', ['rows' => 20,], TRUE, FALSE, 7,
     ''
   );
 
-  createField(
-    'field_book_url',
-    'node',
-    'guide_book_item',
-    'URL',
-    'link',
-    [],
-    ['link_type' => LinkItemInterface::LINK_GENERIC],
-    'link_default',
-    [],
-    TRUE,
-    FALSE,
-    6,
-    ''
-  );
-
-  createField(
-    'field_book_description',
-    'node',
-    'guide_book_item',
-    'Description',
-    'text_long',
-    [],
-    [],
-    'text_textarea',
-    ['rows' => 20,],
-    TRUE,
-    FALSE,
-    7,
-    ''
-  );
-
-  // Create a new Guide Subject taxonomy.
-  create_vocab('LGMS_Guide_Book_Type', 'Guide Book Type', 'Use Guide Book Type to add extra fields to Book content type');
-
-  // Add terms to the Guide Group taxonomy
-  $terms = array(
-    'print',
-    'eBook',
-  );
-
-  add_terms($terms, 'LGMS_Guide_Book_Type');
-
-  // Create field storages and instances...
-  createField(
-    'field_book_type',
-    'node',
-    'guide_book_item',
-    'Book Type',
+  createField('field_book_type', 'node', 'guide_book_item', 'Book Type',
     'list_string',
     [
       'allowed_values' => [
@@ -2313,93 +1724,74 @@ function lgmsModule_install(): void
         'eBook' => 'eBook',
       ],
     ],
+    [], 'options_select', [], True, False, 8, ''
+  );
+
+
+  createField('field_book_call_number', 'node', 'guide_book_item', 'Call Number',
+    'string', [], [], 'string_textfield', [], TRUE, FALSE, 9, ''
+  );
+
+  createField('field_book_location', 'node', 'guide_book_item', 'Location',
+    'string', [], [], 'string_textfield', [], TRUE, FALSE, 10, ''
+  );
+
+  createField('field_book_cat_record', 'node', 'guide_book_item', 'Cat Record',
+    'link', [],
     [
-      'allowed_values' => [
-        'print' => 'Print',
-        'eBook' => 'eBook',
+      'link_type' => LinkItemInterface::LINK_GENERIC
+    ],
+    'link_default', [], TRUE, FALSE, 11, ''
+  );
+
+  createField('field_book_pub_finder', 'node', 'guide_book_item', 'Pub Finder',
+    'link', [],
+    [
+      'link_type' => LinkItemInterface::LINK_GENERIC
+    ],
+    'link_default', [], TRUE, FALSE, 12, ''
+  );
+
+  // User fields
+  createField('field_lgms_first_name', 'user', 'user', 'First Name', 'string',
+    [], [], 'string_textfield', ['size' => 20], TRUE, FALSE, 1, ''
+  );
+
+  createField('field_lgms_last_name', 'user', 'user', 'Last Name', 'string',
+    [], [], 'string_textfield', ['size' => 20], TRUE, FALSE, 2, ''
+  );
+
+  createField('field_lgms_phone_number', 'user', 'user', 'Phone Number', 'string',
+    [], [], 'string_textfield', ['size' => 20], TRUE, FALSE, 3, ''
+  );
+
+  createField('field_lgms_body', 'user', 'user', 'Body', 'text_long',
+    [], [], 'text_textarea', [], TRUE, FALSE, 4, ''
+  );
+
+  createField('field_lgms_user_subjects', 'user', 'user', 'Subjects',
+    'entity_reference', ['target_type' => 'taxonomy_term',],
+    [
+      'handler' => 'default:taxonomy_term',
+      'handler_settings' => [
+        'target_bundles' => [
+          'LGMS_Guide_Subject' => 'LGMS_Guide_Subject',
+        ],
       ],
     ],
-    'options_select',
-    [],
-    True,
-    False,
-    8,
-    ''
-  );
-
-
-  createField(
-    'field_book_call_number',
-    'node',
-    'guide_book_item',
-    'Call Number',
-    'string',
-    [],
-    [],
-    'string_textfield',
-    [],
-    TRUE,
-    FALSE,
-    9,
-    ''
-  );
-
-  createField(
-    'field_book_location',
-    'node',
-    'guide_book_item',
-    'Location',
-    'string',
-    [],
-    [],
-    'string_textfield',
-    [],
-    TRUE,
-    FALSE,
-    10,
-    ''
-  );
-
-  createField(
-    'field_book_cat_record',
-    'node',
-    'guide_book_item',
-    'Cat Record',
-    'link',
-    [],
-    ['link_type' => LinkItemInterface::LINK_GENERIC],
-    'link_default',
-    [],
-    TRUE,
-    FALSE,
-    11,
-    ''
-  );
-
-  createField(
-    'field_book_pub_finder',
-    'node',
-    'guide_book_item',
-    'Pub Finder',
-    'link',
-    [],
-    ['link_type' => LinkItemInterface::LINK_GENERIC],
-    'link_default',
-    [],
-    TRUE,
-    FALSE,
-    12,
-    ''
+    'options_buttons', [], False, True, 5, ''
   );
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
   disable_field('guide', 'display_submitted');
   disable_field('guide_page', 'display_submitted');
   disable_field('guide_box', 'display_submitted');
+  disable_field('guide_item', 'display_submitted');
+  disable_field('guide_html_item', 'display_submitted');
   disable_field('guide_database_item', 'display_submitted');
   disable_field('guide_book_item', 'display_submitted');
 
-  $helpGuideNodeId = createHelpGuide();
+  createHelpGuide();
 }
 
 

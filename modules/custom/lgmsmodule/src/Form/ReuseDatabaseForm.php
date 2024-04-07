@@ -287,7 +287,7 @@ class ReuseDatabaseForm extends FormBase {
     } else {
       // Create a reference
       $new_item = $item->createDuplicate();
-      $new_item->set('field_lgms_database_link', TRUE);
+      $new_item->set('field_lgms_reference', TRUE);
       $new_item->setOwnerId(\Drupal::currentUser()->id());
       $new_item->save();
       $item = $new_item;

@@ -482,7 +482,7 @@ class FormHelper {
           // Create a copy of the item and update it's owner
           $new_item = $item->createDuplicate();
           $new_item->set('field_parent_box', $cloned_box);
-          $new_item->set('field_lgms_database_link', TRUE);
+          $new_item->set('field_lgms_reference', TRUE);
           $new_item->setOwnerId(\Drupal::currentUser()->id());
 
           // Add the item to the list

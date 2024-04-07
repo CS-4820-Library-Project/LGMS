@@ -41,7 +41,7 @@ class DeleteContentItemsForm extends FormBase {
       '#value' => $field_to_delete,
     ];
 
-    $link = ($current_item->get('field_parent_box')->getValue()[0]['target_id'] == $ids->current_box && $current_item->get('field_lgms_database_link')->getValue()) || $current_item->get('field_lgms_database_link')->getValue();
+    $link = ($current_item->get('field_parent_box')->getValue()[0]['target_id'] == $ids->current_box && $current_item->get('field_lgms_reference')->getValue()) || $current_item->get('field_lgms_reference')->getValue();
 
     $message = '<Strong>Are you sure you want to Delete ' . $current_item->label() . '?</Strong>';
 
