@@ -32,9 +32,10 @@ class DeleteGuideForm extends FormBase {
     // Warning message
     $form['warning'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('<strong>Are you sure you want to delete this guide?</strong>
+      '#title' => $this->t('<strong>Are you sure you want to delete this guide @page_title?</strong>
                                     This will remove it and any pages and boxes it directly owns
-                                    (but not links to pages and boxes owned by other pages or guides, nor any content items).'),
+                                    (but not links to pages and boxes owned by other pages or guides,
+                                     nor any content items).', ['@page_title' => Node::load($ids->guide_id)->label()]),
       '#prefix' => '<p>',
       '#suffix' => '</p>',
       '#required' => True,
