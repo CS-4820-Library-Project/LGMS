@@ -247,6 +247,7 @@ function lgmsmodule_entity_delete(EntityInterface $entity): void
  */
 function lgmsmodule_node_update(NodeInterface $node): void
 {
+
   if($node->bundle() === 'guide_page'){
     // Check if the entity is a 'guide_page' and has the field 'field_reference_node'.
     if ($node->getEntityTypeId() === 'node' && $node->bundle() === 'guide_page' && $node->hasField('field_reference_node')) {
@@ -256,7 +257,10 @@ function lgmsmodule_node_update(NodeInterface $node): void
   }
 
   if (($node->bundle() === 'guide' || $node->bundle() === 'guide_page') && !$node->isPublished()){
-    unpublished_child_pages($node);
+    // do not unpublish it's children if it is a reference.
+    if (!$node->hasField('field_reference_node') || $node->get('field_reference_node')->isEmpty()){
+      unpublished_child_pages($node);
+    }
   }
 
   lgmsmodule_refresh_cache($node);
