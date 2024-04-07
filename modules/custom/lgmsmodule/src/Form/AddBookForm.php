@@ -344,6 +344,7 @@ class AddBookForm extends FormBase {
       'field_book_location' => $form_state->getValue('location'),
       'field_book_call_number' => $form_state->getValue('call_number'),
       'status' => $form_state->getValue('published') == '0',
+      'promote' => 0,
     ];
 
     // Create a new book

@@ -247,6 +247,7 @@ function lgmsmodule_entity_delete(EntityInterface $entity): void
  */
 function lgmsmodule_node_update(NodeInterface $node): void
 {
+
   if($node->bundle() === 'guide_page'){
     // Check if the entity is a 'guide_page' and has the field 'field_reference_node'.
     if ($node->getEntityTypeId() === 'node' && $node->bundle() === 'guide_page' && $node->hasField('field_reference_node')) {
@@ -256,7 +257,10 @@ function lgmsmodule_node_update(NodeInterface $node): void
   }
 
   if (($node->bundle() === 'guide' || $node->bundle() === 'guide_page') && !$node->isPublished()){
-    unpublished_child_pages($node);
+    // do not unpublish it's children if it is a reference.
+    if (!$node->hasField('field_reference_node') || $node->get('field_reference_node')->isEmpty()){
+      unpublished_child_pages($node);
+    }
   }
 
   lgmsmodule_refresh_cache($node);
@@ -379,18 +383,24 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
 
     $item_container['#attributes']['class'][] = $database_unpublished_class;
 
-    $item_container['content'][] = [
-      '#type' => 'link',
-      '#title' => $database->label(),
-      '#url' => Url::fromRoute('entity.node.canonical', ['node' => $database->id()]),
-    ];
+    $link = $database->get('field_database_link')->first();
 
-    if(!$database->get('field_hide_description')->value){
-      $item_container['content'][] = [
-        '#type' => 'markup',
-        '#markup' => ' — ' . $database->get('field_description')->value,
-      ];
+    $html_content = '<div> <a href="' . $link->uri . '">' . $link->title . '</a>';
+
+    if (!$database->get('field_hide_description')->value) {
+      $description = $database->get('field_description')->value;
+      // Append description to the HTML content, ensuring it's on the same line.
+      $html_content .= ' — ' . $description;
     }
+
+    // Close the HTML tags.
+    $html_content .= '</div>';
+
+    // Add the combined content to the item container.
+    $item_container['content'][] = [
+      '#type' => 'markup',
+      '#markup' => $html_content,
+    ];
 
     if(!$database->get('field_hide_body')->value){
       $item_container['content'][] = [
@@ -618,7 +628,7 @@ function database_display(EntityInterface $entity){
     $link_item = $entity->get('field_database_link')->first();
 
     // Get the URL from the link field
-    $url = $link_item->getUrl()->toString();
+    $url = $link_item->uri;
 
     // Get the link title (text) from the link field, fall back to the URL if the title is empty
     $link_text = $link_item->title ?: $url;
@@ -628,6 +638,14 @@ function database_display(EntityInterface $entity){
       '#markup' => '<h3><div class="link-icon"><i class="fa fa-link" aria-hidden="true"></i> <a href="' . $url . '">' . $link_text . '</a></div></h3>',
     ];
 
+  }
+
+  if (!$entity->get('field_description')->isEmpty()) {
+    $desc_value = $entity->get('field_description')->value;
+    $build['db_desc'] = [
+      '#type' => 'markup',
+      '#markup' => '<div> - ' . $desc_value . '</div><br>',
+    ];
   }
 
   if (!$entity->get('field_database_body')->isEmpty()) {
@@ -920,7 +938,7 @@ function box_display(EntityInterface $entity, EntityInterface $box)
             '#type' => 'html_tag',
             '#tag' => 'i',
             '#attributes' => [
-              'class' => ['fa', 'fa-up-down-left-right', 're-order-icon'],
+              'class' => ['fa', 'fa-sort', 're-order-icon'],
             ],
           ],
           '#url' => Url::fromRoute('re_order_guide_box.form', [], ['query' => ['current_node' => $entity->id()]]),
@@ -2660,6 +2678,13 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
         }
       }
     }
+  }
+
+  if ($node instanceof NodeInterface && $node->getType() === 'guide' || $node->getType() === 'guide_page'
+    || $node->getType() === 'guide_box' || $node->getType() === 'guide_item' || $node->getType() === 'guide_html_item'
+    || $node->getType() === 'guide_book_item' || $node->getType() === 'guide_database_item') {
+    // Uncheck 'Promoted to front page' by default.
+    $form['promote']['widget']['value']['#default_value'] = FALSE;
   }
 }
 

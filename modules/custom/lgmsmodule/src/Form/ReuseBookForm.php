@@ -532,6 +532,7 @@ class ReuseBookForm extends FormBase {
 
       // Update the duplicates with the values given by the user
       $new_book->set('title', $form_state->getValue('title'));
+      $new_book->set('promote', 0);
       $new_book->set('field_parent_item', $new_item);
       $new_book->set('field_book_author_or_editor', $form_state->getValue('author/editor'));
       $new_book->set('field_book_publisher', $form_state->getValue('publisher'));
@@ -566,6 +567,7 @@ class ReuseBookForm extends FormBase {
 
       $new_item->set('field_parent_box', $current_box);
       $new_item->set('title', $form_state->getValue('title'));
+      $new_item->set('promote', 0);
       $new_item->set('field_book_item', $new_book);
 
     } else {
@@ -573,6 +575,7 @@ class ReuseBookForm extends FormBase {
       $new_item = $item->createDuplicate();
       $new_item->set('field_book_item', $book);
       $new_item->set('field_lgms_reference', TRUE);
+      $new_item->set('promote', 0);
     }
 
     // Save the item

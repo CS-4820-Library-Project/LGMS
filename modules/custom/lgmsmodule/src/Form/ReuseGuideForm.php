@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -78,6 +79,7 @@ class ReuseGuideForm extends FormBase
       // Create a copy
       $cloned_guide = $original_guide->createDuplicate();
       $cloned_guide->set('title', $original_guide->label() . ' copy');
+      $cloned_guide->set('promote', 0);
       $cloned_guide->setOwnerId(\Drupal::currentUser()->id());
       $cloned_guide->save();
 
@@ -90,7 +92,7 @@ class ReuseGuideForm extends FormBase
       // Add a success message
       \Drupal::messenger()->addMessage($this->t('Guide created successfully.'));
 
-      $form_state->setRedirectUrl($cloned_guide->toUrl('edit-form'));
+      $form_state->setRedirectUrl(Url::fromRoute('edit_guide.form', ['guide_id' => $cloned_guide->id()]));
     }
   }
 }

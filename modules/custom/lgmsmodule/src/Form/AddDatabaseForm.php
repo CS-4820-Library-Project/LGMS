@@ -212,6 +212,7 @@ class AddDatabaseForm extends FormBase {
         'field_hide_description' => $form_state->getValue('include_desc') == '0',
         'field_description' => $form_state->getValue('description'),
         'status' => $form_state->getValue('published') == '0',
+        'promote' => 0,
       ]);
       $new_database->save();
 
@@ -226,6 +227,7 @@ class AddDatabaseForm extends FormBase {
 
       // Update database content
       $database->set('title', $form_state->getValue('title'));
+      $database->set('promote', 0);
       $database->set('field_database_link', ['uri' => $form_state->getValue('field_database_link'), 'title' => $form_state->getValue('link_text')]);
       $database->set('field_hide_body', $form_state->getValue('include_body') == '0');
       $database->set('field_database_body', $form_state->getValue('field_database_body'));

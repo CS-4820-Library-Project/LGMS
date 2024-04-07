@@ -332,6 +332,7 @@ class ReuseDatabaseForm extends FormBase {
       $new_database->set('status',$form_state->getValue('published') == '0');
       $new_database->set('field_hide_description', $form_state->getValue('includedesc') == '0');
       $new_database->set('field_description', $form_state->getValue('description'));
+      $new_database->set('promote', 0);
       $new_database->setOwnerId(\Drupal::currentUser()->id());
       $new_database->save();
 
@@ -340,6 +341,7 @@ class ReuseDatabaseForm extends FormBase {
       $new_item->set('title', $form_state->getValue('title'));
       $new_item->set('field_database_item', $new_database);
       $new_item->set('status', $form_state->getValue('published') == '0');
+      $new_item->set('promote', 0);
       $new_item->setOwnerId(\Drupal::currentUser()->id());
       $new_item->save();
 
@@ -348,6 +350,7 @@ class ReuseDatabaseForm extends FormBase {
       // Create a reference
       $new_item = $item->createDuplicate();
       $new_item->set('field_lgms_reference', TRUE);
+      $new_item->set('promote', 0);
       $new_item->setOwnerId(\Drupal::currentUser()->id());
       $new_item->save();
       $item = $new_item;
