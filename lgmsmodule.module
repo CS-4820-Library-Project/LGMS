@@ -1706,13 +1706,8 @@ function lgmsModule_install(): void
     [], 'image_image', ['progress_indicator' => 'throbber'], TRUE, FALSE, 5, ''
   );
 
-  createField('field_book_url', 'node', 'guide_book_item', 'URL', 'link',
-    [], ['link_type' => LinkItemInterface::LINK_GENERIC], 'link_default', [], TRUE, FALSE,
-    6, ''
-  );
-
   createField('field_book_description', 'node', 'guide_book_item', 'Description',
-    'text_long', [], [], 'text_textarea', ['rows' => 20,], TRUE, FALSE, 7,
+    'text_long', [], [], 'text_textarea', ['rows' => 5,], TRUE, FALSE, 7,
     ''
   );
 
@@ -2241,10 +2236,58 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
     }
   }
 
-  if ($form_id === 'node_guide_edit_form' || $form_id === 'node_guide_form' || $form_id === 'node_guide_page_edit_form' || $form_id === 'node_guide_page_form'){
+  if ($form_id === 'node_guide_edit_form' || $form_id === 'node_guide_form'){
     $form['field_description']['#states'] = [
       'invisible' => [
         ':input[name="field_hide_description[value]"]' => ['checked' => TRUE],
+      ],
+    ];
+  }
+
+  if ($form_id === 'node_guide_page_edit_form' || $form_id === 'node_guide_page_form'){
+    $form['field_description']['#states'] = [
+      'invisible' => [
+        ':input[name="field_hide_description[value]"]' => ['checked' => TRUE],
+      ],
+    ];
+  }
+
+  if ($form_id === 'node_guide_database_item_edit_form' || $form_id === 'node_guide_database_item_form'){
+    $form['field_description']['#states'] = [
+      'invisible' => [
+        ':input[name="field_hide_description[value]"]' => ['checked' => TRUE],
+      ],
+    ];
+
+    $form['field_database_body']['#states'] = [
+      'invisible' => [
+        ':input[name="field_hide_body[value]"]' => ['checked' => TRUE],
+      ],
+    ];
+  }
+
+  if ($form_id === 'node_guide_book_item_edit_form' || $form_id === 'node_guide_book_item_form'){
+    $form['field_book_call_number']['#states'] = [
+      'visible' => [
+        ':input[name="field_book_type"]' => ['value' => 'print'],
+      ],
+    ];
+
+    $form['field_book_location']['#states'] = [
+      'visible' => [
+        ':input[name="field_book_type"]' => ['value' => 'print'],
+      ],
+    ];
+
+    $form['field_book_cat_record']['#states'] = [
+      'visible' => [
+        ':input[name="field_book_type"]' => ['value' => 'print'],
+      ],
+    ];
+
+    $form['field_book_pub_finder']['#states'] = [
+      'visible' => [
+        ':input[name="field_book_type"]' => ['value' => 'eBook'],
       ],
     ];
   }
