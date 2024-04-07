@@ -25,18 +25,6 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\views\Entity\View;
 
 /**
- * Implements hook_theme().
- */
-function lgmsmodule_theme($existing, $type, $theme, $path) {
-  return [
-    'lgmsmodule_content' => [
-      'variables' => ['table' => NULL],
-      'template' => 'lgmsmodule-content',
-    ],
-  ];
-}
-
-/**
  * This is executed when a node is created or updated.
  * This is used to generate URL aliases for guide and page nodes.
  * @param \Drupal\node\NodeInterface $node
@@ -87,47 +75,6 @@ function lgmsmodule_generate_url_alias(NodeInterface $node) {
       'langcode' => $node->language()->getId(),
     ]);
     $path_alias->save();
-  }
-}
-
-/**
- * Implements hook_block_access().
- */
-function lgmsmodule_block_access(\Drupal\block\BlockInterface $block, $operation, \Drupal\Core\Session\AccountInterface $account) {
-  // Get the current route.
-  $current_route = \Drupal::routeMatch()->getRouteName();
-  $node = \Drupal::routeMatch()->getParameter('node');
-  $routes = [
-    'entity.node.edit_form',
-    'entity.node.delete_form',
-    'entity.node.version_history',
-    'entity.node.devel_load',
-    'entity.node.devel_load_with_references',
-    'entity.node.devel_render',
-    'entity.node.devel_definition',
-  ];
-
-
-  // Check if the current route is for a node edit form.
-  if ($node && $node->getType() == 'guide' && in_array($current_route, $routes) && ($block->id() === 'lgmsguideownerblock' || $block->id() === 'pageviewblock')) {
-    // Block access to the block on node edit pages.
-    return \Drupal\Core\Access\AccessResult::forbidden();
-  }
-
-  // Allow access to the block for other routes.
-  return \Drupal\Core\Access\AccessResult::allowed();
-}
-
-/**
- * Implements hook_preprocess_page().
- */
-function lgmsmodule_preprocess_page(&$variables) {
-  // Check if the current page is a guide node
-  if ($node = \Drupal::routeMatch()->getParameter('node')) {
-
-    if ($node->getType() == 'guide') {
-      $variables['#attached']['library'][] = 'lgmsmodule/lgmsmodule';
-    }
   }
 }
 
@@ -275,7 +222,7 @@ function lgmsmodule_node_insert(NodeInterface $node): void
  */
 function lgmsmodule_entity_delete(EntityInterface $entity): void
 {
-  if ($entity->bundle() == 'guide_page' && $entity->getEntityTypeId() == 'node') {
+  if ($entity->getEntityTypeId() == 'node' && $entity->bundle() == 'guide_page') {
     $deleted_guide_page_id = $entity->id();
 
     $query = \Drupal::entityQuery('node')
@@ -2416,7 +2363,6 @@ function update_referencing_guide_pages($updated_guide_page) {
     $referencing_guide_pages = Node::loadMultiple($result);
 
     foreach ($referencing_guide_pages as $guide_page) {
-      \Drupal::logger('my_module')->notice('<pre>' . print_r($guide_page->id(), TRUE) . '</pre>');
       $guide_page->set('title', $updated_guide_page->label());
       $guide_page->set('field_description', $updated_guide_page->get('field_description')->value);
       $guide_page->set('field_child_boxes', $updated_guide_page->get('field_child_boxes')->referencedEntities());
