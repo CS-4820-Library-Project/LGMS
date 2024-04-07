@@ -59,14 +59,29 @@ class DeletePageForm extends FormBase{
       ],
     ];
 
+    $selected_page = $form_state->getValue('select_page');
+    $selected_page = Node::load($selected_page);
+
     $form['update_wrapper']['confirm_delete'] = [
       '#type' => 'checkbox',
-      '#required' => true,
+      '#title' => $selected_page? $selected_page->bundle() == 'guide'
+        ? $this->t('<strong>Are you sure you want to delete the guide @page_title?</strong>
+                   This will remove it and any Pages and boxes it directly owns and the boxes of it\'s pages
+                   (but not links to pages or boxes owned by other guides or pages, nor any content items).
+                   ', ['@page_title' => $selected_page->label()])
+        : $this->t(
+          '<strong>Are you sure you want to delete the page @page_title?</strong>
+                   This will remove it and any boxes it directly owns (but not links to boxes owned by other pages,
+                   nor any content items).', ['@page_title' => $selected_page->label()])
+        : '',
       '#states' => [
         'visible' => [
           ':input[name="select_page"]' => ['!value' => ''],
         ],
       ],
+      '#prefix' => '<p>',
+      '#suffix' => '</p>',
+      '#required' => True,
     ];
 
 
