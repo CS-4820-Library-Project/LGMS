@@ -1738,7 +1738,7 @@ function lgmsModule_install(): void
   createField('field_book_cat_record', 'node', 'guide_book_item', 'Cat Record',
     'link', [],
     [
-      'link_type' => LinkItemInterface::LINK_GENERIC
+      'link_type' => LinkItemInterface::LINK_EXTERNAL
     ],
     'link_default', [], TRUE, FALSE, 11, '', False
   );
@@ -1746,7 +1746,7 @@ function lgmsModule_install(): void
   createField('field_book_pub_finder', 'node', 'guide_book_item', 'Pub Finder',
     'link', [],
     [
-      'link_type' => LinkItemInterface::LINK_GENERIC
+      'link_type' => LinkItemInterface::LINK_EXTERNAL
     ],
     'link_default', [], TRUE, FALSE, 12, '', False
   );
@@ -2191,6 +2191,75 @@ function lgmsmodule_page_form_validate($form, \Drupal\Core\Form\FormStateInterfa
   }
 }
 
+function guide_validation(array &$form, FormStateInterface $form_state) {
+  $hide_description = $form_state->getValue(['field_hide_description', 'value']);
+  $description = $form_state->getValue(['field_description', 0, 'value']);
+
+  // Check if hide_description is unchecked and description is empty.
+  if (empty($hide_description) && empty($description)) {
+    // Set an error for field_description since it's required when hide_description is unchecked.
+    $form_state->setErrorByName('field_description', t('Description is required when it is not hidden.'));
+  }
+}
+
+function database_validation(array &$form, FormStateInterface $form_state) {
+  $hide_body = $form_state->getValue(['field_hide_body', 'value']);
+  $body = $form_state->getValue(['field_database_body', 0, 'value']);
+
+  // Check if hide_description is unchecked and description is empty.
+  if (empty($hide_body) && empty($body)) {
+    // Set an error for field_database_body since it's required when hide_body is unchecked.
+    $form_state->setErrorByName('field_database_body', t('Body is required when it is not hidden.'));
+  }
+
+
+  $hide_description = $form_state->getValue(['field_hide_description', 'value']);
+  $description = $form_state->getValue(['field_description', 0, 'value']);
+
+  // Check if hide_description is unchecked and description is empty.
+  if (empty($hide_description) && empty($description)) {
+    // Set an error for field_description since it's required when hide_description is unchecked.
+    $form_state->setErrorByName('field_description', t('Description is required when it is not hidden.'));
+  }
+}
+
+/**
+ * Custom validation handler for book nodes.
+ */
+function book_validation(array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  // Get the value of the book type field.
+  $book_type = $form_state->getValue(['field_book_type', 0, 'value']);
+
+  // Validate based on the book type.
+  if ($book_type === 'eBook') {
+    // Check if field_book_pub_finder is filled for eBook.
+    $pub_finder_uri = $form_state->getValue(['field_book_pub_finder', 0, 'uri']);
+    $pub_finder_title = $form_state->getValue(['field_book_pub_finder', 0, 'title']);
+
+    if (empty($pub_finder_uri) || empty($pub_finder_title)) {
+      $form_state->setErrorByName('field_book_pub_finder', t('Both the URL and the link text for the Pub Finder field are required for eBooks.'));
+    }
+  } elseif ($book_type === 'print') {
+    // Fields to check for 'print' book type.
+    $fields_to_check = ['field_book_call_number', 'field_book_location'];
+    foreach ($fields_to_check as $field_name) {
+      $value = $form_state->getValue([$field_name, 0, 'value']);
+      if (empty($value)) {
+        // Field names are human-readable, but you can customize the message or use the field label.
+        $form_state->setErrorByName($field_name, t('The @field field is required for print books.', ['@field' => $field_name]));
+      }
+    }
+
+    // Check if field_book_cat_record is filled for print.
+    $cat_record_uri = $form_state->getValue(['field_book_cat_record', 0, 'uri']);
+    $cat_record_title = $form_state->getValue(['field_book_cat_record', 0, 'title']);
+
+    if (empty($cat_record_uri) || empty($cat_record_title)) {
+      $form_state->setErrorByName('field_book_pub_finder', t('Both the URL and the link text for the Cat Record field are required for Print.'));
+    }
+  }
+}
+
 
 /**
  * Implements hook_form_FORM_ID_alter() for node edit forms.
@@ -2246,6 +2315,8 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
         ':input[name="field_hide_description[value]"]' => ['checked' => TRUE],
       ],
     ];
+
+    $form['#validate'][] = 'guide_validation';
   }
 
   if ($form_id === 'node_guide_page_edit_form' || $form_id === 'node_guide_page_form'){
@@ -2254,6 +2325,8 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
         ':input[name="field_hide_description[value]"]' => ['checked' => TRUE],
       ],
     ];
+
+    $form['#validate'][] = 'guide_validation';
   }
 
   if ($form_id === 'node_guide_database_item_edit_form' || $form_id === 'node_guide_database_item_form'){
@@ -2268,6 +2341,8 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
         ':input[name="field_hide_body[value]"]' => ['checked' => TRUE],
       ],
     ];
+
+    $form['#validate'][] = 'database_validation';
   }
 
   if ($form_id === 'node_guide_book_item_edit_form' || $form_id === 'node_guide_book_item_form'){
@@ -2294,6 +2369,8 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
         ':input[name="field_book_type"]' => ['value' => 'eBook'],
       ],
     ];
+
+    $form['#validate'][] = 'book_validation';
   }
 
   $node = $form_state->getFormObject()->getEntity();
