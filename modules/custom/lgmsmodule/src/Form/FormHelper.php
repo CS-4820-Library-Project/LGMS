@@ -273,20 +273,22 @@ class FormHelper {
 
         // Create options array from the child pages.
         foreach ($child_pages as $child_page) {
+          // Do not show the selected page as an option
           if ($child_page->id() == $form_state->getValue('select_page')){
-            \Drupal::logger('my_module')->notice('<pre>' . print_r($child_page->id(), TRUE) . '</pre>');
             continue;
           }
 
-          if ($onlyWithSubpages){
-            if ($child_page->hasField('field_child_pages')) {
-              $sub_child_pages = $child_page->get('field_child_pages')->referencedEntities();
-              if (!empty($sub_child_pages)) {
-                $options[$child_page->id()] = $child_page->label();
+          if ($child_page->hasField('field_reference_node') && $child_page->get('field_reference_node')->isEmpty()){
+            if ($onlyWithSubpages){
+              if ($child_page->hasField('field_child_pages')) {
+                $sub_child_pages = $child_page->get('field_child_pages')->referencedEntities();
+                if (!empty($sub_child_pages)) {
+                  $options[$child_page->id()] = $child_page->label();
+                }
               }
+            } else {
+              $options[$group_label][$child_page->id()] = $child_page->label();
             }
-          } else {
-            $options[$group_label][$child_page->id()] = $child_page->label();
           }
         }
       }
