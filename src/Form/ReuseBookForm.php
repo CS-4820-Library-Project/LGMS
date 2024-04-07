@@ -508,7 +508,7 @@ class ReuseBookForm extends FormBase {
       // Create a reference
       $new_item = $item->createDuplicate();
       $new_item->set('field_book_item', $book);
-      $new_item->set('field_lgms_database_link', TRUE);
+      $new_item->set('field_lgms_reference', TRUE);
     }
 
     // Save the item

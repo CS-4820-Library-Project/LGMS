@@ -186,7 +186,7 @@ class ReuseHTMLItemForm extends FormBase {
     } else {
       // Create a new link
       $new_item = $item->createDuplicate();
-      $new_item->set('field_lgms_database_link', TRUE);
+      $new_item->set('field_lgms_reference', TRUE);
       $new_item->save();
     }
 
