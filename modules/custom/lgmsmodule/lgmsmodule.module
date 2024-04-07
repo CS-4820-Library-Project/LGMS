@@ -191,8 +191,7 @@ function createContentType($id, $name, $desc = ''): void
  * Helper function to create fields.
  * @throws EntityStorageException
  */
-function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $storage_settings, $field_settings, $widget_type, $widget_settings, $status, $cardinal, $field_weight, $desc): void
-{
+function createField($field_id, $entity_type, $bundle, $field_name, $field_type, $storage_settings, $field_settings, $widget_type, $widget_settings, $status, $cardinal, $field_weight, $desc, $required = True): void {
   // Create field storage.
   $storage = FieldStorageConfig::loadByName($entity_type, $field_id);
   if (!$storage) {
@@ -217,8 +216,10 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
       'field_storage' => $storage,
       'bundle' => $bundle,
       'label' => $field_name,
+      'required' => $required, // Set the field required status based on the function parameter.
       'settings' => $field_settings ?? [],
     ]);
+
     if (!empty($desc)){
       $field->setDescription($desc);
     }
@@ -251,7 +252,7 @@ function createField($field_id, $entity_type, $bundle, $field_name, $field_type,
       ]);
     }
 
-    // Remove the field from the view display.
+    // Remove the field from the view display if not needed.
     if ($view_display->getComponent($field_id)) {
       $view_display->removeComponent($field_id);
       $view_display->save();
@@ -1308,11 +1309,12 @@ function lgmsModule_install(): void
       'on_label' => 'Yes',
       'off_label' => 'No',
     ],
-    'boolean_checkbox', [], TRUE, False, 1, ''
+    'boolean_checkbox', [], TRUE, False, 1, '', False
   );
 
   createField('field_description', 'node', 'guide', 'Description',
-    'text_long', [], [], 'text_textarea', [], True, False, 2, ''
+    'text_long', [], [], 'text_textarea', [], True, False, 2,
+    '', False
   );
 
 
@@ -1367,7 +1369,7 @@ function lgmsModule_install(): void
       'sort' => [
         'field' => '_none',
       ],
-    ], 'entity_reference_autocomplete', [], TRUE, TRUE, 6, ''
+    ], 'entity_reference_autocomplete', [], TRUE, TRUE, 6, '', False
   );
 
   createField('field_child_boxes', 'node', 'guide', 'Children Boxes',
@@ -1382,7 +1384,7 @@ function lgmsModule_install(): void
       'sort' => [
         'field' => '_none',
       ],
-    ], 'entity_reference_autocomplete', [], TRUE, TRUE, 7, ''
+    ], 'entity_reference_autocomplete', [], TRUE, TRUE, 7, '', False
   );
 
   // Guide_Page content type fields
@@ -1406,7 +1408,7 @@ function lgmsModule_install(): void
       'on_label' => 'Yes',
       'off_label' => 'No',
     ],
-    'boolean_checkbox', [], TRUE, False, 2, ''
+    'boolean_checkbox', [], TRUE, False, 2, '', False
   );
 
   createField('field_description', 'node', 'guide_page', 'Description',
@@ -1415,7 +1417,7 @@ function lgmsModule_install(): void
       'rows' => 5,
       'placeholder' => 'Enter the page description here...'
     ],
-    TRUE, False, 3, ''
+    TRUE, False, 3, '', False
   );
 
   createField('field_child_pages', 'node', 'guide_page', 'Children Pages',
@@ -1431,7 +1433,7 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete', [], TRUE, TRUE, 4, ''
+    'entity_reference_autocomplete', [], TRUE, TRUE, 4, '', False
   );
 
   createField('field_child_boxes', 'node', 'guide_page', 'Children Boxes',
@@ -1447,7 +1449,7 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete', [], TRUE, TRUE, 5, ''
+    'entity_reference_autocomplete', [], TRUE, TRUE, 5, '', False
   );
 
   createField('field_reference_node', 'node', 'guide_page', 'Reference Page',
@@ -1463,7 +1465,7 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete', [], TRUE, False, 6, ''
+    'entity_reference_autocomplete', [], TRUE, False, 6, '', False
   );
 
   // Guide_box fields
@@ -1494,7 +1496,7 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete', [], TRUE, True, 2, ''
+    'entity_reference_autocomplete', [], TRUE, True, 2, '', False
   );
 
   // Guide_item fields
@@ -1519,7 +1521,7 @@ function lgmsModule_install(): void
         'sort' => ['field' => '_none'],
       ],
     ],
-    'media_library_widget', [], TRUE, false, 2, ''
+    'media_library_widget', [], TRUE, false, 2, '', False
   );
 
   createField('field_html_item', 'node', 'guide_item', 'html item',
@@ -1535,7 +1537,7 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete', [], TRUE, False, 3, ''
+    'entity_reference_autocomplete', [], TRUE, False, 3, '', False
   );
 
   createField('field_database_item', 'node', 'guide_item', 'Database item',
@@ -1551,7 +1553,7 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete', [], TRUE, False, 4, ''
+    'entity_reference_autocomplete', [], TRUE, False, 4, '', False
   );
 
   createField('field_book_item', 'node', 'guide_item', 'Book item',
@@ -1567,7 +1569,7 @@ function lgmsModule_install(): void
         'field' => '_none',
       ],
     ],
-    'entity_reference_autocomplete', [], TRUE, False, 5, ''
+    'entity_reference_autocomplete', [], TRUE, False, 5, '', False
   );
 
   createField('field_lgms_reference', 'node', 'guide_item', 'Link', 'boolean',
@@ -1577,7 +1579,7 @@ function lgmsModule_install(): void
         'display_label' => TRUE,
       ],
     ],
-    FALSE, FALSE, 6, ''
+    FALSE, FALSE, 6, '', False
   );
 
   // Guide_html_item content type fields
@@ -1631,7 +1633,7 @@ function lgmsModule_install(): void
         'display_label' => TRUE,
       ],
     ],
-    FALSE, FALSE, 3, ''
+    FALSE, FALSE, 3, '', False
   );
 
   createField('field_hide_body', 'node', 'guide_database_item', 'Hide Body',
@@ -1641,12 +1643,12 @@ function lgmsModule_install(): void
       'on_label' => 'Yes',
       'off_label' => 'No',
     ],
-    'boolean_checkbox', [], TRUE, 1, 4, ''
+    'boolean_checkbox', [], TRUE, 1, 4, '', False
   );
 
   createField('field_database_body', 'node', 'guide_database_item', 'Body',
     'text_long', [], ['text_processing' => 1], 'text_textarea', [], TRUE, FALSE,
-    5, ''
+    5, '', False
   );
 
   createField(
@@ -1657,13 +1659,13 @@ function lgmsModule_install(): void
       'on_label' => 'Yes',
       'off_label' => 'No',
     ],
-    'boolean_checkbox', [], TRUE, False, 6, ''
+    'boolean_checkbox', [], TRUE, False, 6, '', False
   );
 
 
   createField('field_description', 'node', 'guide_database_item', 'Description',
     'text_long', [], ['text_processing' => 1], 'text_textarea', [], TRUE, False,
-    7, ''
+    7, '', False
   );
 
   // guide_book_item content type fields
@@ -1724,11 +1726,13 @@ function lgmsModule_install(): void
 
 
   createField('field_book_call_number', 'node', 'guide_book_item', 'Call Number',
-    'string', [], [], 'string_textfield', [], TRUE, FALSE, 9, ''
+    'string', [], [], 'string_textfield', [], TRUE, FALSE, 9,
+    '', False
   );
 
   createField('field_book_location', 'node', 'guide_book_item', 'Location',
-    'string', [], [], 'string_textfield', [], TRUE, FALSE, 10, ''
+    'string', [], [], 'string_textfield', [], TRUE, FALSE, 10,
+    '', False
   );
 
   createField('field_book_cat_record', 'node', 'guide_book_item', 'Cat Record',
@@ -1736,7 +1740,7 @@ function lgmsModule_install(): void
     [
       'link_type' => LinkItemInterface::LINK_GENERIC
     ],
-    'link_default', [], TRUE, FALSE, 11, ''
+    'link_default', [], TRUE, FALSE, 11, '', False
   );
 
   createField('field_book_pub_finder', 'node', 'guide_book_item', 'Pub Finder',
@@ -1744,24 +1748,24 @@ function lgmsModule_install(): void
     [
       'link_type' => LinkItemInterface::LINK_GENERIC
     ],
-    'link_default', [], TRUE, FALSE, 12, ''
+    'link_default', [], TRUE, FALSE, 12, '', False
   );
 
   // User fields
   createField('field_lgms_first_name', 'user', 'user', 'First Name', 'string',
-    [], [], 'string_textfield', ['size' => 20], TRUE, FALSE, 1, ''
+    [], [], 'string_textfield', ['size' => 20], TRUE, FALSE, 1, '', False
   );
 
   createField('field_lgms_last_name', 'user', 'user', 'Last Name', 'string',
-    [], [], 'string_textfield', ['size' => 20], TRUE, FALSE, 2, ''
+    [], [], 'string_textfield', ['size' => 20], TRUE, FALSE, 2, '', False
   );
 
   createField('field_lgms_phone_number', 'user', 'user', 'Phone Number', 'string',
-    [], [], 'string_textfield', ['size' => 20], TRUE, FALSE, 3, ''
+    [], [], 'string_textfield', ['size' => 20], TRUE, FALSE, 3, '', False
   );
 
   createField('field_lgms_body', 'user', 'user', 'Body', 'text_long',
-    [], [], 'text_textarea', [], TRUE, FALSE, 4, ''
+    [], [], 'text_textarea', [], TRUE, FALSE, 4, '', False
   );
 
   createField('field_lgms_user_subjects', 'user', 'user', 'Subjects',
@@ -1774,7 +1778,7 @@ function lgmsModule_install(): void
         ],
       ],
     ],
-    'options_buttons', [], False, True, 5, ''
+    'options_buttons', [], False, True, 5, '', False
   );
 
   // Disable the display of author and date information for guide, guide_page and guide_box.
