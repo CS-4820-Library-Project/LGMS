@@ -85,3 +85,5 @@ drush cr
 ```
 
 This will automatically install, enable and clear your Drupal's site cache after installing the LGMS module without needing to use the Drupal admin UI.
+
+After installation, go to Block Layout to enable and position the two LGMS blocks - page view and contact information
