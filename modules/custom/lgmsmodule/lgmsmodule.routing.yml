@@ -238,3 +238,11 @@ edit_guide_page.form:
     _title: 'Edit Guide Page'
   requirements:
     _permission: 'edit guide page content'
+
+edit_guide.form:
+  path: '/edit_guide'
+  defaults:
+    _form: '\Drupal\lgmsmodule\Form\EditGuideForm'
+    _title: 'Edit Guide'
+  requirements:
+    _permission: 'edit guide content'
