@@ -246,6 +246,7 @@ class ReuseGuidePageForm extends FormBase {
       $new_page->setOwnerId(\Drupal::currentUser()->id());
       $new_page->setTitle($form_state->getValue('title'));
       $new_page->set('field_child_pages', []);
+      $new_page->set('promote', 0);
       $new_page->save();
 
       $ajaxHelper->clone_boxes($page, $new_page);
@@ -258,6 +259,7 @@ class ReuseGuidePageForm extends FormBase {
       // Create a copy and update parent and reference fields
       $new_page = $page->createDuplicate();
       $new_page->set('field_parent_guide', $parent);
+      $new_page->set('promote', 0);
       $new_page->set('field_reference_node', $page);
       $new_page->set('field_child_pages', []);
       $new_page->save();
@@ -273,48 +275,5 @@ class ReuseGuidePageForm extends FormBase {
 
     // Update child page list
     $ajaxHelper->add_child($parent, $new_page, 'field_child_pages');
-  }
-
-  private function get_all_pages($guide_id): array
-  {
-    $options = [];
-
-    // Fetch all guides.
-    $guides = Node::loadMultiple(
-      \Drupal::entityQuery('node')
-        ->condition('type', 'guide')
-        ->sort('title', 'ASC')
-        ->accessCheck(True)
-        ->execute()
-    );
-
-    foreach ($guides as $guide) {
-      if ($guide->hasField('field_child_pages')) {
-        $child_pages_ids = array_column($guide->get('field_child_pages')->getValue(), 'target_id');
-        $child_pages = !empty($child_pages_ids) ? Node::loadMultiple($child_pages_ids) : [];
-
-        // Create an optgroup for the guide.
-        $options[$guide->getTitle()] = [];
-
-        foreach ($child_pages as $child_page) {
-          // Add the child page under the guide.
-          $options[$guide->getTitle()][$child_page->id()] = $child_page->getTitle();
-
-          // Check if the child page has its own subpages.
-          if ($child_page->hasField('field_child_pages')) {
-            $subpages_ids = array_column($child_page->get('field_child_pages')->getValue(), 'target_id');
-            $subpages = !empty($subpages_ids) ? Node::loadMultiple($subpages_ids) : [];
-
-            // Label each subpage with the parent page title.
-            foreach ($subpages as $subpage) {
-              $label = '— ' . $child_page->getTitle() . ' subpage: ' . $subpage->getTitle();
-              $options[$guide->getTitle()][$subpage->id()] = $label;
-            }
-          }
-        }
-      }
-    }
-
-    return $options;
   }
 }

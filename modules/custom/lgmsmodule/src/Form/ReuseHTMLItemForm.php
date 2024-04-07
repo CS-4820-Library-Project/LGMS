@@ -230,18 +230,21 @@ class ReuseHTMLItemForm extends FormBase {
       $new_html->set('field_parent_item', $new_item);
       $new_html->set('title', $form_state->getValue('title'));
       $new_html->set('field_text_box_item2', $form_state->getValue('body'));
+      $new_html->set('promote', 0);
       $new_html->save();
 
       // Update link fields
       $new_item->set('field_parent_box', $current_box);
       $new_item->set('title', $form_state->getValue('title'));
       $new_item->set('field_html_item', $new_html);
+      $new_item->set('promote', 0);
       $new_item->save();
 
     } else {
       // Create a new link
       $new_item = $item->createDuplicate();
       $new_item->set('field_lgms_reference', TRUE);
+      $new_item->set('promote', 0);
       $new_item->save();
     }
 

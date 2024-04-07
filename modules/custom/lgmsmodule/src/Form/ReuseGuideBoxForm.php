@@ -201,7 +201,6 @@ class ReuseGuideBoxForm extends FormBase {
 
     // Load the selected box and it's parent
     $box = Node::load($form_state->getValue('box_select'));
-    $box_parent = $box->get('field_parent_node')->target_id;
 
     // If the user is creating a copy
     if(!$form_state->getValue('reference')){
@@ -210,6 +209,7 @@ class ReuseGuideBoxForm extends FormBase {
 
       // Upadte it's values
       $new_box->set('field_parent_node', $curr_node->id());
+      $new_box->set('promote', 0);
       $new_box->set('title', $form_state->getValue('title'));
       $new_box->setOwnerId(\Drupal::currentUser()->id());
       $new_box->save();
@@ -223,6 +223,7 @@ class ReuseGuideBoxForm extends FormBase {
         // Create a copy of the item and update it's owner
         $new_item = $item->createDuplicate();
         $new_item->set('field_parent_box', $new_box);
+        $new_item->set('promote', 0);
         $new_item->setOwnerId(\Drupal::currentUser()->id());
 
         $filled_field = '';

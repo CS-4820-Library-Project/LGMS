@@ -79,6 +79,7 @@ class ReuseGuideForm extends FormBase
       // Create a copy
       $cloned_guide = $original_guide->createDuplicate();
       $cloned_guide->set('title', $original_guide->label() . ' copy');
+      $cloned_guide->set('promote', 0);
       $cloned_guide->setOwnerId(\Drupal::currentUser()->id());
       $cloned_guide->save();
 

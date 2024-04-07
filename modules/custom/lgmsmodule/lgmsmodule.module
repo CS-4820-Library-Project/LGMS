@@ -2308,6 +2308,13 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
       }
     }
   }
+
+  if ($node instanceof NodeInterface && $node->getType() === 'guide' || $node->getType() === 'guide_page'
+    || $node->getType() === 'guide_box' || $node->getType() === 'guide_item' || $node->getType() === 'guide_html_item'
+    || $node->getType() === 'guide_book_item' || $node->getType() === 'guide_database_item') {
+    // Uncheck 'Promoted to front page' by default.
+    $form['promote']['widget']['value']['#default_value'] = FALSE;
+  }
 }
 
 function update_referencing_guide_pages($updated_guide_page) {

@@ -172,6 +172,7 @@ class CreateGuidePageForm extends FormBase
         'field_parent_guide' => $parent,
         'field_hide_description' => $form_state->getValue('hide_description') == '1',
         'status' => $form_state->getValue('published') == '0',
+        'promote' => '0',
       ]);
       $new_page->save();
 
