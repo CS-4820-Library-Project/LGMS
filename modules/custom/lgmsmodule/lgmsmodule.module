@@ -2547,6 +2547,10 @@ function createHelpGuide(): array {
     $database_page->id(),
     $media_page->id(),
   ]);
+
+  $help_guide->set('status', 0);
+  $help_guide->save();
+
   return [
     'help_guide_id' => $help_guide->id(),
     'add_html_page_id' => $html_page->id(),
