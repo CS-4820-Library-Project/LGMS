@@ -2254,39 +2254,256 @@ function createHelpGuide(): array {
     </a>
 </div>';
 
+  $reuse_guide = '<h1><a href="https://app.tango.us/app/workflow/1215df59-c463-41b0-8598-f61e3c9ebf86?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Reuse a Guide</a></h1>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/1215df59-c463-41b0-8598-f61e3c9ebf86?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/lgms/dashboard"># Navigate to the Dashboard Overview</a></h2></div>
+
+<div><h3>1. Click on Reuse Guide</h3>
+<img src="https://images.tango.us/workflows/1215df59-c463-41b0-8598-f61e3c9ebf86/steps/99096531-94fe-4499-b913-b68bca5c73c6/a9a64162-3459-467a-bd4c-f3b745675475.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.2191&fp-y=0.2593&fp-z=2.4500&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=441&mark-y=436&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zMTgmaD0xMDgmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Reuse Guide" />
+</div>
+
+<div><h3>2. Select the guide to be reused</h3>
+<img src="https://images.tango.us/workflows/1215df59-c463-41b0-8598-f61e3c9ebf86/steps/fd1b5b98-905d-464b-b24f-bff1aee2f7ad/3ec04f52-0b86-4156-b61d-e69222e3ad33.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.4035&fp-z=1.0521&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=31&mark-y=389&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0xMTM4Jmg9NTQmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Select the guide to be reused" />
+</div>
+
+<div><h3>3. Click on Reuse Guide</h3>
+<img src="https://images.tango.us/workflows/1215df59-c463-41b0-8598-f61e3c9ebf86/steps/4810fb0e-bed3-4bc9-91f2-656df3eba043/28cf6125-1c84-4507-bf09-b9df17770514.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1123&fp-y=0.4843&fp-z=2.5006&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=187&mark-y=423&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zMDAmaD0xMzUmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Reuse Guide" />
+</div>
+
+<div><h3>4. Here you can change the title as well as description of the guide before reusing it.</h3>
+<img src="https://images.tango.us/workflows/1215df59-c463-41b0-8598-f61e3c9ebf86/steps/4ef2a40c-72bf-4df9-a483-840adec33a2e/803cc487-8c30-4b2c-ab5a-0f6e6d0f5a4c.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.3406&fp-z=1.0521&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=31&mark-y=324&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0xMTM4Jmg9NTQmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Here you can change the title as well as description of the guide before reusing it." />
+</div>
+
+<div><h3>5. Check or uncheck subjects that are related to the guide</h3>
+<img src="https://images.tango.us/workflows/1215df59-c463-41b0-8598-f61e3c9ebf86/steps/a1a0171a-d478-4885-b923-788791eb3d51/35481831-914a-4abb-aeef-9dd4771b6c07.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.0591&fp-y=0.3114&fp-z=3.0905&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=184&mark-y=454&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz03MSZoPTcxJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Check or uncheck subjects that are related to the guide" />
+</div>
+
+<div><h3>6. Click on URL alias</h3>
+<img src="https://images.tango.us/workflows/1215df59-c463-41b0-8598-f61e3c9ebf86/steps/30b4d61e-e7fa-4bdc-8734-3f3ca7ebf448/bb7bf288-e6c7-4d29-8c01-962135fe58ec.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1641&fp-y=0.4826&fp-z=1.9030&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=117&mark-y=398&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz01MTUmaD0xODQmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on URL alias" />
+</div>
+
+<div><h3>7. Type new url alias as the previous one is in use by the original guide</h3>
+<img src="https://images.tango.us/workflows/1215df59-c463-41b0-8598-f61e3c9ebf86/steps/d2e2f1b7-ced9-4882-8ac5-d0a3bf741e28/2b0f411b-042e-41a2-92a5-fa6afeb32a9e.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.6100&fp-y=0.3283&fp-z=1.4132&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=61&mark-y=418&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0xMDc3Jmg9NzMmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Type new url alias as the previous one is in use by the original guide" />
+</div>
+
+<div><h3>8. Click on Save to publish the guide.</h3>
+<img src="https://images.tango.us/workflows/1215df59-c463-41b0-8598-f61e3c9ebf86/steps/bbc293e9-d200-4581-9ed4-8b30306667ca/5dd39d3c-b242-48fe-a25a-144f6872227f.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.0797&fp-y=0.7626&fp-z=2.7740&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=165&mark-y=415&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMDEmaD0xNTAmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Save to publish the guide." />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $add_page = '<h1><a href="https://app.tango.us/app/workflow/718b2df1-f17d-40cc-8359-44062a5011d8?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">How to Add a Page To a Guide</a></h1>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/718b2df1-f17d-40cc-8359-44062a5011d8?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/psychology"># Navigate to the Guide from the Dashboard or Create a new guide</a></h2></div>
+
+<div><h3>1. Click on Create/Reuse Guide Page</h3>
+<img src="https://images.tango.us/workflows/718b2df1-f17d-40cc-8359-44062a5011d8/steps/8b7fe742-3586-4071-a7ba-93e05b2bb710/ad7725ff-6685-4be4-bc3a-217deb2d92d6.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1425&fp-y=0.3827&fp-z=1.9754&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=93&mark-y=455&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz00ODkmaD03MCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Create/Reuse Guide Page" />
+</div>
+
+<div><h3>2. Input your title</h3>
+<img src="https://images.tango.us/workflows/718b2df1-f17d-40cc-8359-44062a5011d8/steps/5581320d-59d1-4609-9c5f-15d1aabc60ba/c8dbbd8f-1137-4b8f-8083-7b01a4a14b7a.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.3013&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=315&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Input your title" />
+</div>
+
+<div><h3>3. Input the Description</h3>
+<p>If you would like no description for the page select the Hide Description option.</p>
+<img src="https://images.tango.us/workflows/718b2df1-f17d-40cc-8359-44062a5011d8/steps/9b4377ca-aa3b-440f-8246-68f6ab18a1eb/9b75dae1-d207-43f6-9d18-8b5c3a428c19.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.5814&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=366&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD0yNjgmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Input the Description" />
+</div>
+
+<div><h3>4. Click on Create Page to Have your Page Created</h3>
+<img src="https://images.tango.us/workflows/718b2df1-f17d-40cc-8359-44062a5011d8/steps/d387f0dd-6d40-4b87-a65d-af8a4b1130b0/c756c83f-c8ec-4213-a5b6-31961f2883d3.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.2209&fp-y=0.8704&fp-z=2.3754&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=428&mark-y=609&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zNDUmaD0xMzgmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Create Page to Have your Page Created" />
+</div>
+
+<div><h3>5. Navigation to Recently Created Page </h3>
+<p>To navigate to the recently created page click on the the page title to be redirected to the page.</p>
+<img src="https://images.tango.us/workflows/718b2df1-f17d-40cc-8359-44062a5011d8/steps/7713af79-8b1b-4b3a-b7be-87e7d171033e/e1c585a9-1865-4271-91d5-8f76ee54bc4d.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1370&fp-y=0.6033&fp-z=2.1634&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=145&mark-y=458&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz00MjEmaD02NCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Navigation to Recently Created Page " />
+</div>
+
+<div><h3>6. Here is what the Page looks Like after creation</h3>
+<p>You can start adding More Content by adding boxes. </p>
+<img src="https://images.tango.us/workflows/718b2df1-f17d-40cc-8359-44062a5011d8/steps/ad66da39-5d27-4803-9a5d-f56bc2bcce1c/178159ef-3e67-431a-96a4-9b47bc9a053d.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.5982&fp-z=1.0037&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=2&mark-y=285&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0xMTk2Jmg9NjAxJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Here is what the Page looks Like after creation" />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $reuse_page = '<h1><a href="https://app.tango.us/app/workflow/a964e0e7-53e1-4f98-929a-13ffbcc002e2?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Reuse a Page</a></h1>
+<div><p>A page that is existing in some other guide can be reused again by doing the steps below. <br>Reusing the Page gives you the option to import all the exiting content of a page.</p></div>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/a964e0e7-53e1-4f98-929a-13ffbcc002e2?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/psychology"># Navigate to the Required guide</a></h2></div>
+
+<div><h3>1. Click on Create/Reuse Guide Page</h3>
+<img src="https://images.tango.us/workflows/a964e0e7-53e1-4f98-929a-13ffbcc002e2/steps/b2924888-5eb4-4bb6-9a77-95c87a377eea/3fadcaba-127c-4cea-b6f9-90973f6a1049.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1425&fp-y=0.6947&fp-z=1.9754&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=93&mark-y=455&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz00ODkmaD03MCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Create/Reuse Guide Page" />
+</div>
+
+<div><h3>2. Click on Reuse Guide Page</h3>
+<img src="https://images.tango.us/workflows/a964e0e7-53e1-4f98-929a-13ffbcc002e2/steps/fec62b3f-32ea-422b-a5c8-ecd889f7e64f/ff76b24e-a179-4272-9fe4-092a13d3fc4f.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.3698&fp-y=0.1661&fp-z=2.2072&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=397&mark-y=303&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz00MDUmaD0xMTImZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Reuse Guide Page" />
+</div>
+
+<div><h3>3. Select The page to reused from existing guides</h3>
+<img src="https://images.tango.us/workflows/a964e0e7-53e1-4f98-929a-13ffbcc002e2/steps/83ac1753-1633-481d-874d-587e6092ea0d/00e4f53e-c52e-4f71-af74-f23f8658fec7.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.2565&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=264&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Select The page to reused from existing guides" />
+</div>
+
+<div><h3>4. check Include Subpages if you would also like to import the subpages of the page</h3>
+<p>Note: This option will not be available if the importing page is a subpage already.</p>
+<img src="https://images.tango.us/workflows/a964e0e7-53e1-4f98-929a-13ffbcc002e2/steps/3b9137fe-0d10-44b1-96b6-0d5c1d0e4091/6b9546db-e22e-41d1-9e92-441aee6878a0.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1554&fp-y=0.4371&fp-z=3.0905&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=540&mark-y=454&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz03MSZoPTcxJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="check Include Subpages if you would also like to import the subpages of the page" />
+</div>
+
+<div><h3>5. Select Link: By selecting this, a link to the HTML item will be created. it will be un-editable from this box</h3>
+<img src="https://images.tango.us/workflows/a964e0e7-53e1-4f98-929a-13ffbcc002e2/steps/0d1fdfe0-f036-4562-8870-2794e06568d9/bd7831df-380e-4c2e-8997-0992380921ac.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1554&fp-y=0.4933&fp-z=3.0905&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=540&mark-y=454&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz03MSZoPTcxJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Select Link: By selecting this, a link to the HTML item will be created. it will be un-editable from this box" />
+</div>
+
+<div><h3>6. Enter a Title </h3>
+<img src="https://images.tango.us/workflows/a964e0e7-53e1-4f98-929a-13ffbcc002e2/steps/686aaef5-7263-412c-a615-50cfce8ebebb/2e8b41ef-2c8d-40ac-b306-4cfe3d68062b.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.5864&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=475&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter a Title " />
+</div>
+
+<div><h3>7. Use Position to determine if it is a top level page or if it goes under an existing page.</h3>
+<img src="https://images.tango.us/workflows/a964e0e7-53e1-4f98-929a-13ffbcc002e2/steps/02ab8089-0e69-43ba-97bd-87eb4bae54c6/9db85022-2f86-4f55-966c-5674a95f97d3.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.5000&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Use Position to determine if it is a top level page or if it goes under an existing page." />
+</div>
+
+<div><h3>8. Click on Reuse Guide Page</h3>
+<img src="https://images.tango.us/workflows/a964e0e7-53e1-4f98-929a-13ffbcc002e2/steps/2d103856-4f4f-4d16-9b20-08f28797827a/b7995999-1441-49fe-a8c0-04cebb285a2a.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.2415&fp-y=0.7593&fp-z=2.1634&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=389&mark-y=427&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz00MjEmaD0xMjYmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Reuse Guide Page" />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $add_box = '<h1><a href="https://app.tango.us/app/workflow/a7aa6b7d-ab80-4419-ad9f-6463322ad59f?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Creating A Box</a></h1>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/a7aa6b7d-ab80-4419-ad9f-6463322ad59f?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/psychology/finding-books-psychology"># Navigate to the Page where you would like to add the box </a></h2></div>
+
+<div><h3>1. Click on Create/Reuse Guide Box</h3>
+<img src="https://images.tango.us/workflows/a7aa6b7d-ab80-4419-ad9f-6463322ad59f/steps/079255f6-0e9f-4e02-8bc2-8182bf4035c5/3932ac41-b021-4cff-bf65-79a90b26c61e.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.3799&fp-y=0.6919&fp-z=2.1464&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=386&mark-y=458&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz00MjcmaD02NCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Create/Reuse Guide Box" />
+</div>
+
+<div><h3>2. Enter Your Title</h3>
+<img src="https://images.tango.us/workflows/a7aa6b7d-ab80-4419-ad9f-6463322ad59f/steps/a102b58f-4d40-47b1-9ad0-2c7c56cb0c29/9fb9745b-ec03-471c-97da-63e41182e860.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.4910&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=460&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter Your Title" />
+</div>
+
+<div><h3>3. Click on Save</h3>
+<img src="https://images.tango.us/workflows/a7aa6b7d-ab80-4419-ad9f-6463322ad59f/steps/46454f15-21e6-4e36-ae18-b073fda169be/c3bc9739-3f8a-4113-a962-e35790afc6c4.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1962&fp-y=0.6347&fp-z=2.6918&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=485&mark-y=412&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMzEmaD0xNTcmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Save" />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $reuse_html = '<h1><a href="https://app.tango.us/app/workflow/196d5909-5060-4564-b332-cfb65402a66e?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Reuse an HTML</a></h1>
+<div><p>This is the place where text block or HTML blocks can be reused from the same guide or some other guide</p></div>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/196d5909-5060-4564-b332-cfb65402a66e?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/business-administration/finding-journal-articles-business-administration"># Navigate to the box that is going to reuse the content</a></h2></div>
+
+<div><h3>1. Click on Add/Reuse HTML</h3>
+<img src="https://images.tango.us/workflows/196d5909-5060-4564-b332-cfb65402a66e/steps/de79b58d-8260-44bf-a7ff-e34dcb308b7d/ef79f322-1097-46b3-8bc1-bd576499a772.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.3932&fp-y=0.6470&fp-z=2.3651&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=426&mark-y=455&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zNDkmaD03MCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Add/Reuse HTML" />
+</div>
+
+<div><h3>2. Click on Reuse HTML</h3>
+<img src="https://images.tango.us/workflows/196d5909-5060-4564-b332-cfb65402a66e/steps/adbf34b6-94fb-43c4-9c60-ab8b99d59864/db7f8c99-558f-4d9a-90e2-d5c00c2c846f.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.2961&fp-y=0.1672&fp-z=2.4068&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=433&mark-y=334&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zMzQmaD0xMjImZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Reuse HTML" />
+</div>
+
+<div><h3>3. Select the required block from Select HTML Item</h3>
+<img src="https://images.tango.us/workflows/196d5909-5060-4564-b332-cfb65402a66e/steps/8b801791-daba-4836-bc28-829ea0311d5b/fae176e5-57f5-40c5-a332-14b02cb6f2b8.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.2576&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=265&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Select the required block from Select HTML Item" />
+</div>
+
+<div><h3>4. Click on Save</h3>
+<img src="https://images.tango.us/workflows/196d5909-5060-4564-b332-cfb65402a66e/steps/505fb517-5c70-47f9-b546-01dc0dd85435/73023423-ec38-4a6f-8cb5-21d92aa779ef.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1962&fp-y=0.8861&fp-z=2.6918&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=485&mark-y=601&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMzEmaD0xNTcmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Save" />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
   $the_html_content_node = createHtmlItemNode($html_box_item->id(), 'Add HTML Content', $add_html);
   $book_html_content_node = createHtmlItemNode($book_box_item->id(), 'Add Book HTML Content', $add_book);
   $database_html_content_node = createHtmlItemNode($database_box_item->id(), 'Add Database HTML Content', $add_database);
   $media_html_content_node = createHtmlItemNode($media_box_item->id(), 'Add Media HTML Content', $add_media);
-  $create_box_html_content_node = createHtmlItemNode($create_box_box_item->id(), 'Create Box HTML Content', '<p><a href="https://app.tango.us/app/workflow/Creating-A-Box-a7aa6b7dab804419ad9f6463322ad59f">"Create a Box" tutorial</a></p>');
+  $create_box_html_content_node = createHtmlItemNode($create_box_box_item->id(), 'Create Box HTML Content', $add_box);
   $create_guide_html_content_node = createHtmlItemNode($create_guide_box_item->id(), 'Create Guide HTML Content', $add_guide);
-  $create_page_html_content_node = createHtmlItemNode($create_page_box_item->id(), 'Create Page HTML Content', '<p><a href="https://app.tango.us/app/workflow/How-to-Add-a-Page-To-a-Guide-718b2df1f17d40cc835944062a5011d8">"Create a Page" tutorial</a></p>');
-  $reuse_guide_html_content_node = createHtmlItemNode($reuse_guide_box_item->id(), 'Reuse Guide HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-a-Guide-1215df59c46341b08598f61e3c9ebf86">"Reuse a Guide" tutorial</a></p>');
-  $reuse_html_html_content_node = createHtmlItemNode($reuse_html_box_item->id(), 'Reuse HTML HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-an-HTML-196d590950604564b332cfb65402a66e">"Reuse an HTML" tutorial</a></p>');
-  $reuse_page_html_content_node = createHtmlItemNode($reuse_page_box_item->id(), 'Reuse Page HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-a-Page-a964e0e753e14f98929a13ffbcc002e2">"Reuse a Page" tutorial</a></p>');
+  $create_page_html_content_node = createHtmlItemNode($create_page_box_item->id(), 'Create Page HTML Content', $add_page);
+  $reuse_guide_html_content_node = createHtmlItemNode($reuse_guide_box_item->id(), 'Reuse Guide HTML Content', $reuse_guide);
+  $reuse_html_html_content_node = createHtmlItemNode($reuse_html_box_item->id(), 'Reuse HTML HTML Content', $reuse_html);
+  $reuse_page_html_content_node = createHtmlItemNode($reuse_page_box_item->id(), 'Reuse Page HTML Content', $reuse_page);
   $reuse_database_html_content_node = createHtmlItemNode($reuse_database_box_item->id(), 'Reuse Database HTML Content', $reuse_database);
   $reuse_book_html_content_node = createHtmlItemNode($reuse_book_box_item->id(), 'Reuse Book HTML Content', $reuse_book);
 
 
   $add_html_node = $the_html_content_node->id();
+  $reuse_html_node = $reuse_html_html_content_node->id();
   $add_book_node = $book_html_content_node->id();
   $reuse_book_node = $reuse_book_html_content_node->id();
   $add_database_node = $database_html_content_node->id();
   $reuse_database_node = $reuse_database_html_content_node->id();
   $add_media_node = $media_html_content_node->id();
   $add_guide_node = $create_guide_html_content_node->id();
-
+  $reuse_guide_node = $reuse_guide_html_content_node->id();
+  $add_guide_page_node = $create_page_html_content_node->id();
+  $reuse_guide_page_node = $reuse_page_html_content_node->id();
+  $add_box_node = $create_box_html_content_node->id();
+  // reuse box needed left
 
   $the_html_content = createHtmlItemNode($html_box_item->id(), 'HTML Content', '<p><a href="/node/' . $add_html_node . '">"Add an HTML" tutorial</a></p>');
   $book_html_content = createHtmlItemNode($book_box_item->id(), 'Book HTML Content', '<p><a href="/node/' . $add_book_node . '">"Add a Book" tutorial</a></p>');
   $database_html_content = createHtmlItemNode($database_box_item->id(), 'Database HTML Content', '<p><a href="/node/' . $add_database_node . '">"Add a Database" tutorial</a></p>');
   $media_html_content = createHtmlItemNode($media_box_item->id(), 'Media HTML Content', '<p><a href="/node/' . $add_media_node . '">"Add a Media" tutorial</a></p>');
-  $create_box_html_content = createHtmlItemNode($create_box_box_item->id(), 'Create Box HTML Content', '<p><a href="https://app.tango.us/app/workflow/Creating-A-Box-a7aa6b7dab804419ad9f6463322ad59f">"Create a Box" tutorial</a></p>');
+  $create_box_html_content = createHtmlItemNode($create_box_box_item->id(), 'Create Box HTML Content', '<p><a href="/node/' . $add_box_node . '">"Add a Box" tutorial</a></p>' );
   $create_guide_html_content = createHtmlItemNode($create_guide_box_item->id(), 'Create Guide HTML Content', '<p><a href="/node/' . $add_guide_node . '">"Add a Guide" tutorial</a></p>');
-  $create_page_html_content = createHtmlItemNode($create_page_box_item->id(), 'Create Page HTML Content', '<p><a href="https://app.tango.us/app/workflow/How-to-Add-a-Page-To-a-Guide-718b2df1f17d40cc835944062a5011d8">"Create a Page" tutorial</a></p>');
-  $reuse_guide_html_content = createHtmlItemNode($reuse_guide_box_item->id(), 'Reuse Guide HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-a-Guide-1215df59c46341b08598f61e3c9ebf86">"Reuse a Guide" tutorial</a></p>');
-  $reuse_html_html_content = createHtmlItemNode($reuse_html_box_item->id(), 'Reuse HTML HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-an-HTML-196d590950604564b332cfb65402a66e">"Reuse an HTML" tutorial</a></p>');
-  $reuse_page_html_content = createHtmlItemNode($reuse_page_box_item->id(), 'Reuse Page HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-a-Page-a964e0e753e14f98929a13ffbcc002e2">"Reuse a Page" tutorial</a></p>');
+  $create_page_html_content = createHtmlItemNode($create_page_box_item->id(), 'Create Page HTML Content', '<p><a href="/node/' . $add_guide_page_node . '">"Add a Page" tutorial</a></p>');
+  $reuse_guide_html_content = createHtmlItemNode($reuse_guide_box_item->id(), 'Reuse Guide HTML Content', '<p><a href="/node/' . $reuse_guide_node . '">"Reuse a Guide" tutorial</a></p>');
+  $reuse_html_html_content = createHtmlItemNode($reuse_html_box_item->id(), 'Reuse HTML HTML Content', '<p><a href="/node/' . $reuse_html_node . '">"Reuse an HTML" tutorial</a></p>');
+  $reuse_page_html_content = createHtmlItemNode($reuse_page_box_item->id(), 'Reuse Page HTML Content', '<p><a href="/node/' . $reuse_guide_page_node . '">"Reuse a Page" tutorial</a></p>');
   $reuse_database_html_content = createHtmlItemNode($reuse_database_box_item->id(), 'Reuse Database HTML Content', '<p><a href="/node/' . $reuse_book_node . '">"Reuse a Database" tutorial</a></p>');
   $reuse_book_html_content = createHtmlItemNode($reuse_book_box_item->id(), 'Reuse Book HTML Content', '<p><a href="/node/' . $reuse_database_node . '">"Reuse a Book" tutorial</a></p>');
 
