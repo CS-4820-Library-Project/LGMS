@@ -180,6 +180,11 @@ class ReuseDatabaseForm extends FormBase {
           '#title' => $this->t('Draft mode:'),
           '#description' => $this->t('Un-check this box to publish.'),
           '#default_value' => $parent_db->isPublished() == '0',
+          '#states' => [
+            'invisible' => [
+              [':input[name="reference"]' => ['checked' => TRUE]],
+            ],
+          ],
         ];
       }
     }
