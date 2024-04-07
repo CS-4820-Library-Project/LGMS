@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @Block(
  *   id = "lgms_guide_owner_block",
- *   admin_label = @Translation("Contact information"),
+ *   admin_label = @Translation("LGMS Author information"),
  *   category = @Translation("LGMS"),
  * )
  */
