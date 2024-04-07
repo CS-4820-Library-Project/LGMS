@@ -2553,7 +2553,7 @@ function createHelpGuide(): array {
   $reuse_html_html_content = createHtmlItemNode($reuse_html_box_item->id(), 'Reuse HTML HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-an-HTML-196d590950604564b332cfb65402a66e">"Reuse an HTML" tutorial</a></p>');
   $reuse_page_html_content = createHtmlItemNode($reuse_page_box_item->id(), 'Reuse Page HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-a-Page-a964e0e753e14f98929a13ffbcc002e2">"Reuse a Page" tutorial</a></p>');
   $reuse_database_html_content = createHtmlItemNode($reuse_database_box_item->id(), 'Reuse Database HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-Database-83387a659c5146cf8b06236e0217b73d">"Reuse a Database" tutorial</a></p>');
-  $reuse_book_html_content = createHtmlItemNode($reuse_book_box_item->id(), 'Reuse Book HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reusing-A-Book-b287db8bf52445c7aeaa00376bcb25f7">"Reuse a Book" tutorial</a></p>');
+  $reuse_book_html_content = createHtmlItemNode($reuse_book_box_item->id(), 'Reuse Book HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-A-book-6da44a15c065468184b774fe6cd3b91f">"Reuse a Book" tutorial</a></p>');
 
   // Attach HTML items to box items
   attachChildNodes($html_box_item, 'field_html_item', [$the_html_content->id()]);
