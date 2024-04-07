@@ -739,18 +739,30 @@ function book_display(EntityInterface $entity , bool $include_title = true){
   ];
 
   $build['book_container']['details'][] = [
-    '#markup' => '<strong>' . $entity->get('title')->value . '</strong>',
-  ];
-
-  $build['book_container']['details'][] = [
     '#type' => 'html_tag',
     '#tag' => 'div',
-    '#value' => 'by ' . $entity->get('field_book_author_or_editor')->value,
+    '#value' => $entity->get('field_book_author_or_editor')->value . '.  ' . $entity->get('field_book_year')->value
+      . '. <strong>' . $entity->get('title')->value . '. </strong> ' . $entity->get('field_book_edition')->value .' Edition. '
+      . $entity->get('field_book_publisher')->value
+    ,
   ];
 
-  $build['book_container']['details'][] = [
-    '#markup' => '<p><i> Publisher: ' . $entity->get('field_book_publisher')->value . ', Edition: ' . $entity->get('field_book_edition')->value . ', Year: ' . $entity->get('field_book_year')->value. '</i></p>',
-  ];
+  if($entity->get('field_book_type')->value == 'print') {
+    $build['book_container']['details'][] = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => $entity->get('field_book_location')->value . '. ' . $entity->get('field_book_call_number')->value,
+    ];
+
+    $build['book_container']['details'][] = [
+      '#markup' => '<div><a href="' . $entity->get('field_book_cat_record')->uri . '">' . $entity->get('field_book_cat_record')->title . '</a></div>'
+    ];
+  }
+  else {
+    $build['book_container']['details'][] = [
+      '#markup' => '<div> <a href="' . $entity->get('field_book_pub_finder')->uri . '">' . $entity->get('field_book_pub_finder')->title . '</a></div>'
+    ];
+  }
 
   $build['book_container']['details'][] = [
     '#type' => 'processed_text',
@@ -758,28 +770,6 @@ function book_display(EntityInterface $entity , bool $include_title = true){
     '#format' => $entity->get('field_book_description')->format,
   ];
 
-  if($entity->get('field_book_type')->value == 'print') {
-    $build['book_container']['details'][] = [
-      '#type' => 'html_tag',
-      '#tag' => 'div',
-      '#value' => 'Location: '. $entity->get('field_book_location')->value,
-    ];
-
-    $build['book_container']['details'][] = [
-      '#type' => 'html_tag',
-      '#tag' => 'div',
-      '#value' => 'Call Number: '. $entity->get('field_book_call_number')->value,
-    ];
-
-    $build['book_container']['details'][] = [
-      '#markup' => '<div>Cat Record: <a href="' . $entity->get('field_book_cat_record')->uri . '">' . $entity->get('field_book_cat_record')->title . '</a></div>'
-    ];
-  }
-  else {
-    $build['book_container']['details'][] = [
-      '#markup' => '<div>Pub Finder: <a href="' . $entity->get('field_book_pub_finder')->uri . '">' . $entity->get('field_book_pub_finder')->title . '</a></div>'
-    ];
-  }
 
   return $build;
 }

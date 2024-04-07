@@ -80,39 +80,41 @@ class AddMediaForm extends FormBase {
       ],
     ];
 
-    $form['include_title'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Use Media Default name'),
-      '#default_value' => !$edit || $current_item->label() == $media->getName(),
-    ];
-
-    $form['title'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Media Title:'),
-      '#states' => [
-        'invisible' => [
-          ':input[name="include_title"]' => ['checked' => TRUE],
-        ],
-        'required' => [
-          ':input[name="include_title"]' => ['checked' => False],
-        ],
-      ],
-      '#default_value' => $edit? $current_item->label(): '',
-    ];
-
     $form['update_wrapper'] = [
       '#type' => 'container',
       '#attributes' => ['id' => 'update-wrapper'],
     ];
 
-    // Draft mode Field
-    $form['update_wrapper']['published'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Draft mode:'),
-      '#description' => $this->t('Un-check this box to publish.'),
-      '#default_value' => $edit ? $current_item->isPublished() == '0' || $media->isPublished() == '0': 0,
-      '#disabled' => $edit && !$media->isPublished(),
-    ];
+    if ($form_state->getValue('media')){
+      $form['update_wrapper']['include_title'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Use Media Default name'),
+        '#default_value' => !$edit || $current_item->label() == $media->getName(),
+      ];
+
+      $form['update_wrapper']['title'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Media Title:'),
+        '#states' => [
+          'invisible' => [
+            ':input[name="include_title"]' => ['checked' => TRUE],
+          ],
+          'required' => [
+            ':input[name="include_title"]' => ['checked' => False],
+          ],
+        ],
+        '#default_value' => $edit? $current_item->label(): '',
+      ];
+
+      // Draft mode Field
+      $form['update_wrapper']['published'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Draft mode:'),
+        '#description' => $this->t('Un-check this box to publish.'),
+        '#default_value' => $edit ? $current_item->isPublished() == '0' || $media->isPublished() == '0': 0,
+        '#disabled' => $edit && !$media->isPublished(),
+      ];
+    }
 
 
     $form['actions']['#type'] = 'actions';
@@ -142,6 +144,15 @@ class AddMediaForm extends FormBase {
   public function mediaSelectedCallBack(array &$form, FormStateInterface $form_state) {
     $selected = $form_state->getValue('media');
     $selected = Media::load($selected);
+
+    if (!$selected){
+      return $form['update_wrapper'];
+    }
+
+    $is_document_type = ($selected->bundle() === 'document');
+
+    $form['update_wrapper']['include_title']['#access'] = $is_document_type;
+    $form['update_wrapper']['title']['#access'] = $is_document_type;
 
     if ($selected->isPublished()){
       unset($form['update_wrapper']['published']['#disabled']);
@@ -194,9 +205,11 @@ class AddMediaForm extends FormBase {
       $media = $form_state->getValue('media');
       $media = Media::load($media);
 
+      $is_document_type = ($media->bundle() === 'document');
+
       // Create a link to it and add it to the box
       $item = $ajaxHelper->create_link($media, $form_state->getValue('current_box'));
-      $item->set('title', $form_state->getValue('include_title') != '0'? $media->getName() : $form_state->getValue('title'));
+      $item->set('title', $is_document_type? $form_state->getValue('include_title') != '0'? $media->getName() : $form_state->getValue('title') : $media->getName());
       $item->set('status', $form_state->getValue('published') == '0');
       $item->save();
 
