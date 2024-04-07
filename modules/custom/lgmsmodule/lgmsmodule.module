@@ -2241,7 +2241,7 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
     }
   }
 
-  if ($form_id === 'node_guide_edit_form' || $form_id === 'node_guide_form'){
+  if ($form_id === 'node_guide_edit_form' || $form_id === 'node_guide_form' || $form_id === 'node_guide_page_edit_form' || $form_id === 'node_guide_page_form'){
     $form['field_description']['#states'] = [
       'invisible' => [
         ':input[name="field_hide_description[value]"]' => ['checked' => TRUE],
