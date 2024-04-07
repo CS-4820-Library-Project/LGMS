@@ -622,7 +622,7 @@ function database_display(EntityInterface $entity){
     $link_item = $entity->get('field_database_link')->first();
 
     // Get the URL from the link field
-    $url = $link_item->getUrl()->toString();
+    $url = $link_item->uri;
 
     // Get the link title (text) from the link field, fall back to the URL if the title is empty
     $link_text = $link_item->title ?: $url;
