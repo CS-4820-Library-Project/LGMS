@@ -1,6 +1,7 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
@@ -8,13 +9,32 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+/**
+ * Provides a form to reorder child pages of a given node.
+ *
+ * This form allows users to change the order of child pages for a specific
+ * parent node (guide or page), utilizing Drupal's drag-and-drop functionality
+ * to create an intuitive user experience.
+ */
 class ReOrderPagesForm extends FormBase {
+
+  /**
+   * {@inheritdoc}
+   */
 
   public function getFormId(): string
   {
     return 're_order_box_items_form';
   }
 
+  /**
+   * Builds the reorder pages form.
+   *
+   * @param array $form The initial form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The modified form array with a tabledrag interface for reordering.
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     $form_helper = new FormHelper();
@@ -107,15 +127,36 @@ class ReOrderPagesForm extends FormBase {
     return $form;
   }
 
-  public function updateTable(array &$form, FormStateInterface $form_state) {
+  /**
+   * Callback function to update the form with a table of reorderable pages.
+   *
+   * Triggered when the user selects a page to sort, dynamically updating
+   * the form to display the reorderable list of child pages.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The updated portion of the form with the reorderable pages table.
+   */
+  public function updateTable(array &$form, FormStateInterface $form_state): array
+  {
     return $form['pages_table_wrapper'];
   }
 
 
   /**
+   * AJAX callback for the form submission.
+   *
+   * Handles the AJAX submission, providing a smooth experience by
+   * avoiding a full page reload and directly showing the results of reordering.
+   *
+   * @param array &$form The form structure.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response indicating success.
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
 
@@ -123,8 +164,16 @@ class ReOrderPagesForm extends FormBase {
   }
 
   /**
+   * Processes the submission of the reorder pages form.
+   *
+   * Applies the new order of child pages as determined by the user, saving the
+   * updated order back to the parent node to ensure the changes are reflected.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
    * @throws EntityStorageException
    */
+
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
     $ajaxHelper = new FormHelper();

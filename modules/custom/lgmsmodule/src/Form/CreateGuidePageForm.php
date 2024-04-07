@@ -12,13 +12,34 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+/**
+ * Provides a form for creating new guide page entities.
+ *
+ * This form allows users to create a new page within a guide, specifying details
+ * such as the page title, position in the guide's structure, and whether the page
+ * should be published or saved in draft mode. Users can also choose to hide the
+ * page's description.
+ */
 class CreateGuidePageForm extends FormBase
 {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'create_guide_page_form';
   }
+
+  /**
+   * Builds the guide page creation form.
+   *
+   * @param array $form An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   * @param mixed $ids (optional) Identifiers necessary for form construction.
+   *
+   * @return array The form structure.
+   */
 
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
   {
@@ -81,6 +102,15 @@ class CreateGuidePageForm extends FormBase
     return $form;
   }
 
+  /**
+   * Validates form fields before submission.
+   *
+   * Ensures required fields are filled and validates specific conditions, such
+   * as the necessity of a description if it's not hidden.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   */
   public function validateFields(array &$form, FormStateInterface $form_state): void
   {
     $hide = $form_state->getValue('hide_description');
@@ -91,8 +121,18 @@ class CreateGuidePageForm extends FormBase
   }
 
   /**
+   * Handles AJAX form submissions.
+   *
+   * Provides a smoother user experience by submitting the form and providing feedback
+   * via AJAX, without requiring a full page reload.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response that updates the client-side state.
    * @throws EntityMalformedException
    */
+
   public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
@@ -101,7 +141,15 @@ class CreateGuidePageForm extends FormBase
   }
 
   /**
-   * @throws EntityStorageException
+   * Processes the submission of the guide page creation form.
+   *
+   * Takes the input from the form, validates it, and uses it to create a new
+   * guide page node entity, setting its properties according to the form values.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @throws EntityStorageException If there is an issue saving the guide page entity.
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {

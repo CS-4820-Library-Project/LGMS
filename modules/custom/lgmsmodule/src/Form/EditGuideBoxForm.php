@@ -1,6 +1,7 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
@@ -8,13 +9,31 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+/**
+ * Form handler for editing a guide box.
+ *
+ * Enables users to change the title and publication status of an existing guide box. It checks if
+ * the box is being edited within its parent guide context, and if not, it provides a link to the
+ * appropriate parent guide for editing.
+ */
 class EditGuideBoxForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'edit_guide_box_form';
   }
 
+  /**
+   * Builds the guide box edit form.
+   *
+   * @param array $form An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The form structure.
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     $form_helper = new FormHelper();
@@ -76,10 +95,20 @@ class EditGuideBoxForm extends FormBase {
     return $form;
   }
 
+
   /**
+   * AJAX submission handler for the edit guide box form.
+   *
+   * Processes the form submission using AJAX to provide a smoother user experience
+   * by offering immediate feedback without requiring a page refresh.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response for the form submission.
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
 
@@ -87,6 +116,14 @@ class EditGuideBoxForm extends FormBase {
   }
 
   /**
+   * Processes the submission of the guide box edit form.
+   *
+   * Updates the title and publication status of the guide box based on user input.
+   * It checks if the current guide box can be edited in the current context and
+   * performs the update accordingly.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void

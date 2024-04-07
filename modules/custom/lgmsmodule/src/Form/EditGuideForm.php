@@ -1,6 +1,8 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
@@ -11,13 +13,33 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Provides a form for editing a guide.
+ *
+ * This form allows users to edit the title, description, subjects, type, group,
+ * and publication status of a guide. It dynamically adjusts available options
+ * based on the guide's current settings and taxonomy term availability.
+ */
 class EditGuideForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'edit_guide_form';
   }
 
+  /**
+   * Builds the guide edit form.
+   *
+   * @param array $form An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The form structure, including fields for editing guide properties.
+   * @throws InvalidPluginDefinitionException
+   * @throws PluginNotFoundException
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     // Set the prefix, suffix, and hidden fields
@@ -151,6 +173,14 @@ class EditGuideForm extends FormBase {
     return $form;
   }
 
+  /**
+   * Validates the form input.
+   *
+   * Ensures the description is provided if the 'Hide description' checkbox is not checked.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   */
   public function validateFields(array &$form, FormStateInterface $form_state): void
   {
     $hide = $form_state->getValue('hide_description');
@@ -161,15 +191,29 @@ class EditGuideForm extends FormBase {
     }
   }
 
+  /**
+   * AJAX callback for toggling the description field visibility.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @return AjaxResponse The AJAX response to handle form resizing.
+   */
   public function hideDescriptionCallback(array &$form, FormStateInterface $form_state): AjaxResponse
   {
-    $response = new AjaxResponse();
-
-    return $response;
+    return new AjaxResponse();
   }
 
-
   /**
+   * Handles AJAX form submission.
+   *
+   * Processes the form submission via AJAX, providing a smoother user experience
+   * by offering immediate feedback without requiring a page refresh.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response for the form submission.
    * @throws EntityMalformedException
    */
   public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
@@ -184,7 +228,14 @@ class EditGuideForm extends FormBase {
   }
 
   /**
-   * @throws EntityStorageException
+   * Processes the submission of the guide edit form.
+   *
+   * Updates the guide node with the new values from the form. Handles the
+   * complexity of multiple and single value fields such as taxonomy terms and
+   * publication status.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {

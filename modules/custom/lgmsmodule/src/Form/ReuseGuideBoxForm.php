@@ -10,14 +10,29 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
+use DrupalCodeGenerator\Command\Yml\Links\Contextual;
 
+/**
+ * Provides a form to reuse existing guide box items.
+ */
 class ReuseGuideBoxForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'reuse_guide_box_form';
   }
 
+  /**
+   * Builds the form for reusing a guide box.
+   *
+   * @param array $form
+   * @param FormStateInterface $form_state
+   * @param $ids Contextual IDs or parameters passed to the form.
+   * @return array The form array.
+   */
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
   {
     // Set the prefix, suffix, and hidden fields
@@ -70,6 +85,12 @@ class ReuseGuideBoxForm extends FormBase {
     return $form;
   }
 
+  /**
+   * Validates the form fields.
+   *
+   * @param array &$form
+   * @param FormStateInterface $form_state
+   */
   public function validateFields(array &$form, FormStateInterface $form_state): void
   {
     $reference = $form_state->getValue('reference');
@@ -97,6 +118,12 @@ class ReuseGuideBoxForm extends FormBase {
     }
   }
 
+  /**
+   * Pre-fills form fields based on the selected guide box.
+   *
+   * @param array &$form
+   * @param FormStateInterface $form_state
+   */
   private function prefillSelectedBoxItem(array &$form, FormStateInterface $form_state): void
   {
     $selected = $form_state->getValue('box_select');
@@ -120,7 +147,15 @@ class ReuseGuideBoxForm extends FormBase {
     }
   }
 
-  public function boxItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
+  /**
+   * AJAX callback for when a box is selected.
+   *
+   * @param array &$form
+   * @param FormStateInterface $form_state
+   * @return array The updated part of the form.
+   */
+  public function boxItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state): array
+  {
     $selected = $form_state->getValue('box_select');
     $selected_node = Node::load($selected);
 
@@ -133,6 +168,11 @@ class ReuseGuideBoxForm extends FormBase {
   }
 
   /**
+   * AJAX callback for submitting the form.
+   *
+   * @param array &$form
+   * @param FormStateInterface $form_state
+   * @return AjaxResponse
    * @throws EntityMalformedException
    */
   public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
@@ -143,6 +183,12 @@ class ReuseGuideBoxForm extends FormBase {
   }
 
   /**
+   * Handles the form submission.
+   *
+   * Processes the reuse of the selected guide box based on form inputs.
+   *
+   * @param array &$form
+   * @param FormStateInterface $form_state
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void

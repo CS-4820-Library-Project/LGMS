@@ -11,13 +11,32 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
 
+/**
+ * Form for editing an individual page within a guide.
+ *
+ * Allows users to modify page attributes such as title, description, and whether the
+ * description should be hidden. Users can also change the position of the page within
+ * the guide, update its draft status, and handle pages that are merely references to
+ * other content.
+ */
 class EditPageForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'edit_page_form';
   }
 
+  /**
+   * Builds the page edit form.
+   *
+   * @param array $form An associative array containing the initial structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The modified form structure.
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     // Set the prefix, suffix, and hidden fields
@@ -140,6 +159,18 @@ class EditPageForm extends FormBase {
     return $form;
   }
 
+
+  /**
+   * AJAX callback for hiding the description field.
+   *
+   * Adjusts the form to accommodate user preference regarding the visibility of the
+   * description field.
+   *
+   * @param array &$form The form structure.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @return AjaxResponse The response containing commands for the AJAX request.
+   */
   public function hideDescriptionCallback(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $response = new AjaxResponse();
@@ -150,19 +181,17 @@ class EditPageForm extends FormBase {
     return $response;
   }
 
-
   /**
-   * @throws EntityMalformedException
+   * AJAX callback for updating form elements based on the selected page.
+   *
+   * Dynamically updates the form fields to reflect the attributes of the selected page, allowing
+   * for immediate editing. This includes loading the page's title, description, and draft mode status.
+   *
+   * @param array &$form The form structure.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @return array The updated portion of the form to be replaced.
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
-  {
-    // Create an array of AJAX commands.
-    $ajaxHelper = new FormHelper();
-
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'Page updated successfully.', '#'.$this->getFormId());
-  }
-
-
   public function selectPageCallBack(array &$form, FormStateInterface $form_state) {
     // Get the selected page
     $selected = $form_state->getValue('select_page', '');
@@ -180,8 +209,36 @@ class EditPageForm extends FormBase {
   }
 
   /**
+   * Handles AJAX submissions for the edit page form.
+   *
+   * Provides a smooth user experience by processing form submissions via AJAX, offering
+   * immediate feedback without a full page reload.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response for the form submission.
+   * @throws EntityMalformedException
+   */
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
+    // Create an array of AJAX commands.
+    $ajaxHelper = new FormHelper();
+
+    return $ajaxHelper->submitModalAjax($form, $form_state, 'Page updated successfully.', '#'.$this->getFormId());
+  }
+
+  /**
+   * Processes the submission of the edit page form.
+   *
+   * Updates the selected page with the new values from the form. This includes changing the
+   * page's title, description, position within the guide, and publication status.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
    * @throws EntityStorageException
    */
+
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
     $ajaxHelper = new FormHelper();

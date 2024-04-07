@@ -1,6 +1,7 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
@@ -8,13 +9,34 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+/**
+ * Form to reorder the items within a box.
+ *
+ * This form utilizes a tabledrag interface for users to easily adjust the order of
+ * items within a selected box. The new order is then saved, reflecting the updated
+ * arrangement in the presentation layer.
+ */
 class ReOderBoxItemsForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 're_order_box_items_form';
   }
 
+  /**
+   * Builds the reorder box items form.
+   *
+   * Constructs the form elements necessary for displaying the items in a box
+   * and allows for their order to be changed via a drag-and-drop interface.
+   *
+   * @param array $form The initial form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The modified form structure with reorder capabilities.
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     $form_helper = new FormHelper();
@@ -51,9 +73,18 @@ class ReOderBoxItemsForm extends FormBase {
   }
 
   /**
+   * AJAX callback for form submission.
+   *
+   * Provides immediate feedback through AJAX upon successful reordering of box items,
+   * enhancing user experience by avoiding full page reloads.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response indicating success.
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
 
@@ -61,6 +92,13 @@ class ReOderBoxItemsForm extends FormBase {
   }
 
   /**
+   * Processes the submission of the reorder box items form.
+   *
+   * Applies the new order of items as specified by the user in the form to the actual
+   * box entity, ensuring the updated order is reflected site-wide.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void

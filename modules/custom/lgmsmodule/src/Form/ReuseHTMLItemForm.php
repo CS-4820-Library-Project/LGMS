@@ -11,13 +11,35 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+/**
+ * Provides a form to reuse an HTML item.
+ *
+ * This form allows users to select an existing HTML item to duplicate or reference
+ * within another context, such as a different box or page.
+ */
 class ReuseHTMLItemForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'reuse_html_item_form';
   }
 
+  /**
+   * Builds the reuse HTML item form.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array|null $ids
+   *   (optional) Additional identifiers for form construction.
+   *
+   * @return array
+   *   The form structure.
+   */
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
   {
     // Set the prefix, suffix, and hidden fields
@@ -115,6 +137,17 @@ class ReuseHTMLItemForm extends FormBase {
     }
   }
 
+  /**
+   * Validates the form submission.
+   *
+   * Ensures that a title is provided when not creating a reference.
+   *
+   * @param array &$form
+   *   The form render array.
+   * @param FormStateInterface $form_state
+   *   The form state.
+   */
+
   public function validateFields(array &$form, FormStateInterface $form_state): void
   {
     // Throw error if title field is not filled
@@ -123,7 +156,21 @@ class ReuseHTMLItemForm extends FormBase {
     }
   }
 
-  public function htmlItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
+  /**
+   * Handles AJAX callback for HTML item selection.
+   *
+   * Updates the form state based on the selected HTML item.
+   *
+   * @param array &$form
+   *   The form render array.
+   * @param FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return AjaxResponse
+   *   The AJAX response.
+   */
+  public function htmlItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     // Load the selected html
     $selected = $form_state->getValue('html_select');
     $selected_node = Node::load($selected);
@@ -148,6 +195,14 @@ class ReuseHTMLItemForm extends FormBase {
   }
 
   /**
+   * Handles form submission.
+   *
+   * Duplicates or references the selected HTML item based on user input.
+   *
+   * @param array &$form
+   *   The form render array.
+   * @param FormStateInterface $form_state
+   *   The form state.
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
