@@ -35,7 +35,6 @@ class DeletePageForm extends FormBase{
       '#title' => $this->t('Select Page'),
       '#options' => $form_helper->get_pages_options($ids->guide_id),
       '#empty_option' => $this->t('- Select a Page -'),
-      '#validated' => TRUE,
       '#required' => TRUE,
       '#ajax' => [
         'callback' => '::PageSelectedCallBack',
