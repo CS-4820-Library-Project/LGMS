@@ -1906,18 +1906,389 @@ function createHelpGuide(): array {
   $reuse_book_box_item = createGuideBoxItemNode($reuse_book_guide_box->id(), 'Reuse Book Item');
 
   // Create HTML items
-  $the_html_content = createHtmlItemNode($html_box_item->id(), 'HTML Content', '<p><a href="https://app.tango.us/app/workflow/Adding-HTML--Text-Content-to-Your-Box-80425ed04b3744c78f41bbe19d009ed3">"Add an HTML" tutorial</a></p>');
-  $book_html_content = createHtmlItemNode($book_box_item->id(), 'Book HTML Content', '<p><a href="https://app.tango.us/app/workflow/Adding-a-Book-to-a-Box-e33598e0bfe849e083f0fa057bbb015f">"Add a book" tutorial</a></p>');
-  $database_html_content = createHtmlItemNode($database_box_item->id(), 'Database HTML Content', '<p><a href="https://app.tango.us/app/workflow/Adding-a-DataBase-to-the-Box-1c359512d3ef4064ac76b549ee754a93">"Add a database" tutorial</a></p>');
-  $media_html_content = createHtmlItemNode($media_box_item->id(), 'Media HTML Content', '<p><a href="https://app.tango.us/app/workflow/Adding-Media-9fea3130e2fc4ed29d52fbf31825c9f5">"Add a media" tutorial</a></p>');
+
+  $add_html = '<h1><a href="https://app.tango.us/app/workflow/80425ed0-4b37-44c7-8f41-bbe19d009ed3?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Adding HTML/ Text Content to Your Box</a></h1>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/80425ed0-4b37-44c7-8f41-bbe19d009ed3?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/psychology/finding-books-psychology"># Navigate to the required Page and then the box</a></h2></div>
+
+<div><h3>1. This is what the Box will Look like without any content in it</h3>
+<img src="https://images.tango.us/workflows/80425ed0-4b37-44c7-8f41-bbe19d009ed3/steps/c0b98ecd-f9f8-43aa-a971-63d35b97feb7/82e7c59b-c95f-4e20-8745-c66e6e414c96.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.6214&fp-y=0.6066&fp-z=1.4224&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=46&mark-y=303&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0xMTA4Jmg9Mzc0JmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="This is what the Box will Look like without any content in it" />
+</div>
+
+<div><h3>2. Click on Add/Reuse HTML to add Plain text or HTML content </h3>
+<img src="https://images.tango.us/workflows/80425ed0-4b37-44c7-8f41-bbe19d009ed3/steps/bee8f840-00d2-4541-83b3-5520fa5ca621/7933b6a5-2776-450d-983d-1e2864e3509d.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.3932&fp-y=0.5976&fp-z=2.3651&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=426&mark-y=455&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zNDkmaD03MCZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Add/Reuse HTML to add Plain text or HTML content " />
+</div>
+
+<div><h3>3. Add Title </h3>
+<img src="https://images.tango.us/workflows/80425ed0-4b37-44c7-8f41-bbe19d009ed3/steps/bdc2bb58-3fbc-4c8e-bc3c-8bd4c63ed45a/8015f4ef-4dbc-456a-832e-181d9466b4ec.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.2576&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=265&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Add Title " />
+</div>
+
+<div><h3>4. In the Body text box is where you will add the content.</h3>
+<p>By Default Basic HTML is selected</p>
+<img src="https://images.tango.us/workflows/80425ed0-4b37-44c7-8f41-bbe19d009ed3/steps/097a09ac-c363-42af-835b-242b6cebfbe2/1a01e8b3-83b1-4848-8a3d-18d1be3f366d.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.4826&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=356&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD0yNjgmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="In the Body text box is where you will add the content." />
+</div>
+
+<div><h3>5. You have the option to change it to full HTML or Restricted HTML</h3>
+<img src="https://images.tango.us/workflows/80425ed0-4b37-44c7-8f41-bbe19d009ed3/steps/464ed90c-35f9-4900-b93a-f26c88470c42/6ca23239-c171-44dd-8e4a-54967b3c48b8.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.5932&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=483&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="You have the option to change it to full HTML or Restricted HTML" />
+</div>
+
+<div><h3>6. Click on Save</h3>
+<img src="https://images.tango.us/workflows/80425ed0-4b37-44c7-8f41-bbe19d009ed3/steps/086224cf-3251-45c6-a184-d20bf7e4800e/735bf073-ed2a-4656-938c-e7f063f4ec14.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1962&fp-y=0.8692&fp-z=2.6918&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=485&mark-y=557&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMzEmaD0xNTcmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Save" />
+</div>
+
+<br/>
+<hr/>
+<div>
+</div>';
+
+  $add_book = '<h1><a href="https://app.tango.us/app/workflow/e33598e0-bfe8-49e0-83f0-fa057bbb015f?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Adding a Book to a Box</a></h1>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/e33598e0-bfe8-49e0-83f0-fa057bbb015f?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+<div><h2><a href="http://localhost/LGMS/psychology/finding-books-psychology"># Navigate to the required box</a></h2></div>
+
+<div><h3>1. Click on Add/Reuse Book</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/07da3f50-9fc4-4084-a4f5-7b7bda143000/ca18dfb2-b084-46b7-90a5-af2ed85157ab.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.3900&fp-y=0.7626&fp-z=2.4015&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=432&mark-y=454&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zMzUmaD03MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Add/Reuse Book" />
+</div>
+
+<div><h3>2. Enter the Title</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/caa24488-411d-4c2b-9d91-3a2ea2e71931/e2bb6d54-1032-4ff9-b44b-ed2eddc6defa.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.2565&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=264&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the Title" />
+</div>
+
+<div><h3>3. Enter the  Author/Editor</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/3d96fff4-6d47-472a-8f59-528fb0fb8bbf/16b8d8a0-9f8b-4a9f-a512-ae33bcc3de3f.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.3462&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=367&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the  Author/Editor" />
+</div>
+
+<div><h3>4. Enter the Publisher</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/8e95a740-ba8b-41a5-907a-55cd531ee7bd/fd37f8b0-8cad-4cd8-be31-4f72b6fdc689.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.4360&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=460&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the Publisher" />
+</div>
+
+<div><h3>5. Enter the Year</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/38d38619-9e38-4d0e-8134-fa733154ce9b/ec01bd18-092e-45e6-a562-5e2cf55ea75e.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.5258&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=460&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the Year" />
+</div>
+
+<div><h3>6. Enter the Edition</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/25ea8b9c-2371-40a2-90ce-cc41bfc4323f/44b06cf2-fa64-40f7-8200-7b2764f90f17.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.4360&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=460&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the Edition" />
+</div>
+
+<div><h3>7. Click on Cover Picture to add a cover picture ( optional )</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/f7806d55-30dc-437b-a4de-bc9d201e19fa/0db5112d-40de-4745-8ec8-29ff452d103b.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.3805&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=416&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD00MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Cover Picture to add a cover picture ( optional )" />
+</div>
+
+<div><h3>8. Enter a discription of the book</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/b229e287-b7e7-40f0-9f42-763541029b40/455c7d25-aec1-426e-aff3-72ec76a5ef8b.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.4175&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=345&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD0yNjgmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter a discription of the book" />
+</div>
+
+<div><h2>🖨️ If the type is Print follow the instructions below</h2></div>
+
+<div><h3>9. Enter the Call Number</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/c460dbf7-2587-4390-915a-40b69b33b5e1/3b455d73-3dce-485e-a3eb-adbe6273fef4.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.3844&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=411&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the Call Number" />
+</div>
+
+<div><h3>10. Enter the Location</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/87976202-c905-436b-841b-640ca9706531/918cd941-02c1-4ba0-ac83-05778521f4ee.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.4742&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=460&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the Location" />
+</div>
+
+<div><h3>11. Enter the Link Link Text</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/d650afb6-3ea3-4dc2-bb78-ea5ea8ce8881/7dbaa728-5356-4b07-9577-5ef8954727d1.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.6190&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=513&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the Link Link Text" />
+</div>
+
+<div><h3>12. Enter the URL</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/91b3fd2d-e36a-42be-9fa3-3eef35ef7f15/b6d52c58-abe4-4d25-8380-f5fc7233a80c.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.7088&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=616&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the URL" />
+</div>
+
+<div><h2>📔 If the type is an Ebook, follow the instructions below.</h2></div>
+
+<div><h3>13. Select eBook from Type</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/9df83f36-beff-4488-975b-d624f9daa7c5/8f1058fa-322e-470d-9281-5afddff28550.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.4574&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=460&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Select eBook from Type" />
+</div>
+
+<div><h3>14. Enter the  Link Text</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/ab459363-f65c-4414-9ca5-6a930fb43906/949646a7-49e8-4d8d-ac27-d2bd3552a8fa.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.6190&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=513&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the  Link Text" />
+</div>
+
+<div><h3>15. Enter the URL to the Book</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/a0137618-881e-407c-a2f5-4423235a3b86/b0194519-0e3c-4952-bb4a-a04833cb8bcd.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.7088&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=616&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Enter the URL to the Book" />
+</div>
+
+<div><h3>16. Click on Save to add the book to your box.</h3>
+<img src="https://images.tango.us/workflows/e33598e0-bfe8-49e0-83f0-fa057bbb015f/steps/18a01da9-d8e7-49d7-9b6b-398214fe418b/b70d1a09-8d43-4fdb-870a-8e2fa0ef7fc1.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1962&fp-y=0.8704&fp-z=2.6918&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=485&mark-y=560&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMzEmaD0xNTcmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Save to add the book to your box." />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $reuse_book = '<h1><a href="https://app.tango.us/app/workflow/6da44a15-c065-4681-84b7-74fe6cd3b91f?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Reuse A book</a></h1>
+<div><b>Creation Date:</b> April 6, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/6da44a15-c065-4681-84b7-74fe6cd3b91f?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/psychology"># Navigate to the Required section</a></h2></div>
+
+<div><h3>1. Click on Add/Reuse Book</h3>
+<img src="https://images.tango.us/workflows/6da44a15-c065-4681-84b7-74fe6cd3b91f/steps/511defd6-5c4f-4925-ac02-cdd76e61b9c4/b3c498c3-eb3e-489b-b2bf-d545f8e862dc.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.3900&fp-y=0.6246&fp-z=2.4015&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=432&mark-y=454&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zMzUmaD03MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Add/Reuse Book" />
+</div>
+
+<div><h3>2. Click on Reuse Book</h3>
+<img src="https://images.tango.us/workflows/6da44a15-c065-4681-84b7-74fe6cd3b91f/steps/22db2bc8-2aec-4802-9866-be971d197265/435d0d45-ed51-493f-9777-18437e3741c0.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.2864&fp-y=0.1661&fp-z=2.4445&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=440&mark-y=336&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zMjAmaD0xMjQmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Reuse Book" />
+</div>
+
+<div><h3>3. Select the book item from the drop down</h3>
+<img src="https://images.tango.us/workflows/6da44a15-c065-4681-84b7-74fe6cd3b91f/steps/d7b76074-7363-4de8-be06-0bb708525ed1/952c84b9-2dfd-4617-a2c5-9d5e21403f2e.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.2565&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=264&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Select the book item from the drop down" />
+</div>
+
+<div><h3>4. Click on Save to add the book to your box</h3>
+<img src="https://images.tango.us/workflows/6da44a15-c065-4681-84b7-74fe6cd3b91f/steps/e0732c17-c2f1-49c7-887c-40df8795614f/e494fd73-3fec-457a-bcfd-4e26b5312ca9.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1962&fp-y=0.8704&fp-z=2.6918&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=485&mark-y=560&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMzEmaD0xNTcmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Save to add the book to your box" />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $add_database = '<h1><a href="https://app.tango.us/app/workflow/1c359512-d3ef-4064-ac76-b549ee754a93?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Adding a DataBase to the Box</a></h1>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/1c359512-d3ef-4064-ac76-b549ee754a93?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/psychology/finding-books-psychology"># Navigate to the Box where the database is to be added </a></h2></div>
+
+<div><h3>1. Click on Add/Reuse Database</h3>
+<img src="https://images.tango.us/workflows/1c359512-d3ef-4064-ac76-b549ee754a93/steps/6f935eaf-3cdf-4aa1-9a3d-facef694bec6/70c2d897-1595-43b5-a909-65cd11866854.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.4042&fp-y=0.6515&fp-z=2.2481&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=405&mark-y=457&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zOTEmaD02NyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Add/Reuse Database" />
+</div>
+
+<div><h3>2. Click on Database Title: </h3>
+<p>Enter the Title</p>
+<img src="https://images.tango.us/workflows/1c359512-d3ef-4064-ac76-b549ee754a93/steps/7a1b7889-c4f1-4bfd-b190-77998ce095a4/2db26591-ae26-4ee8-be9b-e49ea23fd239.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.2565&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=264&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Database Title: " />
+</div>
+
+<div><h3>3. Click on Link Text:</h3>
+<p>Enter the Link text</p>
+<img src="https://images.tango.us/workflows/1c359512-d3ef-4064-ac76-b549ee754a93/steps/08de9ad7-7656-4906-9766-4ae9a9d55800/abba0851-38e0-4a6d-9c45-0fe7dbec801a.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.3462&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=367&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Link Text:" />
+</div>
+
+<div><h3>4. Click on Database Link</h3>
+<p>Enter the Database Link</p>
+<img src="https://images.tango.us/workflows/1c359512-d3ef-4064-ac76-b549ee754a93/steps/d8cacaaa-fef5-4042-9fe2-8fe4444939a2/3c98833e-cf75-4b3d-811d-cfc95cc57a11.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.4360&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=460&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Database Link" />
+</div>
+
+<div><h3>5. Check Include Proxy</h3>
+<p>Proxy gives the you the ability to add a url proxy before being redirected to the database.</p>
+<img src="https://images.tango.us/workflows/1c359512-d3ef-4064-ac76-b549ee754a93/steps/fdaf0d51-477b-4401-be0c-dd6e949f807b/e02ddcaf-bfaf-4dcd-b102-f560a462454d.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1554&fp-y=0.5292&fp-z=3.0905&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=540&mark-y=454&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz03MSZoPTcxJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Check Include Proxy" />
+</div>
+
+<div><h3>6. Click on Brief Description</h3>
+<p>Enter a Description</p>
+<img src="https://images.tango.us/workflows/1c359512-d3ef-4064-ac76-b549ee754a93/steps/71ddb844-ffe3-4eb4-93f3-65036c7b8f5a/96dac1a6-d441-4e56-afa9-5d9d48347a19.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.5651&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=460&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Brief Description" />
+</div>
+
+<div><h3>7. Click on Editor editing area</h3>
+<p>Here you can add additional instructions or details about the database</p>
+<img src="https://images.tango.us/workflows/1c359512-d3ef-4064-ac76-b549ee754a93/steps/12b80f61-7823-416e-b780-492f425f60fe/ea707a1c-4b41-48f5-8a7c-a0228fd42a7e.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.6229&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=413&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD0yNjgmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Editor editing area" />
+</div>
+
+<div><h3>8. Click on Save to add the guide to your box</h3>
+<img src="https://images.tango.us/workflows/1c359512-d3ef-4064-ac76-b549ee754a93/steps/3390ce20-f74b-4c65-aea3-a41ba36cd732/06e5e58b-b44a-4e45-993c-2ca409b8af09.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1962&fp-y=0.8704&fp-z=2.6918&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=485&mark-y=560&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMzEmaD0xNTcmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Save to add the guide to your box" />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $reuse_database = '<h1><a href="https://app.tango.us/app/workflow/83387a65-9c51-46cf-8b06-236e0217b73d?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Reuse Database</a></h1>
+<div><p>Allows one to Reuse and existing database content type from a box</p></div>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/83387a65-9c51-46cf-8b06-236e0217b73d?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/business-administration/finding-journal-articles-business-administration"># Navigate to the required box.</a></h2></div>
+
+<div><h3>1. Click on Add/Reuse Database</h3>
+<img src="https://images.tango.us/workflows/83387a65-9c51-46cf-8b06-236e0217b73d/steps/77f3babc-86eb-4a6b-8041-bc94518459c2/2d9326be-af1d-4922-9bd3-9022393744bd.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.4042&fp-y=0.6515&fp-z=2.2481&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=405&mark-y=457&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zOTEmaD02NyZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Add/Reuse Database" />
+</div>
+
+<div><h3>2. Click on Reuse Database</h3>
+<img src="https://images.tango.us/workflows/83387a65-9c51-46cf-8b06-236e0217b73d/steps/a797e346-ff25-40bf-b640-bce414d4bc07/cd901e96-1d97-4579-9df9-8dbd559800c6.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.3304&fp-y=0.1661&fp-z=2.2810&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=411&mark-y=314&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zNzkmaD0xMTUmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Reuse Database" />
+</div>
+
+<div><h3>3. Select the desired Database</h3>
+<img src="https://images.tango.us/workflows/83387a65-9c51-46cf-8b06-236e0217b73d/steps/974de293-1d00-4c4f-bdb1-0cd60dce2953/b0ac0663-6d83-4f40-93ee-be8d193a4da0.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.2565&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=264&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Select the desired Database" />
+</div>
+
+<div><h3>4. Click on Save</h3>
+<img src="https://images.tango.us/workflows/83387a65-9c51-46cf-8b06-236e0217b73d/steps/ed00fcca-8f9e-4927-a1e8-3300a0c70d6f/fe8d172e-8f15-4f90-abdf-a9ec9b9d75fb.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1962&fp-y=0.8704&fp-z=2.6918&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=485&mark-y=560&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMzEmaD0xNTcmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Save" />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $add_media = '<h1><a href="https://app.tango.us/app/workflow/9fea3130-e2fc-4ed2-9d52-fbf31825c9f5?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Adding Media</a></h1>
+<div><p>The Adding Media uses another module to add libraries so the instructions on how to found on their page.</p></div>
+<div><b>Creation Date:</b> March 31, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/9fea3130-e2fc-4ed2-9d52-fbf31825c9f5?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/psychology/finding-books-psychology"># Navigate to the required box</a></h2></div>
+
+<div><h3>1. Click on Add Media</h3>
+<img src="https://images.tango.us/workflows/9fea3130-e2fc-4ed2-9d52-fbf31825c9f5/steps/b7ade9c2-35ac-4a75-894f-17eb917be732/c1ad845a-0c14-4434-adb9-603115414357.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.3708&fp-y=0.7637&fp-z=2.6461&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=476&mark-y=451&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yNDcmaD03OSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Add Media" />
+</div>
+
+<div><h3>2. Select the media you would like to upload by name</h3>
+<p>Additionally if you do not have any media uploaded click on create new media and then the box the says " + add new media"</p><p></p><p>The Media can be of the type </p><ul><li><p> <a target="_blank" rel="noopener noreferrer nofollow" class="admin-item__link" href="http://localhost/LGMS/media/add/audio"><strong>Audio </strong></a> A locally hosted audio file.</p></li><li><p><a target="_blank" rel="noopener noreferrer nofollow" class="admin-item__link" href="http://localhost/LGMS/media/add/document"><strong>Document </strong></a>An uploaded file or document, such as a PDF.</p></li><li><p><a target="_blank" rel="noopener noreferrer nofollow" class="admin-item__link" href="http://localhost/LGMS/media/add/image"><strong>Image </strong></a>Use local images for reusable media.</p></li><li><p><a target="_blank" rel="noopener noreferrer nofollow" class="admin-item__link" href="http://localhost/LGMS/media/add/remote_video"><strong>Remote video </strong></a>A remotely hosted video from YouTube or Vimeo.</p></li><li><p><a target="_blank" rel="noopener noreferrer nofollow" class="admin-item__link" href="http://localhost/LGMS/media/add/video"><strong>Video </strong></a>A locally hosted video file.</p></li></ul>
+<img src="https://images.tango.us/workflows/9fea3130-e2fc-4ed2-9d52-fbf31825c9f5/steps/4e604438-3a05-4f8e-b075-fde56e527e87/b00e41e1-0c52-41eb-bcca-7a1a1423f3f9.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.4091&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=439&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Select the media you would like to upload by name" />
+</div>
+
+<div><h3>3. Uncheck Use Media Default name</h3>
+<img src="https://images.tango.us/workflows/9fea3130-e2fc-4ed2-9d52-fbf31825c9f5/steps/dce3754c-485c-4091-b85f-dc1bee1113f3/8e3bb108-5ecb-4dde-a0df-c361d28879a4.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1554&fp-y=0.5022&fp-z=3.0905&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=540&mark-y=454&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz03MSZoPTcxJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Uncheck Use Media Default name" />
+</div>
+
+<div><h3>4. Add a different tittle if you wish to</h3>
+<img src="https://images.tango.us/workflows/9fea3130-e2fc-4ed2-9d52-fbf31825c9f5/steps/1ed70726-9407-41a5-89fa-25887d833df5/5e3d27a3-2be5-4f8c-80a0-cbaa4f7ae66a.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5005&fp-y=0.5954&fp-z=1.1706&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=102&mark-y=486&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz05OTcmaD02MSZmaXQ9Y3JvcCZjb3JuZXItcmFkaXVzPTEw" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Add a different tittle if you wish to" />
+</div>
+
+<div><h3>5. Click on Save</h3>
+<img src="https://images.tango.us/workflows/9fea3130-e2fc-4ed2-9d52-fbf31825c9f5/steps/8ca8087f-0fdd-448c-abe1-7bee4ffa5ecc/8e2dd2cd-c544-4e48-8be7-9a14122ac3bb.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.8130&fp-y=0.7637&fp-z=3.7595&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=439&mark-y=380&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zMjMmaD0yMTkmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on Save" />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $add_guide = '<h1><a href="https://app.tango.us/app/workflow/2433334b-218b-449e-ac47-cad62f893575?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">Creating a Guide</a></h1>
+<div><b>Creation Date:</b> March 25, 2024</div>
+<div><b>Created By:</b> Mohammed Amaan</div>
+<div><a href="https://app.tango.us/app/workflow/2433334b-218b-449e-ac47-cad62f893575?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank">View most recent version on Tango.us</a></div>
+<div style="height: 24px">&#8203;</div>
+<hr />
+<div style="height: 24px">&#8203;</div>
+
+
+<div><h2><a href="http://localhost/LGMS/lgms"># LGMS Module Landing Page | lgms</a></h2><p>Welcome to Library Guide Management System Setting up a new guide Help. Follow the steps below to create your first guide. </p>
+</div>
+
+<div><h3>1. Click on My Dashboard</h3>
+<img src="https://images.tango.us/workflows/2433334b-218b-449e-ac47-cad62f893575/steps/d9e4bfb7-83b3-4425-94e2-5f60d9776602/a1194031-e14f-473b-ba43-431915d1ca37.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.8818&fp-y=0.3743&fp-z=2.8169&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=614&mark-y=414&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0zNzImaD0xNTImZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on My Dashboard" />
+</div>
+
+<div><h3>2. Click on New</h3>
+<img src="https://images.tango.us/workflows/2433334b-218b-449e-ac47-cad62f893575/steps/705953b7-6adc-4787-b923-6b1b050d6398/973e0e93-ff3e-484f-ad14-86bcb0b18772.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.1329&fp-y=0.2593&fp-z=2.7599&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=337&mark-y=429&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMDYmaD0xMjEmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Click on New" />
+</div>
+
+<div><h3>3. Type the name of the Subject in our case we will add Psychology </h3>
+<img src="https://images.tango.us/workflows/2433334b-218b-449e-ac47-cad62f893575/steps/893b7b96-7bf7-4994-aca4-fbc4f5fc230a/bdd969e3-9a31-477c-85a5-444c3662c3bf.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.4731&fp-z=1.0521&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=31&mark-y=461&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0xMTM4Jmg9NTQmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Type the name of the Subject in our case we will add Psychology " />
+</div>
+
+<div><h3>4. Type or Paste selected text into element</h3>
+<img src="https://images.tango.us/workflows/2433334b-218b-449e-ac47-cad62f893575/steps/50972923-a3cd-4d80-a107-371bd3cb1905/6532afde-cae7-4c6d-bd47-5ef34f5ae694.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.5039&fp-z=1.0521&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=31&mark-y=370&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0xMTM4Jmg9MjQxJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Type or Paste selected text into element" />
+</div>
+
+<div><h3>5. Check The Relevant subjects Psychology. Do not remember all you ? No problem you can add them later in the Edit tab.</h3>
+<img src="https://images.tango.us/workflows/2433334b-218b-449e-ac47-cad62f893575/steps/23f88a2d-c6d1-400f-9baa-c46979dd5724/cc1a8d57-37ba-43dc-b81d-b16c48ab1414.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.0591&fp-y=0.4618&fp-z=3.0905&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=184&mark-y=454&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz03MSZoPTcxJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Check The Relevant subjects Psychology. Do not remember all you ? No problem you can add them later in the Edit tab." />
+</div>
+
+<div><h3>6. Check Economics</h3>
+<img src="https://images.tango.us/workflows/2433334b-218b-449e-ac47-cad62f893575/steps/175cc0f7-1f45-4e3b-bb50-53f706637d9a/b0ee66dc-38a7-4d77-8e87-4004aa1c354b.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.0591&fp-y=0.2250&fp-z=3.0905&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=184&mark-y=454&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz03MSZoPTcxJmZpdD1jcm9wJmNvcm5lci1yYWRpdXM9MTA%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Check Economics" />
+</div>
+
+<div><h3>7. Select The Type of the guide</h3>
+<p>There are 4 options here to choose from </p><ul><li><p>Course Guide </p></li><li><p>General Purpose Guide</p></li><li><p>Subject Guide </p></li><li><p>Topic Guide </p></li></ul><p>These are not mandatory but helpful.</p>
+<img src="https://images.tango.us/workflows/2433334b-218b-449e-ac47-cad62f893575/steps/255f65fd-8186-4858-9f66-d1c2853f1f5f/381f1d88-d933-4e27-8065-c334c623eb70.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.4304&fp-z=1.0521&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=31&mark-y=417&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0xMTM4Jmg9NTQmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Select The Type of the guide" />
+</div>
+
+<div><h3>8. You can Also add them to a group for better organization</h3>
+<p>You will have the option to choose from Group 1-4</p>
+<img src="https://images.tango.us/workflows/2433334b-218b-449e-ac47-cad62f893575/steps/09f63e99-e410-4446-90f5-f252bc0c1862/a83770b5-b6f2-4455-a2b6-ef9258c9fc0c.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.5000&fp-y=0.5382&fp-z=1.0521&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=31&mark-y=477&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0xMTM4Jmg9NTQmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="You can Also add them to a group for better organization" />
+</div>
+
+<div><h3>9. Lastly click save to publish the guide</h3>
+<img src="https://images.tango.us/workflows/2433334b-218b-449e-ac47-cad62f893575/steps/9ad58dab-5350-47b8-ade9-9496a64d7a40/2ba9f428-b133-4ea6-9f08-8c0789f00b25.png?fm=png&crop=focalpoint&fit=crop&fp-x=0.0797&fp-y=0.8075&fp-z=2.7740&w=1200&border=2%2CF4F2F7&border-radius=8%2C8%2C8%2C8&border-radius-inner=8%2C8%2C8%2C8&blend-align=bottom&blend-mode=normal&blend-x=0&blend-w=1200&blend64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL21hZGUtd2l0aC10YW5nby13YXRlcm1hcmstdjIucG5n&mark-x=165&mark-y=415&m64=aHR0cHM6Ly9pbWFnZXMudGFuZ28udXMvc3RhdGljL2JsYW5rLnBuZz9tYXNrPWNvcm5lcnMmYm9yZGVyPTYlMkNGRjc0NDImdz0yMDEmaD0xNTAmZml0PWNyb3AmY29ybmVyLXJhZGl1cz0xMA%3D%3D" style="border-radius: 8px; border: 1px solid #F4F2F7;" width="600" alt="Lastly click save to publish the guide" />
+</div>
+
+<br/>
+<hr/>
+<div>
+<span>Created with </span><a href="https://tango.us?utm_source=magicCopy&utm_medium=magicCopy&utm_campaign=workflow%20export%20links" target="_blank" style="color: #256EFF">Tango.us
+    </a>
+</div>';
+
+  $the_html_content_node = createHtmlItemNode($html_box_item->id(), 'Add HTML Content', $add_html);
+  $book_html_content_node = createHtmlItemNode($book_box_item->id(), 'Add Book HTML Content', $add_book);
+  $database_html_content_node = createHtmlItemNode($database_box_item->id(), 'Add Database HTML Content', $add_database);
+  $media_html_content_node = createHtmlItemNode($media_box_item->id(), 'Add Media HTML Content', $add_media);
+  $create_box_html_content_node = createHtmlItemNode($create_box_box_item->id(), 'Create Box HTML Content', '<p><a href="https://app.tango.us/app/workflow/Creating-A-Box-a7aa6b7dab804419ad9f6463322ad59f">"Create a Box" tutorial</a></p>');
+  $create_guide_html_content_node = createHtmlItemNode($create_guide_box_item->id(), 'Create Guide HTML Content', $add_guide);
+  $create_page_html_content_node = createHtmlItemNode($create_page_box_item->id(), 'Create Page HTML Content', '<p><a href="https://app.tango.us/app/workflow/How-to-Add-a-Page-To-a-Guide-718b2df1f17d40cc835944062a5011d8">"Create a Page" tutorial</a></p>');
+  $reuse_guide_html_content_node = createHtmlItemNode($reuse_guide_box_item->id(), 'Reuse Guide HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-a-Guide-1215df59c46341b08598f61e3c9ebf86">"Reuse a Guide" tutorial</a></p>');
+  $reuse_html_html_content_node = createHtmlItemNode($reuse_html_box_item->id(), 'Reuse HTML HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-an-HTML-196d590950604564b332cfb65402a66e">"Reuse an HTML" tutorial</a></p>');
+  $reuse_page_html_content_node = createHtmlItemNode($reuse_page_box_item->id(), 'Reuse Page HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-a-Page-a964e0e753e14f98929a13ffbcc002e2">"Reuse a Page" tutorial</a></p>');
+  $reuse_database_html_content_node = createHtmlItemNode($reuse_database_box_item->id(), 'Reuse Database HTML Content', $reuse_database);
+  $reuse_book_html_content_node = createHtmlItemNode($reuse_book_box_item->id(), 'Reuse Book HTML Content', $reuse_book);
+
+
+  $add_html_node = $the_html_content_node->id();
+  $add_book_node = $book_html_content_node->id();
+  $reuse_book_node = $reuse_book_html_content_node->id();
+  $add_database_node = $database_html_content_node->id();
+  $reuse_database_node = $reuse_database_html_content_node->id();
+  $add_media_node = $media_html_content_node->id();
+  $add_guide_node = $create_guide_html_content_node->id();
+
+
+  $the_html_content = createHtmlItemNode($html_box_item->id(), 'HTML Content', '<p><a href="/node/' . $add_html_node . '">"Add an HTML" tutorial</a></p>');
+  $book_html_content = createHtmlItemNode($book_box_item->id(), 'Book HTML Content', '<p><a href="/node/' . $add_book_node . '">"Add a Book" tutorial</a></p>');
+  $database_html_content = createHtmlItemNode($database_box_item->id(), 'Database HTML Content', '<p><a href="/node/' . $add_database_node . '">"Add a Database" tutorial</a></p>');
+  $media_html_content = createHtmlItemNode($media_box_item->id(), 'Media HTML Content', '<p><a href="/node/' . $add_media_node . '">"Add a Media" tutorial</a></p>');
   $create_box_html_content = createHtmlItemNode($create_box_box_item->id(), 'Create Box HTML Content', '<p><a href="https://app.tango.us/app/workflow/Creating-A-Box-a7aa6b7dab804419ad9f6463322ad59f">"Create a Box" tutorial</a></p>');
-  $create_guide_html_content = createHtmlItemNode($create_guide_box_item->id(), 'Create Guide HTML Content', '<p><a href="https://app.tango.us/app/workflow/Creating-a-Guide-2433334b218b449eac47cad62f893575">"Create a Guide" tutorial</a></p>');
+  $create_guide_html_content = createHtmlItemNode($create_guide_box_item->id(), 'Create Guide HTML Content', '<p><a href="/node/' . $add_guide_node . '">"Add a Guide" tutorial</a></p>');
   $create_page_html_content = createHtmlItemNode($create_page_box_item->id(), 'Create Page HTML Content', '<p><a href="https://app.tango.us/app/workflow/How-to-Add-a-Page-To-a-Guide-718b2df1f17d40cc835944062a5011d8">"Create a Page" tutorial</a></p>');
   $reuse_guide_html_content = createHtmlItemNode($reuse_guide_box_item->id(), 'Reuse Guide HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-a-Guide-1215df59c46341b08598f61e3c9ebf86">"Reuse a Guide" tutorial</a></p>');
   $reuse_html_html_content = createHtmlItemNode($reuse_html_box_item->id(), 'Reuse HTML HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-an-HTML-196d590950604564b332cfb65402a66e">"Reuse an HTML" tutorial</a></p>');
   $reuse_page_html_content = createHtmlItemNode($reuse_page_box_item->id(), 'Reuse Page HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-a-Page-a964e0e753e14f98929a13ffbcc002e2">"Reuse a Page" tutorial</a></p>');
-  $reuse_database_html_content = createHtmlItemNode($reuse_database_box_item->id(), 'Reuse Database HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-Database-83387a659c5146cf8b06236e0217b73d">"Reuse a Database" tutorial</a></p>');
-  $reuse_book_html_content = createHtmlItemNode($reuse_book_box_item->id(), 'Reuse Book HTML Content', '<p><a href="https://app.tango.us/app/workflow/Reuse-A-book-6da44a15c065468184b774fe6cd3b91f">"Reuse a Book" tutorial</a></p>');
+  $reuse_database_html_content = createHtmlItemNode($reuse_database_box_item->id(), 'Reuse Database HTML Content', '<p><a href="/node/' . $reuse_book_node . '">"Reuse a Database" tutorial</a></p>');
+  $reuse_book_html_content = createHtmlItemNode($reuse_book_box_item->id(), 'Reuse Book HTML Content', '<p><a href="/node/' . $reuse_database_node . '">"Reuse a Book" tutorial</a></p>');
 
   // Attach HTML items to box items
   attachChildNodes($html_box_item, 'field_html_item', [$the_html_content->id()]);
