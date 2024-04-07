@@ -2,19 +2,36 @@
 
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
+use DrupalCodeGenerator\Command\Yml\Links\Contextual;
 
+/**
+ * Provides a form to reuse existing database items.
+ */
 class ReuseDatabaseForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'reuse_database_item_form';
   }
 
+  /**
+   * Builds the reuse database item form.
+   *
+   * @param array $form The initial form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   * @param $ids Contextual IDs or parameters passed to the form.
+   *
+   * @return array The form array with elements to select and edit a database item.
+   */
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
   {
     // Set the prefix, suffix, and hidden fields
@@ -59,6 +76,12 @@ class ReuseDatabaseForm extends FormBase {
     return $form;
   }
 
+  /**
+   * Fills in the form fields based on the selected database item.
+   *
+   * @param array &$form The form structure.
+   * @param FormStateInterface $form_state The current state of the form.
+   */
   private function prefillSelectedDatabaseItem(array &$form, FormStateInterface $form_state): void
   {
     $selected = $form_state->getValue('db_select');
@@ -190,6 +213,13 @@ class ReuseDatabaseForm extends FormBase {
     }
   }
 
+  /**
+   * Validates the form fields.
+   *
+   * @param array &$form The form structure.
+   * @param FormStateInterface $form_state The current state of the form.
+   */
+
   public function validateFields(array &$form, FormStateInterface $form_state): void
   {
     $reference = $form_state->getValue('reference');
@@ -199,7 +229,18 @@ class ReuseDatabaseForm extends FormBase {
     }
   }
 
-  public function databaseItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
+  /**
+   * AJAX callback for when a database item is selected.
+   *
+   * Dynamically updates the form based on the selected database item.
+   *
+   * @param array &$form The form structure.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The part of the form to be updated.
+   */
+  public function databaseItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state): array
+  {
     // Load the selected database
     $selected = $form_state->getValue('db_select');
     $selected_node = Node::load($selected);
@@ -236,9 +277,17 @@ class ReuseDatabaseForm extends FormBase {
   }
 
   /**
+   * AJAX callback for the form submission.
+   *
+   * Handles the form submission via AJAX, providing a smoother user experience.
+   *
+   * @param array &$form The form structure.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response indicating success.
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
 
@@ -246,6 +295,12 @@ class ReuseDatabaseForm extends FormBase {
   }
 
   /**
+   * Handles the form submission.
+   *
+   * Processes the reuse of the selected database item based on the form inputs.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void

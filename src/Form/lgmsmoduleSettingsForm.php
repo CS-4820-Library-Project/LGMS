@@ -1,14 +1,26 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\node\Entity\Node;
 
+/**
+ * Configuration form for LGMS module settings.
+ *
+ * Provides a form interface for administrators to specify the proxy link prefix
+ * applied to certain guide database items. Additionally, it updates existing database
+ * item links with the new prefix and adjusts the field description accordingly to reflect
+ * the change.
+ */
 class lgmsmoduleSettingsForm extends ConfigFormBase {
 
   /**
-   * {@inheritdoc}
+   * Returns a list of configuration names that should be editable.
+   *
+   * @return array An array of configuration object names that are editable.
    */
   protected function getEditableConfigNames(): array
   {
@@ -16,7 +28,9 @@ class lgmsmoduleSettingsForm extends ConfigFormBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Gets the unique form ID for the settings form.
+   *
+   * @return string The form ID.
    */
   public function getFormId(): string
   {
@@ -24,7 +38,12 @@ class lgmsmoduleSettingsForm extends ConfigFormBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Builds the settings form for proxy link prefix configuration.
+   *
+   * @param array $form The initial form array.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @return array The form array with fields for setting the proxy link prefix.
    */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
@@ -41,7 +60,15 @@ class lgmsmoduleSettingsForm extends ConfigFormBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Submits the settings form.
+   *
+   * Upon form submission, updates the stored proxy link prefix in configuration,
+   * adjusts all existing guide database items to use the new prefix, and updates
+   * the field description to reflect the change.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
@@ -82,7 +109,7 @@ class lgmsmoduleSettingsForm extends ConfigFormBase {
       }
     }
 
-    $field_config = \Drupal\field\Entity\FieldConfig::loadByName('node', 'guide_database_item', 'field_database_link');
+    $field_config = FieldConfig::loadByName('node', 'guide_database_item', 'field_database_link');
     if ($field_config) {
       $new_description ='Enter the Title of the proxied content.
        All links in this field will have a proxy prefix attached

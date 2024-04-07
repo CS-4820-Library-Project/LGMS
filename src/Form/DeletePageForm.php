@@ -10,13 +10,32 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
-
+/**
+ * Form handler for deleting a single page or an entire guide.
+ *
+ * Presents a confirmation form to the user for deleting a selected page
+ * from a guide or the guide itself, including the option to delete all
+ * subpages and associated content. It dynamically adjusts the confirmation
+ * message based on whether a guide or a single page is being deleted.
+ */
 class DeletePageForm extends FormBase{
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'delete_page_form';
   }
 
+  /**
+   * Constructs the delete page form.
+   *
+   * @param array $form An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The form structure.
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     $form_helper = new FormHelper();
@@ -100,6 +119,17 @@ class DeletePageForm extends FormBase{
   }
 
   /**
+   * Submits the form using AJAX, providing immediate user feedback.
+   *
+   * Handles the AJAX form submission, allowing for a smoother user experience
+   * by providing feedback directly in the modal dialog without requiring a page
+   * refresh. It constructs an appropriate success message based on the content
+   * type that was deleted.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @return AjaxResponse The AJAX response for the form submission.
    * @throws EntityMalformedException
    */
   public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
@@ -121,7 +151,20 @@ class DeletePageForm extends FormBase{
     return $ajaxHelper->submitModalAjax($form, $form_state, $message, '#'.$this->getFormId());
   }
 
-  public function PageSelectedCallBack(array &$form, FormStateInterface $form_state) {
+  /**
+   * AJAX callback for dynamically updating the form based on page selection.
+   *
+   * Updates the form's confirmation message and visibility of certain form elements
+   * based on the selected page. Adjusts the message for guide deletion or
+   * single page deletion and handles the presence of subpages.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The updated portion of the form.
+   */
+  public function PageSelectedCallBack(array &$form, FormStateInterface $form_state): array
+  {
     $selected_page = $form_state->getValue('select_page');
 
     // Check if a page is selected and it's not the empty option.
@@ -166,7 +209,16 @@ class DeletePageForm extends FormBase{
     return $form['update_wrapper'];
   }
 
-
+  /**
+   * Processes the deletion of the selected page or guide upon form submission.
+   *
+   * Executes the deletion logic for the selected content, removing it from the
+   * system. It handles the deletion of a single page, all its subpages, and
+   * associated content if specified, or an entire guide and its structure.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
     $ajaxHelper = new FormHelper();

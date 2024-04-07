@@ -2,6 +2,7 @@
 
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
@@ -9,13 +10,31 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+/**
+ * Form for reordering boxes within a guide or page.
+ *
+ * This form allows users to adjust the order of content boxes within a guide or page,
+ * facilitating a flexible arrangement of content to improve the reader's experience.
+ * It utilizes a drag-and-drop interface for intuitive interaction.
+ */
 class ReOrderBoxesForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 're_order_guide_box_form';
   }
 
+  /**
+   * Builds the reorder boxes form.
+   *
+   * @param array $form The initial form structure.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The form array with elements for reordering boxes.
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     $form_helper = new FormHelper();
@@ -50,9 +69,18 @@ class ReOrderBoxesForm extends FormBase {
   }
 
   /**
+   * AJAX callback for the reorder form submission.
+   *
+   * Facilitates a smoother user experience by using AJAX to submit the reorder operation,
+   * avoiding the need for a full page reload and providing immediate feedback to the user.
+   *
+   * @param array &$form The form structure.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response for the submission.
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
 
@@ -60,6 +88,13 @@ class ReOrderBoxesForm extends FormBase {
   }
 
   /**
+   * Handles the form submission.
+   *
+   * Processes the new order of boxes as determined by the user and saves this order
+   * back to the database, ensuring the display order matches the user's preference.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void

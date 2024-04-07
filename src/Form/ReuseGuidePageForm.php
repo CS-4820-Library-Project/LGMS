@@ -14,13 +14,36 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+/**
+ * Provides a form for reusing guide pages.
+ *
+ * This form allows users to select an existing guide page to either duplicate
+ * or create a reference link to, potentially including its subpages.
+ *
+ */
 class ReuseGuidePageForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'lgmsmodule_reuse_guide_page_form';
   }
 
+  /**
+   * Builds the reuse guide page form.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array|null $ids
+   *   (optional) Additional identifiers passed to the form.
+   *
+   * @return array
+   *   The form structure.
+   */
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
   {
     // Set the prefix, suffix, and hidden fields
@@ -110,6 +133,17 @@ class ReuseGuidePageForm extends FormBase {
     return $form;
   }
 
+  /**
+   * Validates the form submission.
+   *
+   * Ensures a title is provided for non-reference page creation and prevents
+   * creating references within the same guide.
+   *
+   * @param array &$form
+   *   The form render array.
+   * @param FormStateInterface $form_state
+   *   The form state.
+   */
   public function validateFields(array &$form, FormStateInterface $form_state): void
   {
     $reference = $form_state->getValue('reference');
@@ -134,7 +168,19 @@ class ReuseGuidePageForm extends FormBase {
     return $form['include_sub_wrapper']['position_wrapper'];
   }
 
-  public function IncludeSubCallBack(array &$form, FormStateInterface $form_state) {
+  /**
+   * AJAX callback for updating form elements based on 'include subpages' selection.
+   *
+   * @param array &$form
+   *   The form render array.
+   * @param FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return array
+   *   The updated form element.
+   */
+  public function IncludeSubCallBack(array &$form, FormStateInterface $form_state): array
+  {
     $selected_page = $form_state->getValue('select_page');
 
     // Check if a page is selected and it's not the empty option.
@@ -176,7 +222,15 @@ class ReuseGuidePageForm extends FormBase {
   }
 
   /**
-   * @throws EntityStorageException
+   * Handles form submission.
+   *
+   * Duplicates or references the selected page based on user input and updates
+   * the guide structure accordingly.
+   *
+   * @param array &$form
+   *   The form render array.
+   * @param FormStateInterface $form_state
+   *   The form state.
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {

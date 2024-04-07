@@ -13,13 +13,36 @@ use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 
+/**
+ * Provides a form to reuse a book item.
+ *
+ * This form allows users to either duplicate a book item for reuse in a different
+ * context or create a reference to an existing book item, making it un-editable
+ * in the new context.
+ */
 class ReuseBookForm extends FormBase {
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'reuse_book_item_form';
   }
 
   /**
+   * Builds the reuse book item form.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array|null $ids
+   *   (optional) Identifiers for form construction, such as the current node or box IDs.
+   *
+   * @return array
+   *   The form structure.
+   *
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
@@ -73,6 +96,13 @@ class ReuseBookForm extends FormBase {
   }
 
   /**
+   * Pre-fills the selected book item fields for the form.
+   *
+   * @param array &$form
+   *   The form definition array.
+   * @param FormStateInterface $form_state
+   *   The current state of the form.
+   *
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
@@ -326,7 +356,21 @@ class ReuseBookForm extends FormBase {
     }
   }
 
-  public function bookItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
+  /**
+   * AJAX callback for when a book item is selected.
+   *
+   * Updates the form state based on the selected book item.
+   *
+   * @param array &$form
+   *   The form render array.
+   * @param FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return array
+   *   The updated form element or elements.
+   */
+  public function bookItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state): array
+  {
     // Load selected book
     $selected = $form_state->getValue('book_select');
     $selected_node = Node::load($selected);
@@ -393,6 +437,16 @@ class ReuseBookForm extends FormBase {
     return $form['update_wrapper'];
   }
 
+  /**
+   * Validates the form submission.
+   *
+   * Ensures that required fields are filled and specific conditions are met.
+   *
+   * @param array &$form
+   *   The form render array.
+   * @param FormStateInterface $form_state
+   *   The form state.
+   */
   public function validateFields(array &$form, FormStateInterface $form_state): void
   {
     // Get values from the form's fields
@@ -447,6 +501,16 @@ class ReuseBookForm extends FormBase {
 
 
   /**
+   * Handles form submission.
+   *
+   * Duplicates or references the selected book item based on user input.
+   *
+   * @param array &$form
+   *   The form render array.
+   * @param FormStateInterface $form_state
+   *   The form state.
+   *
+   * @throws EntityMalformedException
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void

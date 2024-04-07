@@ -3,7 +3,9 @@ namespace Drupal\lgmsmodule\Form;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
@@ -11,13 +13,30 @@ use Drupal\Core\Url;
 use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
 
+/**
+ * Provides a form to add or edit media entities.
+ *
+ * This form facilitates the addition of media to a site's content, allowing
+ * users to select from existing media entities, configure titles, and manage
+ * publication status.
+ */
 class AddMediaForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'add_media_form';
   }
 
+  /**
+   * Builds the add/edit media form.
+   *
+   * @param array $form An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   * @return array The form structure.
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     $form_helper = new FormHelper();
@@ -110,6 +129,16 @@ class AddMediaForm extends FormBase {
     return $form;
   }
 
+  /**
+   * AJAX callback for media selection changes.
+   *
+   * Updates form elements dynamically based on the selected media entity, such
+   * as enabling or disabling the publication status checkbox.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   * @return array The updated form elements.
+   */
   public function mediaSelectedCallBack(array &$form, FormStateInterface $form_state) {
     $selected = $form_state->getValue('media');
     $selected = Media::load($selected);
@@ -128,15 +157,34 @@ class AddMediaForm extends FormBase {
   }
 
   /**
+   * AJAX form submission handler.
+   *
+   * Processes the form submission via AJAX, improving user experience by
+   * providing immediate feedback and avoiding full page reloads.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   * @return AjaxResponse An AJAX response to update the UI
+   *                                         based on the form submission.
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'A Media item has been added.', '#'.$this->getFormId());
   }
 
+  /**
+   * Submits the add/edit media form.
+   *
+   * Processes the submitted form values to either create a new media link
+   * within the content structure or update an existing one.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   * @throws EntityStorageException
+   */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
     $ajaxHelper = new FormHelper();
@@ -173,9 +221,16 @@ class AddMediaForm extends FormBase {
   }
 
   /**
-   * @throws InvalidPluginDefinitionException
-   * @throws PluginNotFoundException
+   * Retrieves options for the media select element.
+   *
+   * Generates an options array for the media select element, grouping media
+   * by type for easier selection in the form.
+   *
+   * @return array An associative array of media options, grouped by media type.
+   * @throws InvalidPluginDefinitionException When the media type entity cannot be loaded.
+   * @throws PluginNotFoundException When the media entity storage cannot be accessed.
    */
+
   public function getMediaOptions(): array
   {
     $options = [];
