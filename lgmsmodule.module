@@ -383,18 +383,24 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
 
     $item_container['#attributes']['class'][] = $database_unpublished_class;
 
-    $item_container['content'][] = [
-      '#type' => 'link',
-      '#title' => $database->label(),
-      '#url' => Url::fromRoute('entity.node.canonical', ['node' => $database->id()]),
-    ];
+    $link = $database->get('field_database_link')->first();
 
-    if(!$database->get('field_hide_description')->value){
-      $item_container['content'][] = [
-        '#type' => 'markup',
-        '#markup' => ' — ' . $database->get('field_description')->value,
-      ];
+    $html_content = '<div> <a href="' . $link->uri . '">' . $link->title . '</a>';
+
+    if (!$database->get('field_hide_description')->value) {
+      $description = $database->get('field_description')->value;
+      // Append description to the HTML content, ensuring it's on the same line.
+      $html_content .= ' — ' . $description;
     }
+
+    // Close the HTML tags.
+    $html_content .= '</div>';
+
+    // Add the combined content to the item container.
+    $item_container['content'][] = [
+      '#type' => 'markup',
+      '#markup' => $html_content,
+    ];
 
     if(!$database->get('field_hide_body')->value){
       $item_container['content'][] = [
@@ -632,6 +638,14 @@ function database_display(EntityInterface $entity){
       '#markup' => '<h3><div class="link-icon"><i class="fa fa-link" aria-hidden="true"></i> <a href="' . $url . '">' . $link_text . '</a></div></h3>',
     ];
 
+  }
+
+  if (!$entity->get('field_description')->isEmpty()) {
+    $desc_value = $entity->get('field_description')->value;
+    $build['db_desc'] = [
+      '#type' => 'markup',
+      '#markup' => '<div> - ' . $desc_value . '</div><br>',
+    ];
   }
 
   if (!$entity->get('field_database_body')->isEmpty()) {
