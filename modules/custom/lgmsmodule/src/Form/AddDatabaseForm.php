@@ -1,7 +1,9 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -9,13 +11,35 @@ use Drupal\menu_test\Access\AccessCheck;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 
+/**
+ * Provides a form for adding or editing database entries.
+ *
+ * This form allows users to create new database nodes or edit existing ones
+ * with fields for title, link, proxy configuration, description, and more.
+ * The form dynamically adjusts based on user input, such as showing or hiding
+ * fields based on the selected options.
+ */
 class AddDatabaseForm extends FormBase {
 
-  public function getFormId() {
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormId(): string
+  {
     return 'add_database_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  /**
+   * Builds the add/edit database form.
+   *
+   * @param array $form An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   * @param mixed $ids (optional) Identifiers needed for form construction.
+   *
+   * @return array The form structure as an array.
+   */
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
     $form_helper->set_form_data($form,$ids, $this->getFormId());
@@ -102,8 +126,9 @@ class AddDatabaseForm extends FormBase {
     $form['published'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Draft mode:'),
-      '#description' => $this->t('Un-check this box to publish.'),
+      '#description' => $edit && !$current_database->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
       '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
+      '#disabled' => $edit && !$current_database->isPublished(),
     ];
 
     $form['#validate'][] = '::validateFields';
@@ -123,7 +148,17 @@ class AddDatabaseForm extends FormBase {
     return $form;
   }
 
-  public function validateFields(array &$form, FormStateInterface $form_state) {
+  /**
+   * Custom validation for the database form.
+   *
+   * Ensures all required fields are filled out correctly, applying specific
+   * validations based on user input and form configuration.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   */
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
     $reference = $form_state->getValue('include_desc');
     $title = $form_state->getValue('description');
     if ($reference && empty($title)) {
@@ -132,15 +167,37 @@ class AddDatabaseForm extends FormBase {
   }
 
   /**
-   * @throws EntityMalformedException
+   * Handles AJAX form submissions.
+   *
+   * Performs the form submission via AJAX, providing a user-friendly response
+   * without requiring a full page reload.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse The AJAX response object.
+   *
+   * @throws EntityMalformedException If there's an issue with the form submission.
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'A Database item has been added.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  /**
+   * Submits the add/edit database form.
+   *
+   * Processes the submitted form data, creating or updating the database node
+   * with the provided values.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     if(empty($form_state->getValue('current_item'))){

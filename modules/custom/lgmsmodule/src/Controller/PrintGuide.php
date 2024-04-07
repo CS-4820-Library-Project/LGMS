@@ -18,11 +18,25 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Controller for generating and downloading PDF versions of guide nodes.
+ *
+ * This controller supports transforming guide node content and its related
+ * entities into a formatted PDF document. It leverages Dompdf for PDF generation
+ * and includes functionality for processing various field types and media.
+ */
 class PrintGuide extends ControllerBase {
 
   /**
-   * @throws DOMException
-   * @throws EntityMalformedException
+   * Generates a PDF for a given node of type 'guide'.
+   *
+   * @param NodeInterface $node The guide node entity.
+   *
+   * @return RedirectResponse|Response Redirects to the node page if the node
+   *                                  is not of type 'guide', or initiates a PDF
+   *                                  download response.
+   * @throws DOMException Thrown if there's an error in processing HTML content.
+   * @throws EntityMalformedException Thrown if there's an issue with entity data.
    */
   public function downloadGuide(NodeInterface $node): RedirectResponse|Response
   {
@@ -59,7 +73,13 @@ class PrintGuide extends ControllerBase {
   }
 
   /**
-   * @throws DOMException
+   * Processes and formats box entities associated with a guide for PDF output.
+   *
+   * @param $box The box entity to process.
+   * @param string $baseUrl The base URL of the site for absolute links.
+   *
+   * @return string Formatted HTML content for the box.
+   * @throws DOMException If there's an error in HTML content manipulation.
    */
   protected function processBox($box, $baseUrl): string {
     $boxHtml = '<h3>' . htmlspecialchars($box->getTitle()) . '</h3>';
@@ -91,6 +111,14 @@ class PrintGuide extends ControllerBase {
     return $boxHtml;
   }
 
+  /**
+   * Processes media entities for inclusion in the PDF, adjusting links and formats.
+   *
+   * @param $mediaItem The media entity to process.
+   * @param string $baseUrl The base URL of the site for absolute links.
+   *
+   * @return string Formatted HTML content for the media item.
+   */
   protected function processMediaItem($mediaItem, $baseUrl): string {
     $boxHtml = '';
     $fileUrlGenerator = Drupal::service('file_url_generator');
@@ -121,7 +149,14 @@ class PrintGuide extends ControllerBase {
     return $boxHtml;
   }
 
-  protected function getFieldNameByMediaType($mediaType): string {
+  /**
+   * Helper method to determine the appropriate field name based on media type.
+   *
+   * @param string $mediaType The bundle of the media entity.
+   *
+   * @return string The field name associated with the media file.
+   */
+  protected function getFieldNameByMediaType(string $mediaType): string {
     return match ($mediaType) {
       'document' => 'field_media_document',
       'audio' => 'field_media_audio_file',
@@ -130,6 +165,14 @@ class PrintGuide extends ControllerBase {
     };
   }
 
+  /**
+   * Formats and displays book information for inclusion in the PDF.
+   *
+   * @param EntityInterface $entity The book entity.
+   * @param bool $includeTitle Whether to include the book title in the output.
+   *
+   * @return string Formatted HTML content for the book.
+   */
   function bookDisplayForPDF(EntityInterface $entity, bool $includeTitle = true): string
   {
     // Initialize the HTML with the container for the book details
@@ -191,7 +234,13 @@ class PrintGuide extends ControllerBase {
 
 
   /**
-   * @throws DOMException
+   * Processes page entities associated with a guide for PDF output.
+   *
+   * @param $page The page entity to process.
+   * @param string $baseUrl The base URL of the site for absolute links.
+   *
+   * @return string Formatted HTML content for the page.
+   * @throws DOMException If there's an error in HTML content manipulation.
    */
   protected function processPage($page, $baseUrl): string
   {
@@ -229,7 +278,13 @@ class PrintGuide extends ControllerBase {
 
 
   /**
-   * @throws DOMException
+   * Modifies HTML content, converting image tags into clickable links.
+   *
+   * @param string $htmlContent The original HTML content.
+   * @param string $baseUrl The base URL of the site for absolute links.
+   *
+   * @return false|string The modified HTML content.
+   * @throws DOMException If there's an error loading or saving HTML.
    */
   protected function modifyHtmlContent($htmlContent, $baseUrl): false|string
   {
@@ -248,6 +303,14 @@ class PrintGuide extends ControllerBase {
     return $doc->saveHTML();
   }
 
+  /**
+   * Prepares HTML content for PDF rendering, adjusting image paths.
+   *
+   * @param string $htmlContent The original HTML content.
+   * @param string $baseUrl The base URL of the site for absolute links.
+   *
+   * @return array|string|null The prepared HTML content.
+   */
   protected function prepareHtmlContent($htmlContent, $baseUrl): array|string|null
   {
     $pattern = '/src="\/([^"]+)"/';
@@ -257,6 +320,14 @@ class PrintGuide extends ControllerBase {
     return $processedHtml;
   }
 
+  /**
+   * Generates and streams a PDF document from HTML content.
+   *
+   * @param string $html The HTML content to convert into a PDF.
+   * @param string $title The title for the PDF document.
+   *
+   * @throws DOMException If there's an error during PDF generation.
+   */
   protected function generatePdf($html, $title): void
   {
     $cssStyles = "<style>

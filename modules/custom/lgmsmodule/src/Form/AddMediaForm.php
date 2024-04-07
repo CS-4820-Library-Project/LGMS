@@ -1,6 +1,8 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -11,11 +13,13 @@ use Drupal\node\Entity\Node;
 
 class AddMediaForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'add_media_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array
+  {
     $form_helper = new FormHelper();
 
     $ids = (Object) [
@@ -50,6 +54,11 @@ class AddMediaForm extends FormBase {
       '#required' => TRUE,
       '#description' => $add_media_link_html,
       '#default_value' => $edit? $media->id(): null,
+      '#ajax' => [
+        'callback' => '::mediaSelectedCallBack',
+        'wrapper' => 'update-wrapper',
+        'event' => 'change',
+      ],
     ];
 
     $form['include_title'] = [
@@ -72,12 +81,18 @@ class AddMediaForm extends FormBase {
       '#default_value' => $edit? $current_item->label(): '',
     ];
 
+    $form['update_wrapper'] = [
+      '#type' => 'container',
+      '#attributes' => ['id' => 'update-wrapper'],
+    ];
+
     // Draft mode Field
-    $form['published'] = [
+    $form['update_wrapper']['published'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Draft mode:'),
       '#description' => $this->t('Un-check this box to publish.'),
-      '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
+      '#default_value' => $edit ? $current_item->isPublished() == '0' || $media->isPublished() == '0': 0,
+      '#disabled' => $edit && !$media->isPublished(),
     ];
 
 
@@ -95,16 +110,35 @@ class AddMediaForm extends FormBase {
     return $form;
   }
 
+  public function mediaSelectedCallBack(array &$form, FormStateInterface $form_state) {
+    $selected = $form_state->getValue('media');
+    $selected = Media::load($selected);
+
+    if ($selected->isPublished()){
+      unset($form['update_wrapper']['published']['#disabled']);
+      $form['update_wrapper']['published']['#checked'] = false;
+      $form['update_wrapper']['published']['#description'] = $this->t('Un-check this box to publish.');
+    } else{
+      $form['update_wrapper']['published']['#checked'] = true;
+      $form['update_wrapper']['published']['#attributes']['disabled'] = true;
+      $form['update_wrapper']['published']['#description'] = $this->t('Please publish the original node');
+    }
+
+    return $form['update_wrapper'];
+  }
+
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'A Media item has been added.', '#'.$this->getFormId());
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     if($form_state->getValue('current_item') == null){
@@ -138,7 +172,12 @@ class AddMediaForm extends FormBase {
     $ajaxHelper->updateParent($form, $form_state);
   }
 
-  public function getMediaOptions() {
+  /**
+   * @throws InvalidPluginDefinitionException
+   * @throws PluginNotFoundException
+   */
+  public function getMediaOptions(): array
+  {
     $options = [];
     $media_types = \Drupal::entityTypeManager()->getStorage('media_type')->loadMultiple();
     // Loop through all media types.

@@ -6,17 +6,20 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
 
 class EditPageForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'edit_page_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state){
+  public function buildForm(array $form, FormStateInterface $form_state): array
+  {
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
 
@@ -137,7 +140,8 @@ class EditPageForm extends FormBase {
     return $form;
   }
 
-  public function hideDescriptionCallback(array &$form, FormStateInterface $form_state) {
+  public function hideDescriptionCallback(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     $response = new AjaxResponse();
 
     // Trigger resizing
@@ -147,7 +151,11 @@ class EditPageForm extends FormBase {
   }
 
 
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityMalformedException
+   */
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     // Create an array of AJAX commands.
     $ajaxHelper = new FormHelper();
 
@@ -171,7 +179,11 @@ class EditPageForm extends FormBase {
     return $form['update_wrapper'];
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  /**
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $ajaxHelper = new FormHelper();
 
     // Load the selected page
@@ -206,7 +218,7 @@ class EditPageForm extends FormBase {
         $selected_page->save();
 
         // Add the page to the new position's children
-        $ajaxHelper->add_child_page($new_parent, $selected_page);
+        $ajaxHelper->add_child($new_parent, $selected_page, 'field_child_pages');
       }
     }
 

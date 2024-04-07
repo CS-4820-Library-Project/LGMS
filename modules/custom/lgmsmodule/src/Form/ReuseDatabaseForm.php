@@ -10,36 +10,22 @@ use Drupal\node\Entity\Node;
 
 class ReuseDatabaseForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'reuse_database_item_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
+    // Set the prefix, suffix, and hidden fields
+    $form_helper = new FormHelper();
+    $form_helper->set_form_data($form,$ids, $this->getFormId());
 
-    // Hidden fields to store current context.
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_box,
-    ];
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_node,
-    ];
-
-    // Load HTML items to populate the select options.
-    $options = $this->getDatabaseItemOptions();
-
-    // Select element for HTML items.
-    $form['box'] = [
+    // Select field for database items.
+    $form['db_select'] = [
       '#type' => 'select',
       '#title' => $this->t('Select Database Item'),
-      '#options' => $options,
+      '#options' => $form_helper->get_item_options('guide_database_item'),
       '#empty_option' => $this->t('- Select a Database Item -'),
       '#required' => TRUE,
       '#ajax' => [
@@ -64,11 +50,10 @@ class ReuseDatabaseForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;
@@ -76,11 +61,13 @@ class ReuseDatabaseForm extends FormBase {
 
   private function prefillSelectedDatabaseItem(array &$form, FormStateInterface $form_state): void
   {
-    $selected = $form_state->getValue('box');
+    $selected = $form_state->getValue('db_select');
+
     if (!empty($selected)) {
       $selected_node = Node::load($selected);
+
       if ($selected_node) {
-        \Drupal::logger('Im first 1')->notice('<pre>' . print_r('hello 1', TRUE) . '</pre>');
+        // Get the parent of a database and check if the user wants the link to be a reference
         $parent_db = $selected_node->get('field_parent_item')->entity;
         $reference = $form_state->getValue('reference');
 
@@ -111,6 +98,7 @@ class ReuseDatabaseForm extends FormBase {
           ],
         ];
 
+        // if it's a proxy link, do not show the proxy in the url
         $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
         $current_value = $selected_node?->get('field_database_link')->uri;
 
@@ -207,29 +195,37 @@ class ReuseDatabaseForm extends FormBase {
   }
 
   public function databaseItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
-    \Drupal::logger('Im first 2')->notice('<pre>' . print_r('hello 2', TRUE) . '</pre>');
-    $selected = $form_state->getValue('box');
+    // Load the selected database
+    $selected = $form_state->getValue('db_select');
     $selected_node = Node::load($selected);
+
+    // Get the proxy
     $proxy_prefix = \Drupal::config('lgmsmodule.settings')->get('proxy_prefix');
     $current_value = $selected_node?->get('field_database_link')->uri;
 
+    // Remove the proxy
     if ($selected_node->get('field_make_proxy')->value){
       $current_value = substr($current_value, strlen($proxy_prefix));
     }
+
+    // Update the fields' values based on the selected database
     if ($selected_node){
       $parent_db = $selected_node->get('field_parent_item')->entity;
       $form['update_wrapper']['title']['#value'] = $selected_node->label();
+
       $form['update_wrapper']['link_text']['#value'] = $selected_node->get('field_database_link')->title;
       $form['update_wrapper']['field_database_link']['#value'] = $current_value;
+
       $form['update_wrapper']['field_make_proxy']['#value'] = $selected_node->get('field_make_proxy')->value;
+
       $form['update_wrapper']['includedesc']['#checked'] = !empty($selected_node->get('field_description')->value);
       $form['update_wrapper']['description']['#value'] = $selected_node->get('field_description')->value;
+
       $form['update_wrapper']['includebody']['#checked'] = !empty($selected_node->get('field_database_body')->value);
       $form['update_wrapper']['field_database_body']['value']['#value'] = $selected_node->get('field_database_body')->value;
+
       $form['update_wrapper']['published']['#checked'] = $parent_db->isPublished() == '0';
     }
-
-    $form_state->setValue('desired_text_format', 'restricted_html');
 
     return $form['update_wrapper'];
   }
@@ -249,25 +245,26 @@ class ReuseDatabaseForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
+    $ajaxHelper = new FormHelper();
 
     // Attempt to load the 'current_box'
     $current_box_id = $form_state->getValue('current_box');
     $current_box = Node::load($current_box_id);
 
     // Attempt to load the 'database'
-    $database_id = $form_state->getValue('box');
+    $database_id = $form_state->getValue('db_select');
     $database = Node::load($database_id);
     $item = $database->get('field_parent_item')->entity;
 
     // Check if 'reference' checkbox is checked
     if (!$form_state->getValue('reference')) {
-
+      // Create copies of the database and link
       $new_database = $database->createDuplicate();
       $new_item = $item->createDuplicate();
 
       // Update fields on the new database
-      $new_database->set('field_parent_item', $new_item);
       $new_database->set('title', $form_state->getValue('title'));
+      $new_database->set('field_parent_item', $new_item);
       $new_database->set('field_database_link', ['uri' => $form_state->getValue('field_database_link'), 'title' => $form_state->getValue('link_text')]);
       $new_database->set('field_hide_body', $form_state->getValue('includebody') == '0');
       $new_database->set('field_database_body', $form_state->getValue('field_database_body'));
@@ -275,6 +272,7 @@ class ReuseDatabaseForm extends FormBase {
       $new_database->set('status',$form_state->getValue('published') == '0');
       $new_database->set('field_hide_description', $form_state->getValue('includedesc') == '0');
       $new_database->set('field_description', $form_state->getValue('description'));
+      $new_database->setOwnerId(\Drupal::currentUser()->id());
       $new_database->save();
 
       // Update fields on the new item
@@ -282,47 +280,24 @@ class ReuseDatabaseForm extends FormBase {
       $new_item->set('title', $form_state->getValue('title'));
       $new_item->set('field_database_item', $new_database);
       $new_item->set('status', $form_state->getValue('published') == '0');
-      $new_item->save(); // Saving the new item
+      $new_item->setOwnerId(\Drupal::currentUser()->id());
+      $new_item->save();
 
       $item = $new_item; // Update $item to refer to the new item
     } else {
+      // Create a reference
       $new_item = $item->createDuplicate();
       $new_item->set('field_lgms_database_link', TRUE);
+      $new_item->setOwnerId(\Drupal::currentUser()->id());
       $new_item->save();
       $item = $new_item;
     }
 
     // Updating the box list with the new item
-    $boxList = $current_box->get('field_box_items')->getValue();
-    $boxList[] = ['target_id' => $item->id()];
+    $ajaxHelper->add_child($current_box, $item, 'field_box_items');
 
-    $current_box->set('field_box_items', $boxList);
-    $current_box->save(); // Saving the updated box
-
+    // Update the parents
+    $ajaxHelper->updateParent($form, $form_state);
   }
-
-  /**
-   * Queries and returns options for the HTML item select field.
-   *
-   * @return array
-   *   An associative array of options for the select field.
-   */
-  private function getDatabaseItemOptions(): array
-  {
-    $query = \Drupal::entityQuery('node')
-      ->condition('type', 'guide_database_item')
-      ->sort('title', 'ASC')
-      ->accessCheck(TRUE);
-    $nids = $query->execute();
-
-    $nodes = Node::loadMultiple($nids);
-    $options = [];
-    foreach ($nodes as $node) {
-      $options[$node->id()] = $node->label();
-    }
-
-    return $options;
-  }
-
 }
 

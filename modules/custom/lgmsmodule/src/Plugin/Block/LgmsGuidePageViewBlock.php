@@ -26,24 +26,26 @@ class LgmsGuidePageViewBlock extends BlockBase {
   public function build() {
     $build = [];
 
-
+    // Get the current guide
     $current_guide_id = $this->getCurrentGuideId();
-    $current_guide = Node::load($current_guide_id);
 
-    $guide_title = '';
-    if ($current_guide_id) {
-      $guide_title = $current_guide->label();
+    // Make sure the block is placed on a guide or guide page
+    if (!$current_guide_id){
+      return $build;
     }
 
+    $current_guide = Node::load($current_guide_id);
+
+    // The url for the guide
     $current_guide_url = $current_guide->toUrl()->toString();
     $current_guide_url = str_ireplace('LGMS/', '', $current_guide_url);
 
     $url = Url::fromUri('internal:' . $current_guide_url);
-    $link = Link::fromTextAndUrl($guide_title, $url)->toRenderable();
+    $link = Link::fromTextAndUrl( $current_guide->label(), $url)->toRenderable();
 
     $build['#title'] = $link;
 
-    // Add a list to your block.
+    // Add a list to hold the page list to your block.
     $build['guide_container']['content'] = [
       '#theme' => 'item_list',
       '#items' => [],
@@ -54,18 +56,23 @@ class LgmsGuidePageViewBlock extends BlockBase {
 
     foreach ($pages as $page) {
       $class = '';
+
+      // check if the page is published and user is authenticated
       if($page->isPublished() == 0){
         if(!\Drupal::currentUser()->isAuthenticated()){
           continue;
         }
         $class = 'node--unpublished';
       }
+
       // Retrieve sub-pages for the current page.
       $sub_pages = $page->get('field_child_pages')->referencedEntities();
 
+      // Get the link to the page
       $url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $page->id()]);
       $link = \Drupal\Core\Link::fromTextAndUrl($page->label(), $url)->toString();
 
+      // add a link to the current page to the list
       $page_item['wrapper'] = [
         '#type' => 'html_tag',
         '#tag' => 'div',
@@ -84,6 +91,8 @@ class LgmsGuidePageViewBlock extends BlockBase {
       if (!empty($sub_pages) && $page->get('field_parent_guide')->entity->id() == $current_guide->id()) {
         foreach ($sub_pages as $sub_page) {
           $sub_page_class = '';
+
+          // check if the page is published and user is authenticated
           if($sub_page->isPublished() == 0){
             if(!\Drupal::currentUser()->isAuthenticated()){
               continue;
@@ -91,8 +100,11 @@ class LgmsGuidePageViewBlock extends BlockBase {
             $sub_page_class = 'node--unpublished';
           }
 
+          // Get the link to the subpage
           $sub_url = \Drupal\Core\Url::fromRoute('entity.node.canonical', ['node' => $sub_page->id()]);
           $sub_link = \Drupal\Core\Link::fromTextAndUrl($sub_page->label(), $sub_url)->toString();
+
+          // add a link to the current subpage to the list
           $page_item['sub_pages']['#items'][] = [
             '#markup' => '<div class="' . $sub_page_class . ' sub-page-item">' . $sub_link . '</div>',
           ];
@@ -104,12 +116,13 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $page_item = [];
     }
 
-    if (\Drupal::currentUser()->hasPermission('create guide_page content') && $current_guide_id != null) {
+    if (\Drupal::currentUser()->hasPermission('create guide_page content')) {
       // Generate the URL for the custom form route, including the query parameter for the current guide.
       $array_of_objects = [(object)['name' => 'Create Guide Page', 'form' => 'CreateGuidePageForm'],(object) ['name' => 'Reuse Guide Page', 'form' => 'ReuseGuidePageForm']];
       $json_data = json_encode($array_of_objects);
       $query_param = urlencode($json_data);
 
+      // Store the current guide id and encode it
       $ids = ['current_guide' => $current_guide_id];
       $json_data = json_encode($ids);
       $ids = urlencode($json_data);
@@ -163,7 +176,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
     }
 
 
-// Attach libraries necessary for modal functionality.
+    // Attach libraries necessary for modal functionality.
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
 
 
@@ -185,6 +198,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
 
       return $parent->id();
     }
+
     return NULL;
   }
   public function getCacheMaxAge() {

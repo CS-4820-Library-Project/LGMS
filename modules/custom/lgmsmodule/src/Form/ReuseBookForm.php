@@ -14,7 +14,8 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 
 class ReuseBookForm extends FormBase {
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'reuse_book_item_form';
   }
 
@@ -22,7 +23,8 @@ class ReuseBookForm extends FormBase {
    * @throws InvalidPluginDefinitionException
    * @throws PluginNotFoundException
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
     // Set the prefix, suffix, and hidden fields
     $form_helper = new FormHelper();
     $form_helper->set_form_data($form,$ids, $this->getFormId());
@@ -31,7 +33,7 @@ class ReuseBookForm extends FormBase {
     $form['book_select'] = [
       '#type' => 'select',
       '#title' => $this->t('Select Book Item'),
-      '#options' => $this->getBookItemOptions(),
+      '#options' => $form_helper->get_item_options('guide_book_item'),
       '#empty_option' => $this->t('- Select a Book Item -'),
       '#required' => TRUE,
       '#ajax' => [
@@ -61,11 +63,10 @@ class ReuseBookForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;
@@ -85,6 +86,7 @@ class ReuseBookForm extends FormBase {
       $selected_node = Node::load($selected);
 
       if ($selected_node) {
+        // Check if the user want's a copy or link
         $reference = $form_state->getValue('reference');
 
         $form['update_wrapper']['reference'] = [
@@ -180,6 +182,7 @@ class ReuseBookForm extends FormBase {
 
         $type_check = $form_state->getValue('type');
 
+        // Update the type if a new book has been selected
         if (!$form_state->getValue('prev_node') || $form_state->getValue('prev_node') != $selected_node->id()){
           $type_check = $selected_node->get('field_book_type')->value;
         }
@@ -187,9 +190,6 @@ class ReuseBookForm extends FormBase {
         $book_type = $selected_node->get('field_book_type')->value;
         $isEbookTypeSelected = ($book_type === $ebook);
         $isPrintTypeSelected = ($book_type === $print);
-
-
-        \Drupal::logger('type ###')->notice('Node ID: @id, Type: @type', ['@id' => $type_check, '@type' => gettype($type_check)]);
 
         if ($type_check == $ebook){
           $form['update_wrapper']['pub_finder_group'] = [
@@ -308,22 +308,26 @@ class ReuseBookForm extends FormBase {
             '#required' => $isPrintTypeSelected,
           ];
         }
+
+        // Get the publishing status of the parent item
         $parent_db = $selected_node->get('field_parent_item')->entity;
         $form['update_wrapper']['published'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Draft mode'),
           '#description' => $this->t('Un-check this box to publish.'),
           '#default_value' => $parent_db->isPublished() == '0',
+          '#states' => [
+            'invisible' => [
+              [':input[name="reference"]' => ['checked' => TRUE]],
+            ],
+          ],
         ];
       }
     }
   }
 
-  /**
-   * @throws InvalidPluginDefinitionException
-   * @throws PluginNotFoundException
-   */
   public function bookItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
+    // Load selected book
     $selected = $form_state->getValue('book_select');
     $selected_node = Node::load($selected);
 
@@ -331,20 +335,17 @@ class ReuseBookForm extends FormBase {
       return $form['update_wrapper'];
     }
 
+    // Get the type
     $type_check = $form_state->getValue('type');
+    $ebook = 'eBook';
 
+    // Update the type to be the selected book's, if a new book was selected
     if (!$form_state->getValue('prev_node') || $form_state->getValue('prev_node') != $selected_node->id()){
       $type_check = $selected_node->get('field_book_type')->value;
       $form['update_wrapper']['type']['#value'] = $type_check;
     }
 
-    $ebook = 'eBook';
-    $print = 'print';
-
     if ($selected_node){
-      $book_type = $selected_node->get('field_book_type')->value;
-      $isEbookTypeSelected = ($book_type === $ebook);
-
       // changing the values for the user to see them in the form
       $form['update_wrapper']['title']['#value'] = $selected_node->label();
       $form['update_wrapper']['author/editor']['#value'] = $selected_node->get('field_book_author_or_editor')->value;
@@ -352,11 +353,10 @@ class ReuseBookForm extends FormBase {
       $form['update_wrapper']['year']['#value'] = $selected_node->get('field_book_year')->value;
       $form['update_wrapper']['edition']['#value'] = $selected_node->get('field_book_edition')->value;
       $form['update_wrapper']['description']['value']['#value'] = $selected_node->get('field_book_description')->value;
-      //$form['update_wrapper']['type']['#value'] = $type_check;
-      //$form['update_wrapper']['type1']['#value'] = $type_check;
 
       if ($type_check){
         if ($type_check == $ebook) {
+          // Update ebook fields
           $form['update_wrapper']['pub_finder_group']['#required'] = TRUE;
           $form['update_wrapper']['pub_finder_group']['label2']['#required'] = TRUE;
           $form['update_wrapper']['pub_finder_group']['url2']['#required'] = TRUE;
@@ -365,7 +365,7 @@ class ReuseBookForm extends FormBase {
           $form['update_wrapper']['pub_finder_group']['url2']['#value'] = $selected_node->get('field_book_pub_finder')->uri;
 
         } else {
-
+          // Update print book fields
           $form['update_wrapper']['call_number']['#value'] = $selected_node->get('field_book_call_number')->value;
           $form['update_wrapper']['location']['#value'] = $selected_node->get('field_book_location')->value;
           $form['update_wrapper']['cat_record_group']['label1']['#value'] = $selected_node->get('field_book_cat_record')->title;
@@ -386,28 +386,29 @@ class ReuseBookForm extends FormBase {
       $form_state->setValue('year', $selected_node->get('field_book_year')->value);
       $form_state->setValue('edition', $selected_node->get('field_book_edition')->value);
       $form_state->setValue('description', ['value' => $selected_node->get('field_book_description')->value, 'format' => $selected_node->get('field_book_description')->format]);
-      //$form_state->setValue('type1', $selected_node->get('field_book_type')->target_id);
-      //$form_state->setValue('type', $selected_node->get('field_book_type')->target_id);
 
+      // Update the previous seleected book
       $form['update_wrapper']['prev_node']['#value'] = $selected_node->id();
-
     }
     return $form['update_wrapper'];
   }
 
-  public function validateFields(array &$form, FormStateInterface $form_state) {
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
+    // Get values from the form's fields
+    $selected_book = $form_state->getValue('book_select');
     $reference = $form_state->getValue('reference');
     $title = $form_state->getValue('title');
     $type_check = $form_state->getValue('type');
 
-    $selected_book = $form_state->getValue('book_select');
-
+    // Check if all fields have been filled
     if (empty($selected_book)){
       $form_state->setErrorByName('book_select', $this->t('Please Select A book'));
     } else {
       if (!$reference && empty($title)) {
         $form_state->setErrorByName('title', $this->t('Title: field is required.'));
       }
+
       if($type_check == 'print'){
         if(empty($form_state->getValue('call_number'))){
           $form_state->setErrorByName('call_number', t('Call Number is required.'));
@@ -437,7 +438,8 @@ class ReuseBookForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Book created successfully.', '#'.$this->getFormId());
@@ -447,30 +449,34 @@ class ReuseBookForm extends FormBase {
   /**
    * @throws EntityStorageException
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $current_box_id = $form_state->getValue('current_box');
-    $current_box = Node::load($current_box_id);
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
+    $ajaxHelper = new FormHelper();
 
+    // Get and load the box and book
+    $current_box = Node::load($form_state->getValue('current_box'));
     $book = Node::load($form_state->getValue('book_select'));
     $item = $book->get('field_parent_item')->entity;
 
     $type = $form_state->getValue('type');
 
+    // If the user is creating a copy
     if(!$form_state->getValue('reference')){
+      // Create duplicates
       $new_book = $book->createDuplicate();
       $new_item = $item->createDuplicate();
 
-      $new_book->set('field_parent_item', $new_item);
+      // Update the duplicates with the values given by the user
       $new_book->set('title', $form_state->getValue('title'));
+      $new_book->set('field_parent_item', $new_item);
       $new_book->set('field_book_author_or_editor', $form_state->getValue('author/editor'));
       $new_book->set('field_book_publisher', $form_state->getValue('publisher'));
       $new_book->set('field_book_year', $form_state->getValue('publisher'));
       $new_book->set('field_book_edition', $form_state->getValue('edition'));
-      $new_book->set('field_book_description', [
-        'value' => $form_state->getValue('description')['value'],
-        'format' => $form_state->getValue('description')['format']
-      ]);
-      $new_book->set('field_book_type', $form_state->getValue('type'));
+      $new_book->set('field_book_description', $form_state->getValue('description'));
+      $new_book->setOwnerId(\Drupal::currentUser()->id());
+      $new_book->set('field_book_type', $type);
+
       if ($type == 'print'){
         $new_book->set('field_book_cat_record', [
           'title' => $form_state->getValue('label1'),
@@ -478,13 +484,18 @@ class ReuseBookForm extends FormBase {
         ]);
         $new_book->set('field_book_location', $form_state->getValue('location'));
         $new_book->set('field_book_call_number', $form_state->getValue('call_number'));
+
+        $new_book->set('field_book_pub_finder', null);
       }else{
         $new_book->set('field_book_pub_finder', [
           'title' => $form_state->getValue('label2'),
           'uri' => $form_state->getValue('url2')
         ]);
-      }
 
+        $new_book->set('field_book_cat_record', null);
+        $new_book->set('field_book_location', null);
+        $new_book->set('field_book_call_number', null);
+      }
 
       $new_book->set('status', $form_state->getValue('published') == '0');
       $new_book->save();
@@ -493,41 +504,23 @@ class ReuseBookForm extends FormBase {
       $new_item->set('title', $form_state->getValue('title'));
       $new_item->set('field_book_item', $new_book);
 
-      $new_item->save();
-
-      $item = $new_item;
     } else {
+      // Create a reference
       $new_item = $item->createDuplicate();
       $new_item->set('field_book_item', $book);
-      $new_item->save();
-      $item = $new_item;
+      $new_item->set('field_lgms_database_link', TRUE);
     }
 
-    $boxList = $current_box->get('field_box_items')->getValue();
-    $boxList[] = ['target_id' => $item->id()];
+    // Save the item
+    $new_item->setOwnerId(\Drupal::currentUser()->id());
+    $new_item->save();
+    $item = $new_item;
 
-    $current_box->set('field_box_items', $boxList);
-    $current_box->save();
+    // Add item to the box
+    $ajaxHelper->add_child($current_box, $item, 'field_box_items');
 
-    $ajaxHelper = new FormHelper();
+    // Update the parents
     $ajaxHelper->updateParent($form, $form_state);
-  }
-
-  private function getBookItemOptions(): array
-  {
-    $query = \Drupal::entityQuery('node')
-      ->condition('type', 'guide_book_item')
-      ->sort('title', 'ASC')
-      ->accessCheck(TRUE);
-    $nids = $query->execute();
-
-    $nodes = Node::loadMultiple($nids);
-    $options = [];
-    foreach ($nodes as $node) {
-      $options[$node->id()] = $node->label();
-    }
-
-    return $options;
   }
 }
 

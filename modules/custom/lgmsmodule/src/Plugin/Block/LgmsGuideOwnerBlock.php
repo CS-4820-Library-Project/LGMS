@@ -28,37 +28,31 @@ class LgmsGuideOwnerBlock extends BlockBase {
   public function build(): array
   {
     $build = [];
+    // Initialize an array to hold our elements
+    $elements = [];
+
+    $first_name = '';
+    $last_name = '';
+
+    // Get the node from the route
     $node = \Drupal::routeMatch()->getParameter('node');
+
     if (!$node) {
       return $build; // Early return if there's no node context.
     }
 
-    $current_user = \Drupal::currentUser();
-    // Initialize an array to hold our elements
-    $elements = [];
-
-    // Fetch the author's information.
+    // Fetch the node's author information.
     $author = $node->getOwner();
-    $first_name = '';
-    $last_name = '';
-    $phone_number_clickable = '';
-    $email = $author->getEmail();
 
-    // Check for first name, last name, and phone number fields and format accordingly.
+
+    // Get the first name if present
     if($author->hasField('field_lgms_first_name')){
       $first_name = $author->get('field_lgms_first_name')->value;
+    }
+
+    // Get the first name if present
+    if($author->hasField('field_lgms_last_name')){
       $last_name = $author->get('field_lgms_last_name')->value;
-      $phone_number_raw = $author->get('field_lgms_phone_number')->value;
-
-      // Initialize variables to avoid undefined variable errors.
-      $phone_number_formatted = '';
-      $phone_number_clickable = '';
-
-      // Only format and make the phone number clickable if it's not empty.
-      if (!empty($phone_number_raw)) {
-        $phone_number_formatted = $this->formatPhoneNumber($phone_number_raw);
-        $phone_number_clickable = $this->makePhoneNumberClickable($phone_number_raw, $phone_number_formatted);
-      }
     }
 
     // Set the title using the first name.
@@ -88,6 +82,7 @@ class LgmsGuideOwnerBlock extends BlockBase {
       $user_picture_file = $author->get('user_picture')->entity;
       if ($user_picture_file && $this->configuration['show_user_picture']) {
         $user_picture_uri = $user_picture_file->getFileUri();
+
         $elements['user_picture'] = [
           'content' => [
             '#theme' => 'image',
@@ -107,6 +102,7 @@ class LgmsGuideOwnerBlock extends BlockBase {
     // Email
     if ($this->configuration['show_email']) {
       $email = $author->getEmail();
+
       $elements['email'] = [
         'content' => [
           '#type' => 'html_tag',
@@ -122,6 +118,7 @@ class LgmsGuideOwnerBlock extends BlockBase {
     if ($author->hasField('field_lgms_phone_number') && !$author->get('field_lgms_phone_number')->isEmpty() && $this->configuration['show_phone']) {
       $phone_number_raw = $author->get('field_lgms_phone_number')->value;
       $phone_number_clickable = $this->makePhoneNumberClickable($phone_number_raw, $this->formatPhoneNumber($phone_number_raw));
+
       $elements['phone_number'] = [
         'content' => [
           '#type' => 'html_tag',
@@ -137,7 +134,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
 
     // Subjects
     if ($this->configuration['show_subjects']) {
-      $subjectsMarkup = $this->fetchSubjectsMarkup($node);
+      $subjectsMarkup = $this->fetchSubjectsMarkup($author);
+
       $elements['subjects'] = [
         'content' => [
           '#type' => 'container',
@@ -150,8 +148,6 @@ class LgmsGuideOwnerBlock extends BlockBase {
 
     // Body
     if ($author->hasField('field_lgms_body') && !$author->get('field_lgms_body')->isEmpty() && $this->configuration['show_body']) {
-      $body_value = $author->get('field_lgms_body')->value;
-      $body_format = $author->get('field_lgms_body')->format;
       $elements['body'] = [
         'content' => [
           '#type' => 'container',
@@ -160,14 +156,13 @@ class LgmsGuideOwnerBlock extends BlockBase {
           ],
           'children' => [
             '#type' => 'processed_text',
-            '#text' => $body_value,
-            '#format' => $body_format,
+            '#text' => $author->get('field_lgms_body')->value,
+            '#format' => $author->get('field_lgms_body')->format,
           ],
         ],
         'position' => $this->configuration['position_body'],
       ];
     }
-
 
     // Sort the elements by their position
     uasort($elements, function ($a, $b) {
@@ -179,8 +174,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
       $build[$key] = $element['content'];
     }
 
-    // Add the edit profile link for authenticated users
-    if ($current_user->isAuthenticated()) {
+    // Add the edit profile link for owner of the guide
+    if (\Drupal::currentUser()->isAuthenticated() && \Drupal::currentUser()->id() == $author->id()) {
       $build['edit_profile_link'] = $this->addEditProfileLink();
     }
 
@@ -190,18 +185,18 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $build;
   }
 
-  private function fetchSubjectsMarkup($node): string
+  private function fetchSubjectsMarkup($owner): string
   {
-    $owner = $node->getOwner();
-
+    // Fetch all of the user's selected subjects
     $subjects = $owner->get('field_lgms_user_subjects')->referencedEntities();
     $subjects_arr = [];
 
+    // Add them to an array
     foreach ($subjects as $subject){
       $subjects_arr[] = $subject->label();
     }
 
-
+    // Make them into a markup
     $subjectsMarkup = '';
     if (!empty($subjects_arr)) {
       $subjectsMarkup .= "<p><strong>Subjects:</strong></p><ul>";
@@ -210,18 +205,8 @@ class LgmsGuideOwnerBlock extends BlockBase {
       }
       $subjectsMarkup .= "</ul>";
     }
-    return $subjectsMarkup;
-  }
 
-  private function extractSubjects($entity, $field_name): array
-  {
-    $subjects = [];
-    if (!$entity->get($field_name)->isEmpty()) {
-      foreach ($entity->get($field_name)->referencedEntities() as $term) {
-        $subjects[] = $term->getName();
-      }
-    }
-    return $subjects;
+    return $subjectsMarkup;
   }
 
   private function addEditProfileLink(): array {

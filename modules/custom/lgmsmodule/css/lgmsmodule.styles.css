@@ -2,19 +2,19 @@
 .lgms_all_guides_search_button_container {
   display: flex;
   align-items: center;
-  margin-bottom: 20px; /* Adjust as needed for your theme */
+  margin-bottom: 20px;
   justify-content: space-between;
 }
 
 .lgms-dashboard-search {
   flex-grow: 1;
-  margin-right: 20px; /* Space between search and sort */
+  margin-right: 20px;
   width: 100%;
 }
 
 .lgms-all_guides-search {
   flex-grow: 1;
-  margin-right: 8px; /* Space between search and sort */
+  margin-right: 8px;
   width: 75%;
 }
 
@@ -68,7 +68,6 @@
   background-color: white;
 }
 
-/* Additional styles for the 'Add Guide Box' link */
 .add-guide-box-link {
   display: block;
   text-align: center;
@@ -155,5 +154,5 @@
 
 .page-item-wrapper {
   display: flex;
-  justify-content: space-between; /* Adjust as needed for your design */
+  justify-content: space-between;
 }

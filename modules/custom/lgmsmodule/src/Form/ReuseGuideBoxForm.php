@@ -5,6 +5,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -12,38 +13,21 @@ use Drupal\node\Entity\Node;
 
 class ReuseGuideBoxForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'reuse_guide_box_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $ids = null) {
-    $form['#prefix'] = '<div id="' . $this->getFormId() . '">';
-    $form['#suffix'] = '</div>';
-    $form['messages'] = [
-      '#weight' => -9999,
-      '#type' => 'status_messages',
-    ];
+  public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
+  {
+    // Set the prefix, suffix, and hidden fields
+    $form_helper = new FormHelper();
+    $form_helper->set_form_data($form,$ids, $this->getFormId());
 
-    $form['current_node'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_node,
-    ];
-
-    $form['#attributes']['id'] = 'form-selector';
-
-    // Hidden fields to store current context.
-    $form['current_box'] = [
-      '#type' => 'hidden',
-      '#value' => $ids->current_box,
-    ];
-
-    // Load HTML items to populate the select options.
-    $options = $this->getBoxItemOptions();
-
-    $form['box'] = [
+    $form['box_select'] = [
       '#type' => 'select',
       '#title' => $this->t('Select a Box'),
-      '#options' => $options,
+      '#options' => $form_helper->get_item_options('guide_box', 'field_parent_node'),
       '#empty_option' => $this->t('- Select a Box -'),
       '#target_type' => 'node', // Adjust according to your needs
       '#selection_settings' => [
@@ -77,46 +61,50 @@ class ReuseGuideBoxForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Save'),
       '#button_type' => 'primary',
-    ];
-
-    $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitAjax',
-      'event' => 'click',
+      '#ajax' => [
+        'callback' => '::submitAjax',
+        'event' => 'click',
+      ],
     ];
 
     return $form;
   }
 
-  public function validateFields(array &$form, FormStateInterface $form_state) {
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
     $reference = $form_state->getValue('reference');
     $title = $form_state->getValue('title');
-    $curr_node = $form_state->getValue('current_node');
-    $curr_node = Node::load($curr_node);
-    $nid = $curr_node->id();
-    $bundle = $curr_node->bundle();
-    $box = Node::load($form_state->getValue('box'));
+
+    $curr_node = Node::load($form_state->getValue('current_node'));
+    $box = Node::load($form_state->getValue('box_select'));
+
     $box_parent = $box->get('field_parent_node')->target_id;
 
+    // Check if title is filled
     if (!$reference && empty($title)) {
       $form_state->setErrorByName('title', $this->t('Box Title: field is required.'));
     }
 
-    if ($reference && $nid == $box_parent){
-      if ($bundle == 'guide'){
-        $form_state->setErrorByName('reference', $this->t('This box cannot be created with the same guide as its reference. Please select a different guide or remove the reference to proceed.'));
+    // User can not make reference to a box inside the same page
+    if ($reference && $curr_node->id() == $box_parent){
+      if ($curr_node->bundle() == 'guide'){
+        $form_state->setErrorByName('reference', $this->t('This box cannot be created with the same guide
+          as its reference. Please select a different guide or remove the reference to proceed.'));
       }else {
-        $form_state->setErrorByName('reference', $this->t('This box cannot be created with the same page as its reference. Please select a different page or remove the reference to proceed.'));
+        $form_state->setErrorByName('reference', $this->t('This box cannot be created with the same page
+          as its reference. Please select a different page or remove the reference to proceed.'));
       }
     }
   }
 
-  private function prefillSelectedBoxItem(array &$form, FormStateInterface $form_state) {
-    $selected = $form_state->getValue('box');
+  private function prefillSelectedBoxItem(array &$form, FormStateInterface $form_state): void
+  {
+    $selected = $form_state->getValue('box_select');
 
     if (!empty($selected)) {
       $selected_node = Node::load($selected);
       if ($selected_node) {
-        $reference = $form_state->getValue('reference');
+        // Update the title field based on the selected box
         $form['update_wrapper']['title'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Box Title:'),
@@ -133,9 +121,10 @@ class ReuseGuideBoxForm extends FormBase {
   }
 
   public function boxItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state) {
-
-    $selected = $form_state->getValue('box');
+    $selected = $form_state->getValue('box_select');
     $selected_node = Node::load($selected);
+
+    // Update the title field based on the selected box
     if ($selected_node){
       $form['update_wrapper']['title']['#value'] = $selected_node->label();
     }
@@ -146,147 +135,95 @@ class ReuseGuideBoxForm extends FormBase {
   /**
    * @throws EntityMalformedException
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state) {
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
+  {
     $ajaxHelper = new FormHelper();
 
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.', '#'.$this->getFormId());
   }
 
+  /**
+   * @throws EntityStorageException
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
+    $ajaxHelper = new FormHelper();
 
-  public static function hideTextFormatHelpText(array $element, FormStateInterface $form_state) {
-    if (isset($element['format']['help'])) {
-      $element['format']['help']['#access'] = FALSE;
-    }
-    if (isset($element['format']['guidelines'])) {
-      $element['format']['guidelines']['#access'] = FALSE;
-    }
-    if (isset($element['format']['#attributes']['class'])) {
-      unset($element['format']['#attributes']['class']);
-    }
-    return $element;
-  }
-
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+    // Load the current node
     $curr_node = $form_state->getValue('current_node');
     $curr_node = Node::load($curr_node);
 
-    $nid = $curr_node->id();
-
-    $box = Node::load($form_state->getValue('box'));
+    // Load the selected box and it's parent
+    $box = Node::load($form_state->getValue('box_select'));
     $box_parent = $box->get('field_parent_node')->target_id;
 
+    // If the user is creating a copy
     if(!$form_state->getValue('reference')){
+      // Create a copy of the box
       $new_box = $box->createDuplicate();
-      $new_box->set('field_parent_node', $nid);
+
+      // Upadte it's values
+      $new_box->set('field_parent_node', $curr_node->id());
       $new_box->set('title', $form_state->getValue('title'));
       $new_box->setOwnerId(\Drupal::currentUser()->id());
       $new_box->save();
 
+      // Get the list of items the box has
       $items = $box->get('field_box_items')->referencedEntities();
 
       $new_items_list = [];
+      // Loop through all the items and create copy of the,
       foreach ($items as $item){
+        // Create a copy of the item and update it's owner
         $new_item = $item->createDuplicate();
         $new_item->set('field_parent_box', $new_box);
         $new_item->setOwnerId(\Drupal::currentUser()->id());
 
-        if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
-          $html = $item->get('field_html_item')->entity;
-          $html = $html->createDuplicate();
-          $html->setOwnerId(\Drupal::currentUser()->id());
-          $html->save();
+        $filled_field = '';
 
-          $new_item->set('field_html_item', $html);
+        // Look for the filled field and copy create a copy of it and attach it to the new item
+        if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
+          $filled_field = 'field_html_item';
 
         } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
-          $database = $item->get('field_database_item')->entity;
-          $new_item->set('field_database_item', $database);
+          $filled_field = 'field_database_item';
 
         } elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
-          $book = $item->get('field_book_item')->entity;
-          $book = $book->createDuplicate();
-          $book->setOwnerId(\Drupal::currentUser()->id());
-          $book->save();
+          $filled_field = 'field_book_item';
 
-          $new_item->set('field_book_item', $book);
         } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
+          $filled_field = 'field_media_image';
           $media = $item->get('field_media_image')->entity;
           $new_item->set('field_media_image', $media);
         }
 
+        // Add the field
+        if ($filled_field != 'field_media_image'){
+          $field = $item->get($filled_field)->entity;
+          $field = $field->createDuplicate();
+          $field->setOwnerId(\Drupal::currentUser()->id());
+          $field->save();
+
+          $new_item->set($filled_field, $field);
+        }
+
+        // Add the item to the list
         $new_item->save();
         $new_items_list[] = $new_item;
       }
 
+      // Save the list of items
       $new_box->set('field_box_items', $new_items_list);
       $new_box->save();
 
       $box = $new_box;
     }
 
-    $page = Node::load($nid);
-    $boxList = $page->get('field_child_boxes')->getValue();
-    $boxList[] = ['target_id' => $box->id()];
 
-    $page->set('field_child_boxes', $boxList);
-    $page->save();
+    // Updating the page's child boxes list with the new box
+    $ajaxHelper->add_child($curr_node, $box, 'field_child_boxes');
 
-    $ajaxHelper = new FormHelper();
+    // Update the parents
     $ajaxHelper->updateParent($form, $form_state);
   }
-
-  /**
-   * Queries and returns options for the Box item select field.
-   *
-   * @return array
-   *   An associative array of options for the select field.
-   */
-  private function getBoxItemOptions() {
-    $query = \Drupal::entityQuery('node')
-      ->condition('type', 'guide_box')
-      ->sort('title', 'ASC')
-      ->accessCheck(TRUE);
-    $nids = $query->execute();
-
-    $nodes = \Drupal\node\Entity\Node::loadMultiple($nids);
-    $groupedOptions = [];
-    foreach ($nodes as $node) {
-      // Load the direct parent item.
-      $parent_item = $node->get('field_parent_node')->entity;
-
-      // Initialize parent label.
-      $parent_label = (string) t('No Parent');
-
-      if ($parent_item && $parent_item->access('view')) {
-        // Determine if the parent item is a 'guide_page'.
-        if ($parent_item->bundle() === 'guide_page') {
-          // If the parent is a 'guide_page', find the 'guide' it belongs to.
-          $ultimate_parent = $parent_item->get('field_parent_guide')->entity;
-          if ($ultimate_parent && $ultimate_parent->access('view')) {
-            $parent_label = $ultimate_parent->label();
-          } else {
-            // Handle cases where the ultimate parent is not accessible or not found.
-            $parent_label = (string) t('Unaccessible Parent Guide');
-          }
-        } else {
-          // The parent item is directly a 'guide'.
-          $parent_label = $parent_item->label();
-        }
-
-        // Initialize the parent group if it doesn't exist.
-        if (!isset($groupedOptions[$parent_label])) {
-          $groupedOptions[$parent_label] = [];
-        }
-
-        // Add the node to its parent group.
-        $groupedOptions[$parent_label][$node->id()] = $node->label();
-      }
-    }
-
-    // Sort the groups alphabetically by their label.
-    ksort($groupedOptions);
-
-    return $groupedOptions;
-  }
-
 }

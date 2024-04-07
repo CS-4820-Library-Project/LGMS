@@ -12,11 +12,13 @@ use Drupal\node\Entity\Node;
 
 class DeleteGuideForm extends FormBase {
 
-  public function getFormId() {
+  public function getFormId(): string
+  {
     return 'delete_guide_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array
+  {
     $form_helper = new FormHelper();
 
     // Get the data from the URL
@@ -54,7 +56,8 @@ class DeleteGuideForm extends FormBase {
     return $form;
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void
+  {
     $helper = new FormHelper();
     // Get the id of the guide to be deleted
     $guide = Node::load($form_state->getValue('guide_id'));
