@@ -2504,8 +2504,8 @@ function createHelpGuide(): array {
   $reuse_guide_html_content = createHtmlItemNode($reuse_guide_box_item->id(), 'Reuse Guide HTML Content', '<p><a href="/node/' . $reuse_guide_node . '">"Reuse a Guide" tutorial</a></p>');
   $reuse_html_html_content = createHtmlItemNode($reuse_html_box_item->id(), 'Reuse HTML HTML Content', '<p><a href="/node/' . $reuse_html_node . '">"Reuse an HTML" tutorial</a></p>');
   $reuse_page_html_content = createHtmlItemNode($reuse_page_box_item->id(), 'Reuse Page HTML Content', '<p><a href="/node/' . $reuse_guide_page_node . '">"Reuse a Page" tutorial</a></p>');
-  $reuse_database_html_content = createHtmlItemNode($reuse_database_box_item->id(), 'Reuse Database HTML Content', '<p><a href="/node/' . $reuse_book_node . '">"Reuse a Database" tutorial</a></p>');
-  $reuse_book_html_content = createHtmlItemNode($reuse_book_box_item->id(), 'Reuse Book HTML Content', '<p><a href="/node/' . $reuse_database_node . '">"Reuse a Book" tutorial</a></p>');
+  $reuse_database_html_content = createHtmlItemNode($reuse_database_box_item->id(), 'Reuse Database HTML Content', '<p><a href="/node/' . $reuse_database_node . '">"Reuse a Database" tutorial</a></p>');
+  $reuse_book_html_content = createHtmlItemNode($reuse_book_box_item->id(), 'Reuse Book HTML Content', '<p><a href="/node/' . $reuse_book_node . '">"Reuse a Book" tutorial</a></p>');
 
   // Attach HTML items to box items
   attachChildNodes($html_box_item, 'field_html_item', [$the_html_content->id()]);
