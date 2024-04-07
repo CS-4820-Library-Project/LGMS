@@ -2225,6 +2225,38 @@ function book_validation(array &$form, \Drupal\Core\Form\FormStateInterface $for
   }
 }
 
+function box_item_validation(array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $fields = [
+    'field_html_item',
+    'field_database_item',
+    'field_book_item',
+  ];
+
+  $filledFields = 0;
+
+  foreach ($fields as $fieldName) {
+    // Assuming the use of entity_reference fields, adjust accordingly if needed
+    $fieldValue = $form_state->getValue($fieldName);
+    if (!empty($fieldValue) && !empty($fieldValue[0]['target_id'])) {
+      $filledFields++;
+    }
+  }
+
+  // Check the media field
+  $fieldValue = $form_state->getValue('field_media_image');
+  if (!empty($fieldValue) && !empty($fieldValue['selection'][0]['target_id'])){
+    $filledFields++;
+  }
+
+  // Check if more than one field is filled
+  if ($filledFields != 1) {
+    foreach ($fields as $fieldName) {
+      $form_state->setErrorByName($fieldName, t('Only one of Media, HTML Item, Database Item, or Book Item can be filled. Please clear the others.'));
+    }
+  }
+}
+
+
 
 /**
  * Implements hook_form_FORM_ID_alter() for node edit forms.
@@ -2292,6 +2324,10 @@ function lgmsmodule_form_node_form_alter(&$form, FormStateInterface $form_state,
     ];
 
     $form['#validate'][] = 'guide_validation';
+  }
+
+  if ($form_id === 'node_guide_item_edit_form' || $form_id === 'node_guide_item_form'){
+    $form['#validate'][] = 'box_item_validation';
   }
 
   if ($form_id === 'node_guide_database_item_edit_form' || $form_id === 'node_guide_database_item_form'){
