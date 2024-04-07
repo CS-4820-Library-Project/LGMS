@@ -115,6 +115,7 @@ class DeletePageForm extends FormBase{
       $message = 'Guide deleted successfully.';
     } else {
       $message = 'Page deleted successfully.';
+      $form_state->setValue('current_node', $form_state->getValue('guide_id'));
     }
 
     return $ajaxHelper->submitModalAjax($form, $form_state, $message, '#'.$this->getFormId());
