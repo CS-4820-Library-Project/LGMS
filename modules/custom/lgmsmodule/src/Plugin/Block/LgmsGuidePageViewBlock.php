@@ -4,13 +4,18 @@ namespace Drupal\lgmsmodule\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Component\Serialization\Json;
 use Drupal\node\Entity\Node;
 
 /**
+ * Provides a block to display guide page views.
  *
+ * This block displays a list of guide pages associated with the current guide,
+ * allowing for quick navigation between them. It also provides links to create,
+ * reorder, edit, and delete guide pages if the user has the necessary permissions.
  *
  * @Block(
  *   id = "page_view_block",
@@ -21,9 +26,14 @@ use Drupal\node\Entity\Node;
 class LgmsGuidePageViewBlock extends BlockBase {
 
   /**
-   * {@inheritdoc}
+   * Builds and returns the renderable array for this block plugin.
+   *
+   * @return array
+   *   A renderable array representing the content of the block.
+   * @throws EntityMalformedException
    */
-  public function build() {
+  public function build(): array
+  {
     $build = [];
 
     // Get the current guide
@@ -183,7 +193,18 @@ class LgmsGuidePageViewBlock extends BlockBase {
     return $build;
   }
 
-  public function getCurrentGuideId()
+  /**
+   * Retrieves the ID of the current guide or guide page.
+   *
+   * This method determines the guide associated with the current page, whether
+   * directly viewing a guide or a guide page. It ensures that the block content
+   * is relevant to the current context.
+   *
+   * @return string|null
+   *   The guide ID if available, or NULL if the current page is not a guide or
+   *   guide page.
+   */
+  public function getCurrentGuideId(): ?string
   {
     $current_node = \Drupal::routeMatch()->getParameter('node');
 
@@ -201,7 +222,15 @@ class LgmsGuidePageViewBlock extends BlockBase {
 
     return NULL;
   }
-  public function getCacheMaxAge() {
+
+  /**
+   * Disables caching for this block.
+   *
+   * @return int
+   *   Returns 0 to indicate that the block should not be cached.
+   */
+  public function getCacheMaxAge(): int
+  {
     // Disable caching for this block.
     return 0;
   }
