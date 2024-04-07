@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\Page;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
@@ -29,7 +30,7 @@ class ReuseGuidePageForm extends FormBase {
     $form['select_page'] = [
       '#type' => 'select',
       '#title' => $this->t('Select Page'),
-      '#options' => $this->get_all_pages($ids->current_guide),
+      '#options' => $form_helper->get_pages_options($ids->current_guide,false),
       '#empty_option' => $this->t('- Select a Page -'),
       '#required' => TRUE,
       '#ajax' => [
@@ -94,6 +95,8 @@ class ReuseGuidePageForm extends FormBase {
       '#value' => NULL,
     ];
 
+    $form['#validate'][] = '::validateFields';
+
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Reuse Guide Page'),
@@ -105,6 +108,26 @@ class ReuseGuidePageForm extends FormBase {
     ];
 
     return $form;
+  }
+
+  public function validateFields(array &$form, FormStateInterface $form_state): void
+  {
+    $reference = $form_state->getValue('reference');
+
+    $guide = Node::load($form_state->getValue('current_guide'));
+    $page = Node::load($form_state->getValue('select_page'));
+
+    $parent_guide = $page->get('field_parent_guide')->entity;
+
+    if ($parent_guide->bundle() == 'guide_page'){
+      $parent_guide = $parent_guide->get('field_parent_guide')->entity;
+    }
+
+    // User can not make reference to a box inside the same page
+    if ($reference && $guide->id() == $parent_guide->id()){
+      $form_state->setErrorByName('reference', $this->t('This Page cannot be created with the same guide
+          as its reference. Please select a different guide or make it a copy to proceed.'));
+    }
   }
 
   public function position_callback(array &$form, FormStateInterface $form_state) {
