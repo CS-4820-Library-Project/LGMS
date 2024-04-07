@@ -184,6 +184,7 @@ class FormHelper {
       $field_name => $new_content,
       'field_parent_box' => $current_box,
       'status' => $new_content->isPublished(),
+      'promote' => 0,
     ]);
 
     $new_item->save();
@@ -220,6 +221,7 @@ class FormHelper {
   {
     $current_item->set('title', $form_state->getValue('title'));
     $current_item->set('status', $form_state->getValue('published') == '0');
+    $current_item->set('promote', 0);
     $current_item->set('changed', \Drupal::time()->getRequestTime());
     $current_item->save();
   }
@@ -596,6 +598,7 @@ class FormHelper {
 
     foreach ($pages as $page) {
       $cloned_page = $page->createDuplicate();
+      $cloned_page->set('promote', 0);
       $cloned_page->set('field_parent_guide', $new_parent);
 
       if ($ref){
@@ -637,6 +640,7 @@ class FormHelper {
       } else {
         $cloned_box = $box->createDuplicate();
         $cloned_box->set('field_parent_node', $new_page->id());
+        $cloned_box->set('promote', 0);
         $cloned_box->save();
 
         $new_box_list[] = ['target_id' => $cloned_box->id()];
@@ -648,6 +652,7 @@ class FormHelper {
           // Create a copy of the item and update it's owner
           $new_item = $item->createDuplicate();
           $new_item->set('field_parent_box', $cloned_box);
+          $new_item->set('promote', 0);
           $new_item->set('field_lgms_reference', TRUE);
           $new_item->setOwnerId(\Drupal::currentUser()->id());
 

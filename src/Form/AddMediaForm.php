@@ -212,6 +212,7 @@ class AddMediaForm extends FormBase {
       // Update fields
       $current_item->set('title', $form_state->getValue('include_title') != '0'? $media->getName() : $form_state->getValue('title'));
       $current_item->set('status', $form_state->getValue('published') == '0');
+      $current_item->set('promote', 0);
       $current_item->set('field_media_image', $media);
       $current_item->save();
     }

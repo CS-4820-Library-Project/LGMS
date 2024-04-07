@@ -135,6 +135,7 @@ class AddHTMLForm extends FormBase {
           'format' => $form_state->getValue('body')['format'],
         ],
         'status' => $form_state->getValue('published') == '0',
+        'promote' => 0,
       ]);
 
       $new_html->save();

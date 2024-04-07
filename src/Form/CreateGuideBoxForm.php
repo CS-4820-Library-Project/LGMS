@@ -114,6 +114,7 @@ class CreateGuideBoxForm extends FormBase {
       'title' => $form_state->getValue('title'),
       'field_parent_node' => $curr_page,
       'status' => $form_state->getValue('published') == '0',
+      'promote' => 0,
     ]);
     $new_box->save();
 
