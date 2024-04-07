@@ -12,18 +12,28 @@ use Drupal\user\Entity\User;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
+ * Provides a 'LGMS Author Information' Block.
  *
+ * This block displays the guide owner's contact information including their
+ * name, email, phone number, profile picture, and any associated subjects.
  *
  * @Block(
  *   id = "lgms_guide_owner_block",
- *   admin_label = @Translation("LGMS Author information"),
- *   category = @Translation("LGMS"),
+ *   admin_label = @Translation("LGMS Author Information"),
+ *   category = @Translation("LGMS")
  * )
  */
 class LgmsGuideOwnerBlock extends BlockBase {
 
   /**
-   * {@inheritdoc}
+   * Builds the block content.
+   *
+   * Fetches and displays author information based on the node context. The
+   * displayed information includes name, profile picture, email, phone number,
+   * and subjects associated with the guide's owner.
+   *
+   * @return array
+   *   A renderable array representing the block content.
    */
   public function build(): array
   {
@@ -185,6 +195,15 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $build;
   }
 
+  /**
+   * Fetches and constructs markup for the subjects associated with the user.
+   *
+   * @param User $owner
+   *   The user entity whose subjects are to be fetched.
+   *
+   * @return string
+   *   The constructed HTML markup containing the list of subjects.
+   */
   private function fetchSubjectsMarkup($owner): string
   {
     // Fetch all of the user's selected subjects
@@ -209,6 +228,16 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $subjectsMarkup;
   }
 
+  /**
+   * Adds a link for users to edit their profile.
+   *
+   * This method generates a link to the user profile edit form. It's shown
+   * to the owner of the guide, allowing them to directly access and edit their
+   * profile information.
+   *
+   * @return array
+   *   A render array for the edit profile link.
+   */
   private function addEditProfileLink(): array {
     // Get the current user's ID.
     $user_id = \Drupal::currentUser()->id();
@@ -233,11 +262,15 @@ class LgmsGuideOwnerBlock extends BlockBase {
   }
 
   /**
-   * Makes a phone number clickable for devices that support dialing.
+   * Converts a phone number into a clickable link format.
    *
-   * @param string $phone_number_raw The raw phone number.
-   * @param string $phone_number_formatted The formatted phone number.
-   * @return string The clickable phone number link.
+   * @param string $phone_number_raw
+   *   The unformatted phone number string.
+   * @param string $phone_number_formatted
+   *   The phone number formatted for display.
+   *
+   * @return string
+   *   A string containing an HTML anchor tag with the href set to a tel: URI.
    */
   protected function makePhoneNumberClickable($phone_number_raw, $phone_number_formatted): string
   {
@@ -250,10 +283,13 @@ class LgmsGuideOwnerBlock extends BlockBase {
 
 
   /**
-   * Formats a raw phone number into the American format.
+   * Formats a raw phone number into a more readable format.
    *
-   * @param string $phone_number_raw The raw phone number.
-   * @return string The formatted phone number.
+   * @param string $phone_number_raw
+   *   The unformatted phone number string.
+   *
+   * @return string
+   *   The formatted phone number.
    */
   protected function formatPhoneNumber($phone_number_raw): string
   {
@@ -269,12 +305,18 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $phone_number_raw;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getCacheMaxAge(): int
   {
     // Disable caching for this block.
     return 0;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function blockForm($form, FormStateInterface $form_state): array
   {
     $form = parent::blockForm($form, $form_state);
@@ -357,6 +399,9 @@ class LgmsGuideOwnerBlock extends BlockBase {
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function blockSubmit($form, FormStateInterface $form_state): void
   {
     parent::blockSubmit($form, $form_state);
@@ -374,6 +419,9 @@ class LgmsGuideOwnerBlock extends BlockBase {
     $this->configuration['position_body'] = $form_state->getValue('position_body');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration(): array
   {
     return parent::defaultConfiguration() + [

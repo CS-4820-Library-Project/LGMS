@@ -13,9 +13,30 @@ use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Provides helper functions for form operations in the LGMS module.
+ *
+ * This class includes methods for AJAX responses, updating parent nodes,
+ * setting form data, and more, aiding in the manipulation and handling of form
+ * submissions and operations within the LGMS (Library Guide Management System) module.
+ */
 class FormHelper {
 
   /**
+   * Handles AJAX submissions and redirects or updates the page accordingly.
+   *
+   * @param array &$form
+   *   The form array.
+   * @param FormStateInterface $form_state
+   *   The state of the form.
+   * @param string $message
+   *   The message to display upon successful submission.
+   * @param string $form_id
+   *   The CSS ID of the form element, defaults to '#modal-form'.
+   *
+   * @return AjaxResponse
+   *   The AJAX response to be returned.
+   *
    * @throws EntityMalformedException
    */
   public function submitModalAjax(array &$form, FormStateInterface $form_state, String $message, $form_id = '#modal-form'): AjaxResponse
@@ -50,6 +71,13 @@ class FormHelper {
   }
 
   /**
+   * Updates the 'changed' timestamp of the parent node and potentially its parent guide.
+   *
+   * @param array &$form
+   *   The form array.
+   * @param FormStateInterface $form_state
+   *   The state of the form.
+   *
    * @throws EntityStorageException
    */
   public function updateParent(array &$form, FormStateInterface $form_state,): void
@@ -75,6 +103,16 @@ class FormHelper {
     $current_node->save();
   }
 
+  /**
+   * Sets initial data for forms, including hidden fields for IDs and AJAX wrappers.
+   *
+   * @param array &$form
+   *   The form array.
+   * @param object $ids
+   *   An object containing identifiers required for the form.
+   * @param string $form_id
+   *   The form ID used for setting prefixes and suffixes.
+   */
   public function set_form_data(array &$form, $ids, string $form_id): void
   {
     $this->set_prefix($form,$form_id);
@@ -92,6 +130,15 @@ class FormHelper {
     }
   }
 
+  /**
+   * Sets the AJAX wrapper prefixes and suffixes for the form.
+   *
+   * @param array &$form
+   *   The form array.
+   * @param string $id
+   *   The form ID to use as the AJAX wrapper ID.
+   */
+
   public function set_prefix(array &$form, string $id): void
   {
     $form['#prefix'] = '<div id="'. $id .'">';
@@ -103,9 +150,20 @@ class FormHelper {
   }
 
   /**
+   * Creates a new link entity from provided content and associates it with a box.
+   *
+   * @param EntityInterface $new_content
+   *   The new content entity to link.
+   * @param string $current_box
+   *   The ID of the box to link the content to.
+   *
+   * @return EntityInterface
+   *   The newly created link entity.
+   *
    * @throws EntityStorageException
    */
-  public function create_link(EntityInterface $new_content, String $current_box)
+
+  public function create_link(EntityInterface $new_content, String $current_box): EntityInterface
   {
     //find what item is being created
     $field_name = '';
@@ -147,6 +205,15 @@ class FormHelper {
   }
 
   /**
+   * Updates the content link with new information from form submission.
+   *
+   * @param array &$form
+   *   The form array.
+   * @param FormStateInterface $form_state
+   *   The current state of the form.
+   * @param EntityInterface $current_item
+   *   The content link entity being updated.
+   *
    * @throws EntityStorageException
    */
   public function update_link(array &$form, FormStateInterface $form_state, EntityInterface $current_item): void
@@ -156,6 +223,15 @@ class FormHelper {
     $current_item->set('changed', \Drupal::time()->getRequestTime());
     $current_item->save();
   }
+
+  /**
+   * Determines the field of the current item that is filled.
+   *
+   * @param $current_item
+   *   The current item entity to check.
+   * @return string
+   *   The field name that is filled for the current item.
+   */
 
   public function get_filled_field($current_item): string
   {
@@ -172,6 +248,13 @@ class FormHelper {
     return $filled_field;
   }
 
+  /**
+   * Provides a list of content item field names.
+   *
+   * @return array
+   *   An array of field names for content items.
+   */
+
   public function get_content_items(): array
   {
     return [
@@ -182,6 +265,15 @@ class FormHelper {
     ];
   }
 
+  /**
+   * Deletes the specified pages and optionally their subpages.
+   *
+   * @param EntityInterface $parent
+   *   The parent entity from which pages will be deleted.
+   * @param bool $delete_sub
+   *   Whether to delete subpages of the specified pages.
+   * @throws EntityStorageException
+   */
   public function deletePages($parent, $delete_sub): void
   {
     $this->delete_all_boxes($parent);
@@ -193,10 +285,15 @@ class FormHelper {
         $this->deletePages($page, $delete_sub);
       }
     }
-
     $parent->delete();
   }
 
+  /**
+   * Deletes all boxes associated with a parent entity.
+   *
+   * @param EntityInterface $parent
+   *   The parent entity from which boxes will be deleted.
+   */
   public function delete_all_boxes($parent): void
   {
     $boxes = $parent->get('field_child_boxes')->referencedEntities();
@@ -208,6 +305,12 @@ class FormHelper {
     }
   }
 
+  /**
+   * Deletes a specific box and its content.
+   *
+   * @param EntityInterface $box
+   *   The box entity to delete.
+   */
   public function delete_box($box): void {
     $query = \Drupal::entityQuery('node')
       ->condition('type', 'guide_page')
@@ -223,6 +326,15 @@ class FormHelper {
     $box?->delete();
   }
 
+  /**
+   * Removes a child entity from a parent's field.
+   *
+   * @param $page
+   * @param EntityInterface $child_to_remove
+   *   The child entity to remove.
+   * @param string $field
+   *   The field from which the child will be removed.
+   */
   public function remove_child($page, $child_to_remove, $field): void {
     $children = $page->get($field)->getValue();
 
@@ -234,6 +346,17 @@ class FormHelper {
     $page->save();
   }
 
+  /**
+   * Adds a child entity to a parent's field.
+   *
+   * @param EntityInterface $parent
+   *   The parent entity.
+   * @param EntityInterface $child
+   *   The child entity to add.
+   * @param string $field
+   *   The field to which the child will be added.
+   * @throws EntityStorageException
+   */
   public function add_child(EntityInterface $parent, EntityInterface $child, $field): void
   {
     $page_list = $parent->get($field)->getValue();
@@ -347,6 +470,12 @@ class FormHelper {
     return $options;
   }
 
+  /**
+   * Generates the reorder table for entities.
+   *
+   * @param array &$form The form array to append the reorder table to.
+   * @param mixed $list The list of entities to be reordered.
+   */
   public function get_reorder_table(array &$form, $list): void
   {
     $form['pages_table'] = [
@@ -377,6 +506,13 @@ class FormHelper {
     }
   }
 
+  /**
+   * Processes the reordered list to update the entity storage accordingly.
+   *
+   * @param array $values The form values containing the new order.
+   * @param array $items The original items to reorder.
+   * @return array The reordered items.
+   */
   public function get_new_order($values, $items): array
   {
     $reordered_items = [];
@@ -392,6 +528,17 @@ class FormHelper {
     return $reordered_items;
   }
 
+  /**
+   * Generates a list of options for entity reference fields, optionally grouped.
+   *
+   * @param string $content_type
+   *   The content type of entities to include.
+   * @param string $group_by
+   *   (optional) The field by which to group the options.
+   *
+   * @return array
+   *   An array of options for entity reference fields.
+   */
   public function get_item_options(String $content_type, String $group_by = ''): array
   {
     $query = \Drupal::entityQuery('node')
@@ -432,7 +579,17 @@ class FormHelper {
     return $options;
   }
 
-  public function clone_pages($parent, $new_parent, bool $ref = false){
+  /**
+   * Clones the pages from one guide to another, optionally creating references.
+   *
+   * @param EntityInterface $parent The source guide.
+   * @param EntityInterface $new_parent The destination guide.
+   * @param bool $ref Whether to create references instead of duplicates.
+   * @throws EntityStorageException
+   */
+
+  public function clone_pages($parent, $new_parent, bool $ref = false): void
+  {
     $pages = $parent->get('field_child_pages')->referencedEntities();
 
     $new_page_list = [];
@@ -461,6 +618,13 @@ class FormHelper {
     }
   }
 
+  /**
+   * Clones all boxes from one guide/page to another.
+   *
+   * @param EntityInterface $page The source page.
+   * @param EntityInterface $new_page The destination page.
+   * @throws EntityStorageException
+   */
   public function clone_boxes($page, $new_page): void
   {
     $guide_boxes = $page->get('field_child_boxes')->referencedEntities();

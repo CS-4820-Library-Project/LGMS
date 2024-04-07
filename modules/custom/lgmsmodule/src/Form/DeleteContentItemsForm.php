@@ -2,6 +2,7 @@
 namespace Drupal\lgmsmodule\Form;
 
 use Drupal;
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
@@ -11,13 +12,33 @@ use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Provides a form for deleting content items.
+ *
+ * This form enables users to delete various types of content items from the
+ * system, with a confirmation step to prevent accidental deletions. It is
+ * capable of handling HTML items, Book items, and Database items, adjusting
+ * its behavior based on the item type to ensure proper deletion of both the
+ * item and any associated links or references.
+ */
 class DeleteContentItemsForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'delete_html_form';
   }
 
+  /**
+   * Builds the deletion confirmation form.
+   *
+   * @param array $form An associative array containing the initial structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return array The modified form structure, including the confirmation checkbox and deletion button.
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     $form_helper = new FormHelper();
@@ -81,6 +102,15 @@ class DeleteContentItemsForm extends FormBase {
     return $form;
   }
 
+  /**
+   * Validates the confirmation checkbox.
+   *
+   * Ensures the user has checked the confirmation checkbox to proceed with deletion,
+   * preventing accidental deletions of content.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   */
   public function validateCheckbox(array &$form, FormStateInterface $form_state): void
   {
     // Check if the 'Delete' checkbox is not checked.
@@ -93,6 +123,15 @@ class DeleteContentItemsForm extends FormBase {
 
 
   /**
+   * Handles AJAX submissions for the deletion form.
+   *
+   * Provides a smoother user experience by processing form submissions via AJAX,
+   * allowing for immediate feedback without a full page reload.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response to update the client-side application state.
    * @throws EntityMalformedException
    */
   public function submitAjax(array &$form, FormStateInterface $form_state): Drupal\Core\Ajax\AjaxResponse
@@ -103,6 +142,14 @@ class DeleteContentItemsForm extends FormBase {
   }
 
   /**
+   * Processes the form submission for content item deletion.
+   *
+   * Executes the deletion of the specified content item, including any necessary
+   * cleanup of associated entities or references. This method ensures the item is
+   * properly removed from the system.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
    * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void

@@ -10,14 +10,27 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\node\Entity\Node;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+/**
+ * Provides a form to reuse existing guide items.
+ */
 class ReuseGuideForm extends FormBase
 {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'lgmsmodule_reuse_guide_form';
   }
 
+  /**
+   * Builds the guide reuse form with a select field populated with existing guides.
+   *
+   * @param array $form
+   * @param FormStateInterface $form_state
+   * @return array The form array.
+   */
   public function buildForm(array $form, FormStateInterface $form_state): array
   {
     // Set the prefix, suffix, and hidden fields
@@ -44,8 +57,14 @@ class ReuseGuideForm extends FormBase
   }
 
   /**
-   * @throws EntityStorageException
+   * Handles the form submission to duplicate the selected guide.
+   *
+   * Clones the selected guide and all its associated content, like guide boxes and pages, setting up a new guide with the same structure and content but under a new title and ownership.
+   *
+   * @param array &$form
+   * @param FormStateInterface $form_state
    * @throws EntityMalformedException
+   * @throws EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {

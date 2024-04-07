@@ -5,18 +5,40 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Entity\EntityMalformedException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+/**
+ * Form for creating new guide box entities.
+ *
+ * Provides a simple form within the lgmsmodule for creating box entities that
+ * can be associated with a guide. These box entities can hold various types of
+ * content and are intended to structure guide content into manageable sections.
+ */
 class CreateGuideBoxForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'create_guide_box_form';
   }
 
+  /**
+   * Builds the create guide box form.
+   *
+   * @param array $form An associative array containing the initial structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   * @param mixed $ids Optional identifiers for form construction, typically including
+   *                   the parent node ID and other contextual data.
+   *
+   * @return array The modified form structure including fields for the box title
+   *               and publication status.
+   */
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
   {
     // Set the prefix, suffix, and hidden fields
@@ -49,6 +71,16 @@ class CreateGuideBoxForm extends FormBase {
   }
 
   /**
+   * AJAX callback for the form submission.
+   *
+   * Handles the form submission using AJAX to provide a smoother user experience.
+   * On success, it provides feedback and may update the user interface to reflect
+   * the newly created box entity.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response object to handle client-side updates.
    * @throws EntityMalformedException
    */
   public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
@@ -58,6 +90,18 @@ class CreateGuideBoxForm extends FormBase {
     return $ajaxHelper->submitModalAjax($form, $form_state, 'Box created successfully.', '#'.$this->getFormId());
   }
 
+  /**
+   * Processes the guide box creation form submission.
+   *
+   * Takes the input from the form, validates it, and uses it to create a new
+   * guide box node entity. It associates this box with its parent guide and
+   * updates related entities as necessary.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The state of the form.
+   *
+   * @throws EntityStorageException If there is an issue saving the box entity.
+   */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
     // Get the current page

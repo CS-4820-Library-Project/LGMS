@@ -1,6 +1,7 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
@@ -8,13 +9,33 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 
+/**
+ * Provides a form for adding or editing HTML content items.
+ *
+ * This form allows users to input and save HTML content as part of custom content
+ * structures within the site, like guides or tutorials. It supports creating new
+ * HTML items or editing existing ones, with features to save as draft or publish.
+ */
 class AddHTMLForm extends FormBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId(): string
   {
     return 'add_html_form';
   }
 
+  /**
+   * Builds the HTML item add/edit form.
+   *
+   * @param array $form An associative array containing the structure of the form.
+   * @param FormStateInterface $form_state The current state of the form.
+   * @param mixed $ids Optional parameters for form construction, such as the
+   *                   IDs of items to edit.
+   *
+   * @return array The form structure.
+   */
   public function buildForm(array $form, FormStateInterface $form_state, $ids = null): array
   {
     // Set the prefix, suffix, and hidden fields
@@ -67,9 +88,20 @@ class AddHTMLForm extends FormBase {
   }
 
   /**
-   * @throws EntityMalformedException
+   * AJAX form submission handler.
+   *
+   * Provides an AJAX callback for the form submission, enabling a more dynamic
+   * and responsive user interface.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @return AjaxResponse An AJAX response that can include
+   *                                        commands like modal close and re-render.
+   * @throws EntityMalformedException If the form submission encounters an
+   *                                   entity related error.
    */
-  public function submitAjax(array &$form, FormStateInterface $form_state): \Drupal\Core\Ajax\AjaxResponse
+  public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
 
@@ -77,7 +109,16 @@ class AddHTMLForm extends FormBase {
   }
 
   /**
-   * @throws EntityStorageException
+   * Handles the submission of the HTML form.
+   *
+   * Processes the form values to either create a new HTML item node or update an
+   * existing one. It ensures all HTML content is properly saved and linked within
+   * the system.
+   *
+   * @param array &$form The form array.
+   * @param FormStateInterface $form_state The current state of the form.
+   *
+   * @throws EntityStorageException If there's an issue saving the HTML content item.
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void
   {
