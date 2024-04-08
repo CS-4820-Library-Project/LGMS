@@ -248,6 +248,18 @@ function lgmsmodule_entity_delete(EntityInterface $entity): void
  */
 function lgmsmodule_node_update(NodeInterface $node): void
 {
+  if ($node->bundle() === 'guide_book_item' || $node->bundle() === 'guide_html_item' || $node->bundle() === 'guide_database_item') {
+    // Load the parent entity.
+    $parent_entity = $node->get('field_parent_item')->entity;
+    if ($parent_entity) {
+      \Drupal::service('cache_tags.invalidator')->invalidateTags([$parent_entity->id()]);
+
+      $parent_entity = $parent_entity->get('field_parent_box')->entity;
+      if ($parent_entity) {
+        \Drupal::service('cache_tags.invalidator')->invalidateTags([$parent_entity->id()]);
+      }
+    }
+  }
 
   if($node->bundle() === 'guide_page'){
     // Check if the entity is a 'guide_page' and has the field 'field_reference_node'.
@@ -976,6 +988,8 @@ function box_display(EntityInterface $entity, EntityInterface $box)
     ],
     'body' => $guide_box_build,
   ];
+
+  $build['#cache']['tags'][] = $box->id();
 
   return $build;
 }
