@@ -2,13 +2,16 @@
 
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Form handler for deleting a single page or an entire guide.
@@ -19,6 +22,23 @@ use Drupal\node\Entity\Node;
  * message based on whether a guide or a single page is being deleted.
  */
 class DeletePageForm extends FormBase{
+
+  /**
+   * Checks if the user can edit their own article.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param \Drupal\Core\Session\AccountInterface $account
+   * @return \Drupal\Core\Access\AccessResult
+   */
+  public function access(Request $request, AccountInterface $account) {
+    $nid = $request->query->get('guide_id');
+    $node = Node::load($nid);
+
+    if ($node && $node->getType() == 'guide' && $node->access('delete')) {
+      return AccessResult::allowed();
+    }
+    return AccessResult::forbidden();
+  }
 
   /**
    * {@inheritdoc}
