@@ -126,7 +126,7 @@ class LgmsGuidePageViewBlock extends BlockBase {
       $page_item = [];
     }
 
-    if (\Drupal::currentUser()->hasPermission('create guide_page content')) {
+    if ($current_guide->access('update')) {
       // Generate the URL for the custom form route, including the query parameter for the current guide.
       $array_of_objects = [(object)['name' => 'Create Guide Page', 'form' => 'CreateGuidePageForm'],(object) ['name' => 'Reuse Guide Page', 'form' => 'ReuseGuidePageForm']];
       $json_data = json_encode($array_of_objects);
