@@ -33,6 +33,8 @@ class HelpGuide extends ControllerBase {
       'type' => $type,
       'title' => $title,
     ], $fields));
+
+    $node->set('promote', 0);
     $node->save();
     return $node;
   }
