@@ -242,7 +242,7 @@ class ReuseGuidePageForm extends FormBase {
 
     // The user is making a copy
     if(!$form_state->getValue('reference')){
-      $new_page = $page->createDuplicate(); //$this->copyPage($page, $parent, $form_state->getValue('title'));
+      $new_page = $page->createDuplicate();
       $new_page->setOwnerId(\Drupal::currentUser()->id());
       $new_page->setTitle($form_state->getValue('title'));
       $new_page->set('field_child_pages', []);
