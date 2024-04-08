@@ -64,14 +64,7 @@ class AddHTMLForm extends FormBase {
       '#format' => $edit ? $current_html->get('field_text_box_item2')->format : 'basic_html',
     ];
 
-    // Draft mode Field
-    $form['published'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Draft mode:'),
-      '#description' => $edit && !$current_html->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
-      '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
-      '#disabled' => $edit && !$current_html->isPublished(),
-    ];
+    $form_helper->draft_field($form,$form_state, $current_html, $current_item, $edit);
 
     // Create submit button and attach ajax method to it
     $form['actions']['submit'] = [

@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\menu_test\Access\AccessCheck;
 use Drupal\node\Entity\Node;
@@ -123,13 +124,7 @@ class AddDatabaseForm extends FormBase {
       ],
     ];
 
-    $form['published'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Draft mode:'),
-      '#description' => $edit && !$current_database->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
-      '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
-      '#disabled' => $edit && !$current_database->isPublished(),
-    ];
+    $form_helper->draft_field($form,$form_state, $current_database, $current_item, $edit);
 
     $form['#validate'][] = '::validateFields';
 

@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -702,5 +703,28 @@ class FormHelper {
     $new_box->set('field_box_items', $new_items_list);
     $new_box->save();
 
+  }
+
+  public function draft_field(array &$form, FormStateInterface $form_state,  $content, $item, bool $edit)
+  {
+    if ($edit && !$content->isPublished()){
+      // Create a URL object for the current book's canonical page.
+      $url = Url::fromRoute('entity.node.canonical', ['node' => $content->id()]);
+      // Create a Link object from the URL and set the link text.
+      $link = Link::fromTextAndUrl(t('Please publish the original node'), $url)->toString();
+      // Set the description with the link included.
+      $description = $link;
+    } else {
+      // If not editing or the current book is published, set a generic description.
+      $description = t('Un-check this box to publish.');
+    }
+
+    $form['published'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Draft mode'),
+      '#description' => $description,
+      '#default_value' => $edit ? !$item->isPublished() : 0,
+      '#disabled' => $edit && !$content->isPublished(),
+    ];
   }
 }
