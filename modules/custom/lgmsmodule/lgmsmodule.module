@@ -912,7 +912,7 @@ function box_display(EntityInterface $entity, EntityInterface $box)
         '#value' => $box->label(),
         '#attributes' => ['class' => ['guide-box-title ' . $unpublished_class]],
       ],
-      'icons' => $entity !== $box && $entity->access('update')?[
+      'icons' => $entity !== $box && $entity->access('update') && ((!$entity->hasField('field_reference_node') ||$entity->get('field_reference_node')->isEmpty()))?[
         '#type' => 'html_tag',
         '#tag' => 'div',
         '#attributes' => [
