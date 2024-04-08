@@ -1,13 +1,16 @@
 <?php
 namespace Drupal\lgmsmodule\Form;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Form handler for editing a guide box.
@@ -17,6 +20,24 @@ use Drupal\node\Entity\Node;
  * appropriate parent guide for editing.
  */
 class EditGuideBoxForm extends FormBase {
+
+  /**
+   * Checks if the user can edit their own article.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param \Drupal\Core\Session\AccountInterface $account
+   * @return \Drupal\Core\Access\AccessResult
+   */
+  public function access(Request $request, AccountInterface $account) {
+    $nid = $request->query->get('current_box');
+    $node = Node::load($nid);
+
+    if ($node && $node->getType() == 'guide_box' && $node->access('update')) {
+      return AccessResult::allowed();
+    }
+    return AccessResult::forbidden();
+  }
+
 
   /**
    * {@inheritdoc}

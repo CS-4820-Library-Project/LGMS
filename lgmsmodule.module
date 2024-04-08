@@ -344,7 +344,6 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
   ];
 
   $edit_route = '';
-  $delete_route = '';
 
   if ($item->hasField('field_html_item') && !$item->get('field_html_item')->isEmpty()) {
     $html_item = $item->get('field_html_item')->entity;
@@ -359,7 +358,6 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $item_container['content'][] = html_display($html_item, false);
 
     $edit_route = 'AddHTMLForm';
-    $delete_route = 'delete_html.form';
   } elseif ($item->hasField('field_book_item') && !$item->get('field_book_item')->isEmpty()) {
     $book_item = $item->get('field_book_item')->entity;
 
@@ -373,7 +371,6 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     $item_container['content'][] = book_display($book_item, false);
 
     $edit_route = 'AddBookForm';
-    $delete_route = 'delete_book.form';
   } elseif ($item->hasField('field_database_item') && !$item->get('field_database_item')->isEmpty()) {
     $database = $item->get('field_database_item')->entity;
 
@@ -411,7 +408,6 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     }
 
     $edit_route = 'AddDatabaseForm';
-    $delete_route = 'delete_database.form';
   } elseif ($item->hasField('field_media_image') && !$item->get('field_media_image')->isEmpty()) {
     $media = $item->get('field_media_image')->entity;
     $media_type = $media->bundle();
@@ -524,10 +520,9 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
     }
 
     $edit_route = 'add_media.form';
-    $delete_route = 'delete_media.form';
   }
 
-  if(!empty($edit_route) && !empty($delete_route) && (($item->access('update') && (!$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()) && $entity->id() === $box->get('field_parent_node')->entity->id()) || ($entity->id() == $box->id()))) {
+  if(!empty($edit_route) && (($item->access('update') && (!$entity->hasField('field_reference_node') || $entity->get('field_reference_node')->isEmpty()) && $entity->id() === $box->get('field_parent_node')->entity->id()) || ($entity->id() == $box->id()))) {
     if ($box->id() === $item->get('field_parent_box')->entity->id()){
       $ids = [ 'current_node' => $entity->id(), 'current_box' => $box->id(), 'current_item' => $item->id()];
       $json_data = json_encode($ids);
@@ -588,7 +583,7 @@ function build_item(EntityInterface $entity, EntityInterface $box, EntityInterfa
       }
     }
 
-    $url = Url::fromRoute($delete_route, [], ['query' => [
+    $url = Url::fromRoute('delete_box_item.form', [], ['query' => [
       'current_node' => $entity->id(),
       'current_box' => $box->id(),
       'current_item' => $item->id()]
