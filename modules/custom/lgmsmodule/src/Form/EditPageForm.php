@@ -10,7 +10,9 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -157,10 +159,15 @@ class EditPageForm extends FormBase {
       // if it's a reference check if the page it references is published
       $disable = !$selected_node->get('field_reference_node')->isEmpty() && !$selected_node->get('field_reference_node')->entity->isPublished();
 
+      if($disable){
+        $url = Url::fromRoute('entity.node.canonical', ['node' => $selected_node->get('field_reference_node')->entity->id()]);
+        $link = Link::fromTextAndUrl(t('The Linked page is unPublished. Publish it to be able to update this Page.'), $url)->toString();
+      }
+
       $form['update_wrapper']['draft_mode'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Draft Mode'),
-        '#description' => $disable? $this->t('The Linked page is unPublished. Publish it to be able to update this Page.') : $this->t('Check this box if the page is still in draft mode.'),
+        '#description' => $disable? $link : $this->t('Check this box if the page is still in draft mode.'),
         '#default_value' => !$selected_node->isPublished(),
         '#disabled' => $disable,
       ];

@@ -7,6 +7,8 @@ use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Exception;
@@ -228,13 +230,7 @@ class AddBookForm extends FormBase {
       ]
     );
 
-    $form['published'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Draft mode'),
-      '#description' => $edit && !$current_book->isPublished() ? $this->t('Please publish the original node') : $this->t('Un-check this box to publish.'),
-      '#default_value' => $edit ? $current_item->isPublished() == '0': 0,
-      '#disabled' => $edit && !$current_book->isPublished(),
-    ];
+    $form_helper->draft_field($form,$form_state, $current_book, $current_item, $edit);
 
     $form['#validate'][] = '::validateFields';
 

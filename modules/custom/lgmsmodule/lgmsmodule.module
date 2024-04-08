@@ -1676,7 +1676,7 @@ function lgmsModule_install(): void
       'uri_scheme' => 'public',
       'file_extensions' => 'png jpg jpeg'
     ],
-    [], 'image_image', ['progress_indicator' => 'throbber'], TRUE, FALSE, 5, ''
+    [], 'image_image', ['progress_indicator' => 'throbber'], TRUE, FALSE, 5, '', false
   );
 
   createField('field_book_description', 'node', 'guide_book_item', 'Description',
