@@ -104,8 +104,13 @@ class AddHTMLForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
+    $message = 'A HTML item has been added.';
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'an HTML field has been added.', '#'.$this->getFormId());
+    if ($form_state->getValue('current_item')){
+      $message = 'A HTML item has been edited.';
+    }
+
+    return $ajaxHelper->submitModalAjax($form, $form_state, $message, '#'.$this->getFormId());
   }
 
   /**
