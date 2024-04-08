@@ -106,7 +106,7 @@ class AddMediaForm extends FormBase {
       '#attributes' => ['id' => 'update-wrapper'],
     ];
 
-    if ($form_state->getValue('media')){
+    if ($form_state->getValue('media') || $media){
       $form['update_wrapper']['include_title'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Use Media Default name'),
