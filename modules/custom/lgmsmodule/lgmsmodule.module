@@ -1082,41 +1082,43 @@ function lgmsmodule_node_view(array &$build, EntityInterface $entity, EntityView
           ],
         ];
 
-        $icons['edit_icon'] = [
-          '#type' => 'link',
-          '#title' => [
-            '#type' => 'html_tag',
-            '#tag' => 'i',
-            '#attributes' => [
-              'class' => ['fa', 'fa-edit'],
-              'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 12px; margin-top: 11px;' : 'margin: 32px;',
+        if($entity->access('update')){
+          $icons['edit_icon'] = [
+            '#type' => 'link',
+            '#title' => [
+              '#type' => 'html_tag',
+              '#tag' => 'i',
+              '#attributes' => [
+                'class' => ['fa', 'fa-edit'],
+                'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 12px; margin-top: 11px;' : 'margin: 32px;',
+              ],
             ],
-          ],
-          '#url' => Url::fromRoute('edit_guide.form', ['guide_id' => $entity->id()]),
-          '#attributes' => [
-            'class' => ['use-ajax'],
-            'data-dialog-type' => 'modal',
-            'data-dialog-options' => json_encode(['width' => 700]),
-          ],
-        ];
+            '#url' => Url::fromRoute('edit_guide.form', ['guide_id' => $entity->id()]),
+            '#attributes' => [
+              'class' => ['use-ajax'],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => json_encode(['width' => 700]),
+            ],
+          ];
 
-        $icons['delete_icon'] = [
-          '#type' => 'link',
-          '#title' => [
-            '#type' => 'html_tag',
-            '#tag' => 'i',
-            '#attributes' => [
-              'class' => ['fa', 'fa-trash'],
-              'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
+          $icons['delete_icon'] = [
+            '#type' => 'link',
+            '#title' => [
+              '#type' => 'html_tag',
+              '#tag' => 'i',
+              '#attributes' => [
+                'class' => ['fa', 'fa-trash'],
+                'style' => \Drupal::currentUser()->isAuthenticated() ? 'margin-right: 48px; margin-top: 11px;' : 'margin: 32px;',
+              ],
             ],
-          ],
-          '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['guide_id' => $entity->id()]),
-          '#attributes' => [
-            'class' => ['use-ajax'],
-            'data-dialog-type' => 'modal',
-            'data-dialog-options' => json_encode(['width' => 700]),
-          ],
-        ];
+            '#url' => Url::fromRoute('lgmsmodule.delete_guide', ['guide_id' => $entity->id()]),
+            '#attributes' => [
+              'class' => ['use-ajax'],
+              'data-dialog-type' => 'modal',
+              'data-dialog-options' => json_encode(['width' => 700]),
+            ],
+          ];
+        }
       }
 
     }
