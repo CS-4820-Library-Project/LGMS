@@ -68,7 +68,7 @@ class AllGuidesController extends ControllerBase
       }
 
       // if the user is authenticated
-      if (\Drupal::currentUser()->isAuthenticated()) {
+      if (\Drupal::currentUser()->hasPermission('access dashboard')) {
         // Add a container
         $build['top_row'] = [
           '#type' => 'container',
