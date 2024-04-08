@@ -207,7 +207,8 @@ class PrintGuide extends ControllerBase {
 
 
     // Type-specific information: 'print' or others
-    $bookTypeName = $entity->get('field_book_type');
+    $bookTypeName = $entity->get('field_book_type')->value;
+
     if ($bookTypeName === 'print') {
       // Location and Call Number for print books
       $location = htmlspecialchars($entity->get('field_book_location')->value);
