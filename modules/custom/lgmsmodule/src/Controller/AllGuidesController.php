@@ -97,6 +97,14 @@ class AllGuidesController extends ControllerBase
       ];
     }
 
+    $build['#cache'] = [
+      'tags' => ['node_list:guide'], // Invalidate when guides are added, removed, or updated.
+      'contexts' => [
+        'user.roles:authenticated', // Different cache for authenticated vs. anonymous users.
+      ],
+      'max-age' => 3600,
+    ];
+
     return $build;
   }
 }

@@ -279,24 +279,24 @@ class EditPageForm extends FormBase {
         'format' => $form_state->getValue('description')['format'],
       ]);
       $form_state->getValue('draft_mode') == '0'? $selected_page->setPublished(): $selected_page->setUnpublished();
+    }
 
-      // If the position has changed
-      if($selected_page->hasField('field_parent_guide') && $form_state->getValue('position') != $selected_page->get('field_parent_guide')->entity->id()){
-        $parent = $selected_page->get('field_parent_guide')->entity;
+    // If the position has changed
+    if($selected_page->hasField('field_parent_guide') && $form_state->getValue('position') != $selected_page->get('field_parent_guide')->entity->id()){
+      $parent = $selected_page->get('field_parent_guide')->entity;
 
-        // Remove the selected page from the old position
-        $ajaxHelper->remove_child($parent, $selected_page, 'field_child_pages');
+      // Remove the selected page from the old position
+      $ajaxHelper->remove_child($parent, $selected_page, 'field_child_pages');
 
-        // Load the new position
-        $new_parent = Node::load($form_state->getValue('position'));
+      // Load the new position
+      $new_parent = Node::load($form_state->getValue('position'));
 
-        // Set the new position as the parent
-        $selected_page->set('field_parent_guide', $new_parent);
-        $selected_page->save();
+      // Set the new position as the parent
+      $selected_page->set('field_parent_guide', $new_parent);
+      $selected_page->save();
 
-        // Add the page to the new position's children
-        $ajaxHelper->add_child($new_parent, $selected_page, 'field_child_pages');
-      }
+      // Add the page to the new position's children
+      $ajaxHelper->add_child($new_parent, $selected_page, 'field_child_pages');
     }
 
     // Update Parents
