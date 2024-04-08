@@ -681,7 +681,7 @@ class FormHelper {
       if ($copy_content){
         $field = $this->get_filled_field($item);
 
-        if ($field != '	field_media_image'){
+        if ($field != 'field_media_image'){
           $content = $item->get($field)->entity;
           $new_content = $content->createDuplicate();
           $new_content->setOwnerId(\Drupal::currentUser()->id());
