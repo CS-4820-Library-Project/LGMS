@@ -2153,6 +2153,25 @@ function lgmsModule_uninstall(): void
   delete_field_storage('field_book_cat_record');
   delete_field_storage('field_book_pub_finder');
   delete_field_storage('field_book_item');
+  delete_field_storage('field_lgms_user_subjects');
+  delete_field_storage('field_lgms_body');
+  delete_field_storage('field_database_body');
+  delete_field_storage('field_hide_body');
+  delete_field_storage('field_make_proxy');
+  delete_field_storage('field_text_box_item2');
+  delete_field_storage('field_parent_item');
+  delete_field_storage('field_lgms_reference');
+  delete_field_storage('field_database_item');
+  delete_field_storage('field_hide_description');
+  delete_field_storage('field_child_pages');
+  delete_field_storage('field_child_boxes');
+  delete_field_storage('field_parent_guide');
+  delete_field_storage('field_reference_node');
+  delete_field_storage('field_box_items');
+  delete_field_storage('field_parent_box');
+  delete_field_storage('field_media_image');
+  delete_field_storage('field_html_item');
+
 
   $content_type = NodeType::load('guide');
   $content_type?->delete();
