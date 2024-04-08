@@ -289,6 +289,7 @@ class EditGuideForm extends FormBase {
 
     try {
       $guide->save();
+      $form_state->setRedirect('entity.node.canonical', ['node' => $guide->id()]);
     } catch (EntityStorageException $e) {
       \Drupal::messenger()->addError($this->t('An error occurred while saving the guide.'));
       \Drupal::logger('lgmsmodule')->error($e->getMessage());
