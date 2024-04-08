@@ -169,7 +169,7 @@ class ReuseHTMLItemForm extends FormBase {
    * @return AjaxResponse
    *   The AJAX response.
    */
-  public function htmlItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state): AjaxResponse
+  public function htmlItemSelectedAjaxCallback(array &$form, FormStateInterface $form_state)
   {
     // Load the selected html
     $selected = $form_state->getValue('html_select');

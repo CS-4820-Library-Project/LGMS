@@ -608,7 +608,7 @@ class FormHelper {
       $cloned_page->setOwnerId(\Drupal::currentUser()->id());
       $cloned_page->save();
 
-      $this->clone_boxes($page, $cloned_page);
+      $this->clone_boxes($page, $cloned_page, !$ref);
       $this->clone_pages($page, $cloned_page);
 
       $new_page_list[] = ['target_id' => $cloned_page->id()];
@@ -628,7 +628,7 @@ class FormHelper {
    * @param EntityInterface $new_page The destination page.
    * @throws EntityStorageException
    */
-  public function clone_boxes($page, $new_page): void
+  public function clone_boxes($page, $new_page, bool $copy_content = true): void
   {
     $guide_boxes = $page->get('field_child_boxes')->referencedEntities();
 
@@ -641,30 +641,12 @@ class FormHelper {
         $cloned_box = $box->createDuplicate();
         $cloned_box->set('field_parent_node', $new_page->id());
         $cloned_box->set('promote', 0);
+        $cloned_box->setOwnerId(\Drupal::currentUser()->id());
         $cloned_box->save();
 
         $new_box_list[] = ['target_id' => $cloned_box->id()];
 
-        $new_items_list = [];
-        $items = $box->get('field_box_items')->referencedEntities();
-
-        foreach ($items as $item){
-          // Create a copy of the item and update it's owner
-          $new_item = $item->createDuplicate();
-          $new_item->set('field_parent_box', $cloned_box);
-          $new_item->set('promote', 0);
-          $new_item->set('field_lgms_reference', TRUE);
-          $new_item->setOwnerId(\Drupal::currentUser()->id());
-
-          // Add the item to the list
-          $new_item->save();
-          $new_items_list[] = $new_item;
-        }
-
-        // Save the list of items
-        $cloned_box->set('field_box_items', $new_items_list);
-        $cloned_box->setOwnerId(\Drupal::currentUser()->id());
-        $cloned_box->save();
+        $this->clone_items($box, $cloned_box, $copy_content);
       }
     }
 
@@ -673,5 +655,52 @@ class FormHelper {
       $new_page->set('field_child_boxes', $new_box_list);
       $new_page->save();
     }
+  }
+
+  /**
+   * Clones all boxes from one guide/page to another.
+   *
+   * @param EntityInterface $box The source page.
+   * @param EntityInterface $new_box The destination page.
+   * @throws EntityStorageException
+   */
+  public function clone_items(EntityInterface $box, EntityInterface $new_box, bool $copy_content): void
+  {
+    $items = $box->get('field_box_items')->referencedEntities();
+    $new_items_list = [];
+
+    foreach ($items as $item){
+      // Create a copy of the item and update its owner
+      $new_item = $item->createDuplicate();
+      $new_item->set('field_parent_box', $new_box);
+      $new_item->set('promote', 0);
+      $new_item->set('field_lgms_reference', TRUE);
+      $new_item->setOwnerId(\Drupal::currentUser()->id());
+      $new_item->save();
+
+      if ($copy_content){
+        $field = $this->get_filled_field($item);
+
+        if ($field != '	field_media_image'){
+          $content = $item->get($field)->entity;
+          $new_content = $content->createDuplicate();
+          $new_content->setOwnerId(\Drupal::currentUser()->id());
+          $new_content->set('field_parent_item', $new_item);
+          $new_content->save();
+
+          $new_item->set($field, $new_content);
+          $new_item->set('field_lgms_reference', 0);
+          $new_item->save();
+        }
+      }
+
+      // Add the item to the list
+      $new_items_list[] = $new_item;
+    }
+
+    // Save the list of items
+    $new_box->set('field_box_items', $new_items_list);
+    $new_box->save();
+
   }
 }
