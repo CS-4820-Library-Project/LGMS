@@ -302,8 +302,13 @@ class AddBookForm extends FormBase {
   public function submitAjax(array &$form, FormStateInterface $form_state): AjaxResponse
   {
     $ajaxHelper = new FormHelper();
+    $message = 'A Book item has been added.';
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'A Book item has been created.', '#'.$this->getFormId());
+    if ($form_state->getValue('current_item')){
+      $message = 'A Book item has been edited.';
+    }
+
+    return $ajaxHelper->submitModalAjax($form, $form_state, $message, '#'.$this->getFormId());
   }
 
   /**

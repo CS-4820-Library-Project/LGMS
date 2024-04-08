@@ -204,7 +204,13 @@ class AddMediaForm extends FormBase {
   {
     $ajaxHelper = new FormHelper();
 
-    return $ajaxHelper->submitModalAjax($form, $form_state, 'A Media item has been added.', '#'.$this->getFormId());
+    $message = 'A Media item has been added.';
+
+    if ($form_state->getValue('current_item')){
+      $message = 'A Media item has been edited.';
+    }
+
+    return $ajaxHelper->submitModalAjax($form, $form_state, $message, '#'.$this->getFormId());
   }
 
   /**
