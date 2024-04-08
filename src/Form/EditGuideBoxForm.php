@@ -86,8 +86,9 @@ class EditGuideBoxForm extends FormBase {
       $form['published'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Draft mode:'),
-        '#description' => $this->t('Un-check this box to publish.'),
-        '#default_value' => !$current_box->isPublished(),
+        '#description' => !$current_node->isPublished() ? $this->t('Please publish the page First') : $this->t('Un-check this box to publish.'),
+        '#default_value' => $current_box->isPublished() == '0',
+        '#disabled' => !$current_node->isPublished(),
       ];
 
     } else {
