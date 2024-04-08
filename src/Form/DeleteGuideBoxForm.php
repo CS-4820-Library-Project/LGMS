@@ -32,10 +32,10 @@ class DeleteGuideBoxForm extends FormBase {
    * @return \Drupal\Core\Access\AccessResult
    */
   public function access(Request $request, AccountInterface $account) {
-    $nid = $request->query->get('current_box');
+    $nid = $request->query->get('current_node');
     $node = Node::load($nid);
 
-    if ($node && $node->getType() == 'guide_box' && $node->access('delete')) {
+    if ($node && ($node->getType() == 'guide' || $node->getType() == 'guide_page') && $node->access('update')) {
       return AccessResult::allowed();
     }
     return AccessResult::forbidden();
